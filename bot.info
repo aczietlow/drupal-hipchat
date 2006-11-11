@@ -1,0 +1,4 @@
+; $Id$
+name = Bot
+package = Bot
+description = Enables a network and plugin framework for IRC bots.

@@ -1,0 +1,4 @@
+// $Id$
+
+2006, November:
+ * Initial proof of concept release.
