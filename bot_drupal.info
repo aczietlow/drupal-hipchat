@@ -1,0 +1,5 @@
+; $Id$
+name = Bot Drupal
+package = Bot
+dependencies = bot
+description = Enables various Drupal developer friendly actions.

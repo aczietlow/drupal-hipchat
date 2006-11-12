@@ -5,6 +5,9 @@ CONTENTS OF THIS FILE
 
  * Introduction
  * Installation
+ * IRC API Hooks
+ * Cache Warning
+ * Design Decisions
 
 
 INTRODUCTION
@@ -51,3 +54,55 @@ entails running the bot through a shell NOT through web browser access.
 
 5. Your bot is now started and is trying to connect.
 
+
+IRC API HOOKS
+-------------
+
+The following message types are supported by Net_SmartIRC:
+
+  UNKNOWN     CHANNEL  QUERY     CTCP         NOTICE        WHO
+  JOIN        INVITE   ACTION    TOPICCHANGE  NICKCHANGE    KICK
+  QUIT        LOGIN    INFO      LIST         NAME          MOTD
+  MODECHANGE  PART     ERROR     BANLIST      TOPIC         NONRELEVANT
+  WHOIS       WHOWAS   USERMODE  CHANNELMODE  CTCP_REQUEST  CTCP_REPLY
+
+A module may create a function in the form of:
+
+  MODULENAME_irc_msg_MESSAGETYPE
+
+such that a module named "bot_example" could respond or act upon all channel
+messages with a function called bot_example_irc_msg_channel(). Passed to
+this function is $data, an object reference that contains the message, who
+said it, in what channel, and more.
+
+Modules can respond to the user or channel with bot_message($to, $message),
+where $to is either a channel name ("#drupal") or user ("Morbus Iff"). Other
+IRC actions are demonstrated in the modules shipped with this package. In a
+worse case scenario (ie., there's no helper function in bot.module that will
+accomplish your desired tasks), you can use "global $irc;" to get the actual
+Net_SmartIRC object that represents the IRC connection. Under the most ideal
+conditions, you'd contribute back a patch to bot.module that'd let you
+accomplish your needs without using the $irc global.
+
+
+CACHE WARNING
+-------------
+
+Since the IRC bot runs forever, some of Drupal's internal caching mechanisms
+(such as variable_get) actually flummox regular operation. We are still working
+on workarounds for these (normally desired) features.
+
+
+DESIGN DECISIONS
+----------------
+
+ * We do not enforce command prefixes such as !.
+
+ * We do not enforce direct addressing like "botname: <command>".
+
+Since the entire raw IRC message is passed off to each module, you are more
+than welcome to enforce either of the above in your own code. Note that you
+WILL have to insure that "botname: <command>" and simply "<command>" both do
+as you'd expect - we do not remove "botname:" from the start of messages (and
+thus a simple test of "^command$" will fail if the bot is addressed). Most
+of our shipped modules cater to these two possibilities.

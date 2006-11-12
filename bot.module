@@ -48,8 +48,17 @@ function bot_menu($may_cache) {
   return $items;
 }
 
-function bot_message($type, $to, $message) {
-  global $irc; // Net_SmartIRC object created in bot_start.php.
+/**
+ * Send a message to a channel or user.
+ *
+ * @param $to
+ *   A channel or user.
+ * @param $message
+ *   The message string to send.
+ */
+function bot_message($to, $message) {
+  global $irc; // from bot_start.php.
+  $type = strpos($to, '#') == 0 ? 'CHANNEL' : 'QUERY';
   $irc->message(constant('SMARTIRC_TYPE_'.$type), $to, $message);
 }
 
