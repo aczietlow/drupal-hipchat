@@ -1,0 +1,5 @@
+; $Id$
+name = Bot Join
+package = Bot
+dependencies = bot
+description = Allows IRC commands to control the bot's channel list.

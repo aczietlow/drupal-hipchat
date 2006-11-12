@@ -1,0 +1,34 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Allows IRC commands to control the bot's channel list.
+ */
+
+/**
+ * Implementation of hook_help().
+ */
+function bot_version_help($section) {
+  switch ($section) {
+    case '':
+      return '';
+  }
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function bot_version_menu($may_cache) {
+  $items = array();
+
+  if ($may_cache) {
+
+  }
+
+  return $items;
+}
+
+function bot_version_irc_msg_join($data) {
+  //bot_message('CHANNEL', $data->channel, $data->nick.': you just joined!');
+}
