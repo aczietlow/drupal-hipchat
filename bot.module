@@ -40,11 +40,16 @@ function bot_menu($may_cache) {
     );
   }
 
+  // minor CSS width fix for module names with more than one word.
+  if (arg(0) == 'admin' && arg(1) == 'build' && arg(2) == 'modules') {
+    drupal_add_css(drupal_get_path('module', 'bot') .'/bot.css');
+  }
+
   return $items;
 }
 
 function bot_message($type, $to, $message) {
-  global $irc; // Net_SmartIRC object created in run_bot.php.
+  global $irc; // Net_SmartIRC object created in bot_start.php.
   $irc->message(constant('SMARTIRC_TYPE_'.$type), $to, $message);
 }
 
