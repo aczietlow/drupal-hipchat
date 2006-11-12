@@ -1,5 +1,0 @@
-; $Id$
-name = Bot Version
-package = Bot
-dependencies = bot
-description = A plugin that reports version numbers for various components.
