@@ -1,4 +1,6 @@
 // $Id$
 
 2006, November:
+ * Removed layer of abstraction from the hook system.
+ * Renamed some files, got rid of bot_version.module.
  * Initial proof of concept release.

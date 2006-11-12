@@ -43,11 +43,6 @@ function bot_menu($may_cache) {
   return $items;
 }
 
-
-function bot_invoke_irc_msg_channel($data) {
-  module_invoke_all('irc_msg_channel', $data);
-}
-
 function bot_message($type, $to, $message) {
   global $irc; // Net_SmartIRC object created in run_bot.php.
   $irc->message(constant('SMARTIRC_TYPE_'.$type), $to, $message);
@@ -67,7 +62,7 @@ function bot_settings() {
   );
   $form['bot_server_port'] = array(
     '#default_value' => variable_get('bot_server_port', 6667),
-    '#description'   => t('Enter the IRC port of the IRC server. 6667 is the commonest configuration.'),
+    '#description'   => t('Enter the IRC port of the IRC server. 6667 is the most common configuration.'),
     '#title'         => t('IRC server port'),
     '#type'          => 'textfield',
   );
