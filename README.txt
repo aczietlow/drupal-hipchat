@@ -106,3 +106,12 @@ WILL have to insure that "botname: <command>" and simply "<command>" both do
 as you'd expect - we do not remove "botname:" from the start of messages (and
 thus a simple test of "^command$" will fail if the bot is addressed). Most
 of our shipped modules cater to these two possibilities.
+
+This is an IRC bot... in PHP. PHP is not especially awesome with regards to
+memory management, and it certainly wasn't intended to run a script for any
+respectable period of time (like, say, longer than the default 30 seconds).
+Likewise, there's no way to uninclude a file, so any change to the loaded
+modules (either codewise or enabled/disabled) will require the bot to be
+restarted entirely.
+
+Love the limitations, and craziness, of this project.

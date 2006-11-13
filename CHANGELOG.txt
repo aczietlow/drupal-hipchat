@@ -1,6 +1,7 @@
 // $Id$
 
 2006, November:
+ * bot_drupal.module added; Drupal developer helper.
  * Removed layer of abstraction from the hook system.
  * Renamed some files, got rid of bot_version.module.
  * Initial proof of concept release.
