@@ -1,8 +1,9 @@
 // $Id$
 
 2006, November:
- * Shipped plugins moved to their own directories.
- * Help interface added; module devs, see README.txt.
+ * bot_drupal: URLs are remembered and counted in the database now.
+ * Shipped plugins moved to their own directories for less clutter.
+ * Help interface added; module developers, please see README.txt.
  * bot_drupal.module added; Drupal developer helper.
  * Removed layer of abstraction from the hook system.
  * Renamed some files, got rid of bot_version.module.

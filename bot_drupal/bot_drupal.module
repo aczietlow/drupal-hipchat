@@ -58,6 +58,11 @@ function bot_drupal_irc_msg_channel($data, $from_query = 0) {
       $result = drupal_http_request($url);
       preg_match('/<title>(.*?)\| (groups.)?drupal.org<\/title>/', $result->data, $title_matches);
       bot_message($data->channel, "$url => ". decode_entities($title_matches[1]));
+
+      // update the database with last seen and count.
+      if (db_result(db_query('SELECT url FROM {bot_urls} WHERE url = "%s"', $url))) {
+         db_query('UPDATE {bot_urls} SET count = count + 1, last_seen = %d WHERE url = "%s"', time(), $url);
+      } else { db_query('INSERT INTO {bot_urls} (url, count, last_seen) VALUES ("%s", %d, %d)', $url, 1, time()); }
     }
   }
 }
