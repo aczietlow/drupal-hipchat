@@ -1,0 +1,71 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Enables various Drupal developer friendly actions.
+ */
+
+/**
+ * Implementation of hook_help().
+ */
+function bot_drupal_help($section) {
+  switch ($section) {
+    case 'irc:features':
+      return array(t('Drupal URLs'));
+    case 'irc:features#drupal_urls':
+      return t('Displays the title of drupal.org URLs; multiple URLs in a single message are acceptable. Also supports node IDs such as "#12345" or "4321", but only if that is the entirety of the message and the number is at least 4 digits.');
+  }
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function bot_drupal_menu($may_cache) {
+  $items = array();
+
+  if ($may_cache) {
+
+  }
+
+  return $items;
+}
+
+/**
+ * Listen for Drupal URLs or a node ID and respond with the title.
+ *
+ * @param $data
+ *   The regular $data object prepared by the IRC library.
+ * @param $from_query
+ *   Boolean; whether this was a queried request.
+ */
+function bot_drupal_irc_msg_channel($data, $from_query = 0) {
+  $addressed = $from_query ? '' : variable_get('bot_nickname', 'bot_module') .':? ';
+  $to = $from_query ? $data->nick : $data->channel;
+  $message = $data->message;
+
+  // this is a *.drupal.org URL or what appears to be a recent nid.
+  if (preg_match_all('/(http:\/\/.*?drupal.org\/node\/\d+)/', $data->message, $url_matches) ||
+      preg_match('/^#?(\d{4,})$/', $data->message, $url_matches)) { // #12345 or 5432.
+
+    // any numbers we fake into a URL for the match looping.
+    if (!is_array($url_matches[1]) && is_numeric($url_matches[1])) {
+      $url_matches[1] = array('http://drupal.org/node/'. $url_matches[1]);
+    }
+
+    // retrieve each URL.
+    foreach ($url_matches[1] as $url) {
+      $result = drupal_http_request($url);
+      preg_match('/<title>(.*?)\| (groups.)?drupal.org<\/title>/', $result->data, $title_matches);
+      bot_message($data->channel, "$url => ". decode_entities($title_matches[1]));
+    }
+  }
+}
+
+/**
+ * All responses are available via a query.
+ */
+function bot_drupal_irc_msg_query($data) {
+  bot_drupal_irc_msg_channel($data, 1);
+}
+

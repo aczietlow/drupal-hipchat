@@ -1,0 +1,18 @@
+<?php
+// $Id$
+
+/**
+ * Implementation of hook_install().
+ */
+function bot_drupal_install() {
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      db_query("CREATE TABLE {bot_urls} (
+        urid int(10) NOT NULL default '0',
+      ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");
+      break;
+    case 'pgsql':
+  }
+}
+
