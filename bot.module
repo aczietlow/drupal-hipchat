@@ -49,6 +49,40 @@ function bot_menu($may_cache) {
 }
 
 /**
+ * Framework related messages and features.
+ *
+ * @param $data
+ *   The regular $data object prepared by the IRC library.
+ * @param $from_query
+ *   Boolean; whether this was a queried request.
+ */
+function bot_irc_msg_channel($data, $from_query = 0) {
+  $addressed = $from_query ? '' : variable_get('bot_nickname', 'bot_module') .':? ';
+  $to = $from_query ? $data->nick : $data->channel;
+
+  // our IRC help interface which piggybacks off of Drupal's hook_help().
+  if (preg_match('/^'.$addressed.'help\??(.*)?/', $data->message, $help_matches)) {
+    if (!$help_matches[1]) { // no specific help was asked for.
+      $irc_features = module_invoke_all('help', 'irc:features');
+      bot_message($to, t('Detailed information is available by asking for "help <feature>" where <feature> is one of: !features.', array('!features' => implode(', ', $irc_features))));
+    }
+    else { // a specific type of help was required, so load up just that bit of text.
+      $feature_name = 'irc:features#'. preg_replace('/[^\w\d]/', '_', strtolower(trim($help_matches[1])));
+      $feature_help = module_invoke_all('help', $feature_name);
+      bot_message($to, array_shift($feature_help));
+    }
+  }
+
+}
+
+/**
+ * All responses are available via a query.
+ */
+function bot_irc_msg_query($data) {
+  bot_irc_msg_channel($data, 1);
+}
+
+/**
  * Send a message to a channel or user.
  *
  * @param $to

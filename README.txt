@@ -47,7 +47,7 @@ entails running the bot through a shell NOT through web browser access.
      php bot_start.php --root /path/to/drupal/root --url http://www.example.com
 
    --root refers to the full path to your Drupal installation directory
-   and allows you to execute run_bot.php without moving it to the root
+   and allows you to execute bot_start.php without moving it to the root
    directory. --url is required (and is equivalent to Drupal's base URL)
    to trick Drupal into thinking that it is being run as through a web
    browser. It sets HTTP_HOST and PHP_SELF, as required by Drupal.
@@ -83,6 +83,31 @@ accomplish your desired tasks), you can use "global $irc;" to get the actual
 Net_SmartIRC object that represents the IRC connection. Under the most ideal
 conditions, you'd contribute back a patch to bot.module that'd let you
 accomplish your needs without using the $irc global.
+
+In addition to the actual utility of your module, you also should add a
+few lines describing how to use your module. This is done via Drupal's
+hook_help(), and the use of two special strings:
+
+ irc:features
+   Returns an array of feature names your modules provides.
+
+ irc:features#FEATURE_NAME
+   Returns an explanation of a specific feature of your module.
+
+FEATURE_NAME will be lowercased, trimmed of whitespace, and anything not a
+letter or number will be turned into an underscore. For an example in code,
+take a look at the shipped bot_drupal.module. This information is provided
+by the bot under the following conditions:
+
+  <Morbus>     bot_module: help
+
+  <bot_module> Detailed information is available by asking for
+               "help <feature>" where <feature> is one of:
+               Drupal URLs, dns, karma.
+
+  <Morbus>     bot_module: help Drupal URLs
+
+  <bot_module> Displays the title of drupal.org URLs ...
 
 
 CACHE WARNING
