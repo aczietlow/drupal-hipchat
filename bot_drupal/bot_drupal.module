@@ -44,7 +44,7 @@ function bot_drupal_irc_msg_channel($data, $from_query = 0) {
   $message = $data->message;
 
   // this is a *.drupal.org URL or what appears to be a recent nid.
-  if (preg_match_all('/(http:\/\/.*?drupal.org\/node\/\d+)/', $data->message, $url_matches) ||
+  if (preg_match_all('/(http:\/\/.*?drupal.org\/node\/\d+)/i', $data->message, $url_matches) ||
       preg_match('/^#?(\d{4,})$/', $data->message, $url_matches)) { // #12345 or 5432.
 
     // any numbers we fake into a URL for the match looping.

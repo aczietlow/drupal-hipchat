@@ -34,7 +34,7 @@ function bot_menu($may_cache) {
       'access'             => user_access('administer bot'),
       'callback'           => 'drupal_get_form',
       'callback arguments' => 'bot_settings',
-      'description'        => t('Configure your bot framework with these settings.'),
+      'description'        => bot_help('admin/settings/bot'),
       'path'               => 'admin/settings/bot',
       'title'              => t('Bot framework'),
     );
@@ -57,7 +57,7 @@ function bot_menu($may_cache) {
  *   Boolean; whether this was a queried request.
  */
 function bot_irc_msg_channel($data, $from_query = 0) {
-  $addressed = $from_query ? '' : variable_get('bot_nickname', 'bot_module') .':? ';
+  $addressed = $from_query ? '' : variable_get('bot_nickname', 'bot_module') .':? ?';
   $to = $from_query ? $data->nick : $data->channel;
 
   // our IRC help interface which piggybacks off of Drupal's hook_help().
@@ -72,7 +72,6 @@ function bot_irc_msg_channel($data, $from_query = 0) {
       bot_message($to, array_shift($feature_help));
     }
   }
-
 }
 
 /**

@@ -1,6 +1,7 @@
 // $Id$
 
 2006, November:
+ * bot_agotchi.module added; botsnacks, greetings, personality.
  * bot_drupal: URLs are remembered and counted in the database now.
  * Shipped plugins moved to their own directories for less clutter.
  * Help interface added; module developers, please see README.txt.

@@ -1,0 +1,102 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Proper care and feeding lets your bot grow and be happy!
+ *
+ * Usage note: code and variable wise, it's "bot_agotchi" (so as to have
+ * proper alphabetizing with the rest of the plugins in a directory). To
+ * a human, however, this is always called a "botagotchi".
+ */
+
+/**
+ * Implementation of hook_help().
+ */
+function bot_agotchi_help($section) {
+  switch ($section) {
+    case 'irc:features':
+      return array(t('Botagotchi'));
+    case 'irc:features#botagotchi':
+      return t('Enables various personifying bot features like greetings, botsnacks, and more.');
+    case 'admin/settings/bot/agotchi':
+      return t('Configure your botagotchi with these settings.');
+  }
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function bot_agotchi_menu($may_cache) {
+  $items = array();
+
+  if ($may_cache) {
+    $items[] = array(
+      'access'             => user_access('administer bot'),
+      'callback'           => 'drupal_get_form',
+      'callback arguments' => 'bot_agotchi_settings',
+      'description'        => bot_agotchi_help('admin/settings/bot/agotchi'),
+      'path'               => 'admin/settings/bot/agotchi',
+      'title'              => t('Botagotchi'),
+    );
+  }
+
+  return $items;
+}
+
+/**
+ * Listen for conversation directed at, or about, the bot.
+ *
+ * @param $data
+ *   The regular $data object prepared by the IRC library.
+ * @param $from_query
+ *   Boolean; whether this was a queried request.
+ */
+function bot_agotchi_irc_msg_channel($data, $from_query) {
+  $addressed = variable_get('bot_nickname', 'bot_module') .':? ?';
+  $to = $from_query ? $data->nick : $data->channel;
+
+  // feeding makes the bot's tumbly less rumbly.
+  // @todo make the bot's tumbly actually rumbly.
+  if (preg_match("/^($addressed)?(bot(\s|\-)?snack)/i", $data->message)) {
+    $feeding_responses = explode("\n", variable_get('bot_agotchi_feeding_responses', _bot_agotchi_feeding_responses()));
+    $feeding_response_key = array_rand($feeding_responses); // of all our feeding responses, get a random one.
+    bot_message($to, $feeding_responses[$feeding_response_key]);
+  }
+}
+
+/**
+ * All responses are available via a query.
+ */
+function bot_agotchi_irc_msg_query($data) {
+  bot_agotchi_irc_msg_channel($data, 1);
+}
+
+/**
+ * Configures the botagotchi's personality.
+ */
+function bot_agotchi_settings() {
+  $form = array();
+
+  $form['bot_agotchi_feeding_responses'] = array(
+    '#default_value' => variable_get('bot_agotchi_feeding_responses', _bot_agotchi_feeding_responses()),
+    '#description'   => t('List the responses, one per line, your botagotchi will make when fed a botsnack.'),
+    '#title'         => t('Feeding responses'),
+    '#type'          => 'textarea',
+  );
+
+  return system_settings_form($form);
+}
+
+/**
+ * Returns the default list of feeding responses.
+ */
+function _bot_agotchi_feeding_responses() {
+  return
+      "My tumbly is less rumbly now!\n"
+    . "Woohoo! Tasty snacks!\n"
+    . "Delicious!\n"
+    . "Thanks!\n"
+    . ":)\n"
+  ;
+}
