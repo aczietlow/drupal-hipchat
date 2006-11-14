@@ -40,7 +40,6 @@ function bot_drupal_menu($may_cache) {
  *   Boolean; whether this was a queried request.
  */
 function bot_drupal_irc_msg_channel($data, $from_query = 0) {
-  $addressed = $from_query ? '' : variable_get('bot_nickname', 'bot_module') .':? ';
   $to = $from_query ? $data->nick : $data->channel;
   $message = $data->message;
 
