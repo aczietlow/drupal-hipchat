@@ -66,6 +66,6 @@ function bot_drupal_irc_msg_channel($data, $from_query = 0) {
  * All responses are available via a query.
  */
 function bot_drupal_irc_msg_query($data) {
-  bot_irc_msg_channel($data, 1);
+  bot_drupal_irc_msg_channel($data, 1);
 }
 
