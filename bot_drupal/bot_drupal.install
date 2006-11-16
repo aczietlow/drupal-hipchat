@@ -26,3 +26,16 @@ function bot_drupal_update_1() {
   return $ret;
 }
 
+function bot_drupal_update_2() {
+  $ret = array();
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      $ret[] = update_sql("ALTER TABLE {bot_urls} ADD title varchar(128) NOT NULL default '' AFTER url");
+      break;
+    case 'pgsql':
+      $ret[] = update_sql("ALTER TABLE {bot_urls} ALTER COLUMN title varchar(128) NOT NULL default ''");
+      break;
+  }
+  return $ret;
+}

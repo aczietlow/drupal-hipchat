@@ -7,7 +7,7 @@
  *
  * Usage note: code and variable wise, it's "bot_agotchi" (so as to have
  * proper alphabetizing with the rest of the plugins in a directory). To
- * a human, however, this is always called a "botagotchi".
+ * a human, however, it is always called a "botagotchi".
  */
 
 /**
@@ -18,9 +18,9 @@ function bot_agotchi_help($section) {
     case 'irc:features':
       return array(t('Botagotchi'));
     case 'irc:features#botagotchi':
-      return t('Enables various personifying bot features like greetings, botsnacks, and more.');
+      return t('Proper care and feeding lets your botagotchi grow and be happy!');
     case 'admin/settings/bot/agotchi':
-      return t('Configure your botagotchi with these settings.');
+      return '<p>'.t('Configure your botagotchi with these settings.').'</p>';
   }
 }
 
@@ -35,7 +35,7 @@ function bot_agotchi_menu($may_cache) {
       'access'             => user_access('administer bot'),
       'callback'           => 'drupal_get_form',
       'callback arguments' => 'bot_agotchi_settings',
-      'description'        => bot_agotchi_help('admin/settings/bot/agotchi'),
+      'description'        => t('Configure your botagotchi with these settings.'),
       'path'               => 'admin/settings/bot/agotchi',
       'title'              => t('Botagotchi'),
     );
@@ -92,11 +92,11 @@ function bot_agotchi_settings() {
  * Returns the default list of feeding responses.
  */
 function _bot_agotchi_feeding_responses() {
-  return
-      "My tumbly is less rumbly now!\n"
-    . "Woohoo! Tasty snacks!\n"
-    . "Delicious!\n"
-    . "Thanks!\n"
-    . ":)\n"
-  ;
+  return implode("\n", array(
+    t('My tumbly is less rumbly now!'),
+    t('Woohoo! Tasty snacks!'),
+    t('Delicious!'),
+    t('Thanks!'),
+    t(':)'),
+  ));
 }

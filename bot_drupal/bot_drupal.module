@@ -14,7 +14,9 @@ function bot_drupal_help($section) {
     case 'irc:features':
       return array(t('Drupal URLs'));
     case 'irc:features#drupal_urls':
-      return t('Displays the title of drupal.org URLs; multiple URLs in a single message are acceptable. Also supports node IDs such as "#12345" or "4321", but only if that is the entirety of the message and the number is at least 4 digits.');
+      return t('Displays the title of drupal.org URLs; multiple URLs in a single message are acceptable. Also supports node IDs such as "#12345" or "4321", but only if that is the entirety of the message and the number is at least 4 digits. Popular and recent URLs are tracked at !url.', array('!url' => url('bot/drupal_urls', NULL, NULL, TRUE)));
+    case 'bot/drupal_urls':
+      return '<p>'.t('View the most recent and popular URLs mentioned in the Drupal IRC channels.').'</p>';
   }
 }
 
@@ -25,7 +27,13 @@ function bot_drupal_menu($may_cache) {
   $items = array();
 
   if ($may_cache) {
-
+    $items[] = array(
+      'access'             => user_access('access content'),
+      'callback'           => 'bot_drupal_urls_overview',
+      'description'        => t('View the most recent and popular URLs mentioned in the Drupal IRC channels.'),
+      'path'               => 'bot/drupal_urls',
+      'title'              => t('Bot Drupal URLs'),
+    );
   }
 
   return $items;
@@ -44,7 +52,7 @@ function bot_drupal_irc_msg_channel($data, $from_query = 0) {
   $message = $data->message;
 
   // this is a *.drupal.org URL or what appears to be a recent nid.
-  if (preg_match_all('/(http:\/\/.*?drupal.org\/node\/\d+)/i', $data->message, $url_matches) ||
+  if (preg_match_all('/(http:\/\/(groups.)?drupal.org\/node\/\d+)/i', $data->message, $url_matches) ||
       preg_match('/^#?(\d{4,})$/', $data->message, $url_matches)) { // #12345 or 5432.
 
     // any numbers we fake into a URL for the match looping.
@@ -56,12 +64,13 @@ function bot_drupal_irc_msg_channel($data, $from_query = 0) {
     foreach ($url_matches[1] as $url) {
       $result = drupal_http_request($url);
       preg_match('/<title>(.*?)\| (groups.)?drupal.org<\/title>/', $result->data, $title_matches);
+      if (!$title_matches[1]) { $title_matches[1] = '<'.t('unable to determine title.').'>'; }
       bot_message($data->channel, "$url => ". decode_entities($title_matches[1]));
 
       // update the database with last seen and count.
       if (db_result(db_query('SELECT url FROM {bot_urls} WHERE url = "%s"', $url))) {
-         db_query('UPDATE {bot_urls} SET count = count + 1, last_seen = %d WHERE url = "%s"', time(), $url);
-      } else { db_query('INSERT INTO {bot_urls} (url, count, last_seen) VALUES ("%s", %d, %d)', $url, 1, time()); }
+         db_query('UPDATE {bot_urls} SET title = "%s", count = count + 1, last_seen = %d WHERE url = "%s"', decode_entities($title_matches[1]), time(), $url);
+      } else { db_query('INSERT INTO {bot_urls} (url, title, count, last_seen) VALUES ("%s", "%s", %d, %d)', $url, decode_entities($title_matches[1]), 1, time()); }
     }
   }
 }
@@ -71,5 +80,26 @@ function bot_drupal_irc_msg_channel($data, $from_query = 0) {
  */
 function bot_drupal_irc_msg_query($data) {
   bot_drupal_irc_msg_channel($data, 1);
+}
+
+/**
+ * Display top ten lists of the most recent and popular.
+ */
+function bot_drupal_urls_overview() {
+  $output = NULL; $headers = array(t('URL or Title'), t('Count'), t('Last Seen'));
+
+  $output .= '<h2>'.t('Popular URLs').'</h2>';
+  $results = pager_query('SELECT * FROM {bot_urls} ORDER BY count DESC, last_seen DESC', 10, 1);
+  $rows = array(); while ($result = db_fetch_object($results)) { // titles could possibly be blank, so spit URL instead.
+    $rows[] = array(l($result->title ? $result->title : $result->url, $result->url), $result->count, format_date($result->last_seen));
+  } $output .= theme('table', $headers, $rows) . theme('pager', NULL, 10, 1);
+
+  $output .= '<h2>'.t('Most Recent URLs').'</h2>';
+  $results = pager_query('SELECT * FROM {bot_urls} ORDER BY last_seen DESC', 10, 2);
+  $rows = array(); while ($result = db_fetch_object($results)) { // titles could possibly be blank, so spit URL instead.
+    $rows[] = array(l($result->title ? $result->title : $result->url, $result->url), $result->count, format_date($result->last_seen));
+  } $output .= theme('table', $headers, $rows) . theme('pager', NULL, 10, 2);
+
+  return $output;
 }
 

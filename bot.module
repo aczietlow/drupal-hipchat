@@ -12,7 +12,7 @@
 function bot_help($section) {
   switch ($section) {
     case 'admin/settings/bot':
-      return t('Configure your bot framework with these settings.');
+      return '<p>'.t('Configure your bot framework with these settings.').'</p>';
   }
 }
 
@@ -34,7 +34,7 @@ function bot_menu($may_cache) {
       'access'             => user_access('administer bot'),
       'callback'           => 'drupal_get_form',
       'callback arguments' => 'bot_settings',
-      'description'        => bot_help('admin/settings/bot'),
+      'description'        => t('Configure your bot framework with these settings.'),
       'path'               => 'admin/settings/bot',
       'title'              => t('Bot framework'),
     );
@@ -122,8 +122,9 @@ function bot_settings() {
   $form['bot_channels'] = array(
     '#default_value' => variable_get('bot_channels', '#test'),
     '#description'   => t('Enter a comma-separated list of channels the bot will automatically join.'),
+    '#rows'          => 3,
     '#title'         => t('Bot channels'),
-    '#type'          => 'textfield',
+    '#type'          => 'textarea',
   );
   $form['bot_debugging'] = array(
     '#default_value' => variable_get('bot_debugging', 0), // spits out a TON of (useful) stuff.
