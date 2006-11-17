@@ -1,12 +1,8 @@
 // $Id$
 
-Todo:
- * url() seems broken from inside IRC - see addition to help in bot_drupal.
- * add class and CSS declarations to the newly added bot/drupal_urls page.
- * make Popular URLs check only in the last 14 days.
- * make the two queries/tables into one foreach on ORDER.
-
 2006, November:
+ * bot_drupal: popular URLs are now constrained to last 14 days.
+ * bot_start: fixed error where SCRIPT_NAME was not being set properly.
  * bot_drupal: now shows page of popular/recent URLs at bot/drupal_urls.
  * bot_drupal: now stores the retrieved title in the database.
  * bot_agotchi.module added; botsnacks, greetings, personality.

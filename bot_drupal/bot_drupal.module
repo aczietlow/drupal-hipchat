@@ -14,7 +14,7 @@ function bot_drupal_help($section) {
     case 'irc:features':
       return array(t('Drupal URLs'));
     case 'irc:features#drupal_urls':
-      return t('Displays the title of drupal.org URLs; multiple URLs in a single message are acceptable. Also supports node IDs such as "#12345" or "4321", but only if that is the entirety of the message and the number is at least 4 digits. Popular and recent URLs are tracked at !url.', array('!url' => url('bot/drupal_urls', NULL, NULL, TRUE)));
+      return t('Displays the title of drupal.org URLs; multiple URLs in a single message are acceptable. Also supports node IDs such as "#12345" or "4321", but only if that is the entirety of the message and the number is at least 4 digits. Popular and recent URLs are tracked at <!url>.', array('!url' => url('bot/drupal_urls', NULL, NULL, TRUE)));
     case 'bot/drupal_urls':
       return '<p>'.t('View the most recent and popular URLs mentioned in the Drupal IRC channels.').'</p>';
   }
@@ -86,19 +86,22 @@ function bot_drupal_irc_msg_query($data) {
  * Display top ten lists of the most recent and popular.
  */
 function bot_drupal_urls_overview() {
-  $output = NULL; $headers = array(t('URL or Title'), t('Count'), t('Last Seen'));
+  $output = NULL; $headers = array(t('URL or Title'), t('#'), t('Last Seen'));
+  drupal_add_css(drupal_get_path('module', 'bot_drupal') .'/bot_drupal.css');
 
-  $output .= '<h2>'.t('Popular URLs').'</h2>';
-  $results = pager_query('SELECT * FROM {bot_urls} ORDER BY count DESC, last_seen DESC', 10, 1);
-  $rows = array(); while ($result = db_fetch_object($results)) { // titles could possibly be blank, so spit URL instead.
-    $rows[] = array(l($result->title ? $result->title : $result->url, $result->url), $result->count, format_date($result->last_seen));
-  } $output .= theme('table', $headers, $rows) . theme('pager', NULL, 10, 1);
+  $output .= '<h2>'.t('Popular URLs in the last 14 days').'</h2>';
+  $results = pager_query('SELECT * FROM {bot_urls} WHERE last_seen >= %d ORDER BY count DESC, last_seen DESC', 10, 1, NULL, time() - 60*60*24*14);
+  $rows = array(); while ($result = db_fetch_object($results)) { // titles could possibly be blank.
+    $rows[] = array(array('data' => l($result->title ? $result->title : $result->url, $result->url), 'class' => 'title'),
+      array('data' => $result->count, 'class' => 'count'), array('data' => format_date($result->last_seen), 'class' => 'last_seen'));
+  } $output .= theme('table', $headers, $rows, array('id' => 'drupal_urls_popular')) . theme('pager', NULL, 10, 1);
 
-  $output .= '<h2>'.t('Most Recent URLs').'</h2>';
+  $output .= '<h2>'.t('Most recent URLs').'</h2>';
   $results = pager_query('SELECT * FROM {bot_urls} ORDER BY last_seen DESC', 10, 2);
-  $rows = array(); while ($result = db_fetch_object($results)) { // titles could possibly be blank, so spit URL instead.
-    $rows[] = array(l($result->title ? $result->title : $result->url, $result->url), $result->count, format_date($result->last_seen));
-  } $output .= theme('table', $headers, $rows) . theme('pager', NULL, 10, 2);
+  $rows = array(); while ($result = db_fetch_object($results)) { // titles could possibly be blank.
+    $rows[] = array(array('data' => l($result->title ? $result->title : $result->url, $result->url), 'class' => 'title'),
+      array('data' => $result->count, 'class' => 'count'), array('data' => format_date($result->last_seen), 'class' => 'last_seen'));
+  } $output .= theme('table', $headers, $rows, array('id' => 'drupal_urls_recent')) . theme('pager', NULL, 10, 2);
 
   return $output;
 }

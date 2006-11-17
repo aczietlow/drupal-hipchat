@@ -27,8 +27,8 @@ while ($param = array_shift($_SERVER['argv'])) {
       $drupal_base_url = parse_url(array_shift($_SERVER['argv']));
       $_SERVER['HTTP_HOST'] = $drupal_base_url['host'];
       $_SERVER['PHP_SELF'] = $drupal_base_url['path'].'/'.$script_name;
-      $_SERVER['REQUEST_URI'] = $_SERVER['PHP_SELF'];
-      $_SERVER['REMOTE_ADDR'] = NULL; // any values here do...
+      $_SERVER['REQUEST_URI'] = $_SERVER['SCRIPT_NAME'] = $_SERVER['PHP_SELF'];
+      $_SERVER['REMOTE_ADDR'] = NULL; // any values here do rather...
       $_SERVER['REQUEST_METHOD'] = NULL; // ...odd things. uh huh.
       break;
   }
