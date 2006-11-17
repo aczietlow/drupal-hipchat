@@ -53,6 +53,7 @@ function bot_agotchi_menu($may_cache) {
  *   Boolean; whether this was a queried request.
  */
 function bot_agotchi_irc_msg_channel($data, $from_query) {
+  $substitutions = array('!who' => $data->nick, '!channel' => $data->channel);
   $addressed = variable_get('bot_nickname', 'bot_module') .':? ?';
   $to = $from_query ? $data->nick : $data->channel;
 
@@ -61,7 +62,7 @@ function bot_agotchi_irc_msg_channel($data, $from_query) {
   if (preg_match("/^($addressed)?(bot(\s|\-)?snack)/i", $data->message)) {
     $feeding_responses = explode("\n", variable_get('bot_agotchi_feeding_responses', _bot_agotchi_feeding_responses()));
     $feeding_response_key = array_rand($feeding_responses); // of all our feeding responses, get a random one.
-    bot_message($to, $feeding_responses[$feeding_response_key]);
+    bot_message($to, strtr($feeding_responses[$feeding_response_key], $substitutions));
   }
 }
 
@@ -78,6 +79,8 @@ function bot_agotchi_irc_msg_query($data) {
 function bot_agotchi_settings() {
   $form = array();
 
+  $form['#prefix'] = t('The following variables are available for use in responses: !nick, !channel.');
+
   $form['bot_agotchi_feeding_responses'] = array(
     '#default_value' => variable_get('bot_agotchi_feeding_responses', _bot_agotchi_feeding_responses()),
     '#description'   => t('List the responses, one per line, your botagotchi will make when fed a botsnack.'),
@@ -93,10 +96,9 @@ function bot_agotchi_settings() {
  */
 function _bot_agotchi_feeding_responses() {
   return implode("\n", array(
-    t('My tumbly is less rumbly now!'),
-    t('Woohoo! Tasty snacks!'),
-    t('Delicious!'),
-    t('Thanks!'),
-    t(':)'),
+    'this is why I love !channel',
+    'thanks !who :)',
+    ':)',
   ));
 }
+
