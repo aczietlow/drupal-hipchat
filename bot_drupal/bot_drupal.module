@@ -32,7 +32,7 @@ function bot_drupal_menu($may_cache) {
       'callback'           => 'bot_drupal_urls_overview',
       'description'        => t('View the most recent and popular URLs mentioned in the Drupal IRC channels.'),
       'path'               => 'bot/drupal_urls',
-      'title'              => t('Bot Drupal URLs'),
+      'title'              => t('Drupal URLs'),
     );
   }
 

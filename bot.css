@@ -6,3 +6,6 @@ table.package .description {
   width: 75%;
 }
 
+#bot_features .bot_feature {
+  font-weight: bold;
+}

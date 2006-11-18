@@ -11,6 +11,8 @@
  */
 function bot_help($section) {
   switch ($section) {
+    case 'bot':
+      return '<p>'.t('Listed here are the bot\'s enabled features and settings. Information about the bot\'s features is also available by asking it directly for "help", and then for more detail with "help &lt;feature&gt;" (such as "help Drupal URLs"). This would best be done in a private message, so as not to disrupt regular channel activity.').'</p>';
     case 'admin/settings/bot':
       return '<p>'.t('Configure your bot framework with these settings.').'</p>';
   }
@@ -31,12 +33,19 @@ function bot_menu($may_cache) {
 
   if ($may_cache) {
     $items[] = array(
+      'access'             => user_access('access content'),
+      'callback'           => 'bot_overview',
+      'description'        => t('View the bot\'s enabled features and settings.'),
+      'path'               => 'bot',
+      'title'              => t('Bot'),
+    );
+    $items[] = array(
       'access'             => user_access('administer bot'),
       'callback'           => 'drupal_get_form',
       'callback arguments' => 'bot_settings',
       'description'        => t('Configure your bot framework with these settings.'),
       'path'               => 'admin/settings/bot',
-      'title'              => t('Bot framework'),
+      'title'              => t('Bot'),
     );
   }
 
@@ -64,6 +73,7 @@ function bot_irc_msg_channel($data, $from_query = 0) {
   if (preg_match('/^'.$addressed.'help\??(.*)?/', $data->message, $help_matches)) {
     if (!$help_matches[1]) { // no specific help was asked for.
       $irc_features = module_invoke_all('help', 'irc:features');
+      asort($irc_features); // alphabetical listing of features.
       bot_message($to, t('Detailed information is available by asking for "help <feature>" where <feature> is one of: !features.', array('!features' => implode(', ', $irc_features))));
     }
     else { // a specific type of help was required, so load up just that bit of text.
@@ -93,6 +103,29 @@ function bot_message($to, $message) {
   global $irc; // from bot_start.php.
   $type = strpos($to, '#') == 0 ? 'CHANNEL' : 'QUERY';
   $irc->message(constant('SMARTIRC_TYPE_'.$type), $to, $message);
+}
+
+/**
+ * Displays a quick page listing all the enabled features of the bot.
+ * This is a wrapper around the IRC help features, and spits those helps
+ * verbatim (meaning URLs won't be linked, etc.). @todo Someday, urlfilter.
+ */
+function bot_overview() {
+  drupal_add_css(drupal_get_path('module', 'bot') .'/bot.css');
+  $output = '<p>'.t('The bot connects to server %server as nick %name.', 
+    array('%server' => variable_get('bot_server', 'irc.freenode.net'), 
+      '%name' => variable_get('bot_nickname', 'bot_module'))).'</p>';
+  $output .= '<ul id="bot_features">';
+
+  $irc_features = module_invoke_all('help', 'irc:features');
+  asort($irc_features); // alphabetical listing of features.
+  foreach ($irc_features as $irc_feature) {
+    $feature_help = module_invoke_all('help', 'irc:features#'. preg_replace('/[^\w\d]/', '_', strtolower(trim($irc_feature))));
+    $output .= '<li><span class="bot_feature">'.check_plain($irc_feature).':</span> '.check_plain(array_shift($feature_help)).'</li>';
+  }
+
+  $output .= '</ul>';
+  return $output;
 }
 
 /**

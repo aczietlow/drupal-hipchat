@@ -1,15 +1,13 @@
 // $Id$
 
 Todo:
- * make a bot/ master page that lists installed plugins.
- * remove "Bot" preface for plugins, like "Bot Drupal URLs".
  * bring in Frando's logger as a Seen-er too.
  * add that hook that allows bot responses to be logged.
- * decide if it'll be "Bot" for hierarchy or "Bot framework".
- * add uninstall hooks: delete the database tables?
 
 2006, November:
- * bot_agotchi: greeting and thankful responses added.
+ * bot_drupal: "Bot Drupal URLs" renamed to just "Drupal URLs".
+ * bot: bot/ URL now exists and displays connection/feature details.
+ * bot_agotchi: greeting and thankful responses added, user configurable.
  * bot_agotchi: variable substitution is now possible in responses.
  * bot_drupal: popular URLs are now constrained to last 14 days.
  * bot_start: fixed error where SCRIPT_NAME was not being set properly.
