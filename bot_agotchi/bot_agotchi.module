@@ -54,15 +54,31 @@ function bot_agotchi_menu($may_cache) {
  */
 function bot_agotchi_irc_msg_channel($data, $from_query) {
   $substitutions = array('!who' => $data->nick, '!channel' => $data->channel);
-  $addressed = variable_get('bot_nickname', 'bot_module') .':? ?';
+  $bot_name = variable_get('bot_nickname', 'bot_module');
+  $addressed = "$bot_name:? ?"; // bot name prefixed.
   $to = $from_query ? $data->nick : $data->channel;
 
   // feeding makes the bot's tumbly less rumbly.
-  // @todo make the bot's tumbly actually rumbly.
   if (preg_match("/^($addressed)?(bot(\s|\-)?snack)/i", $data->message)) {
     $feeding_responses = explode("\n", variable_get('bot_agotchi_feeding_responses', _bot_agotchi_feeding_responses()));
     $feeding_response_key = array_rand($feeding_responses); // of all our feeding responses, get a random one.
     bot_message($to, strtr($feeding_responses[$feeding_response_key], $substitutions));
+  }
+
+  // spit out a greeting in response to another (addressed or not).
+  if (preg_match("/^\s*(h(ello|i( there)?|owdy|ey|ola)|salut|bonjour|niihau|que\s*tal)( $bot_name)?\s*$/i", $data->message)) {
+    if (rand(0, 100) < variable_get('bot_agotchi_greeting_randomness', 65)) {
+      $greeting_responses = explode("\n", variable_get('bot_agotchi_greeting_responses', _bot_agotchi_greeting_responses()));
+      $greeting_response_key = array_rand($greeting_responses); // of all our greeting responses, get a random one.
+      bot_message($to, strtr($greeting_responses[$greeting_response_key], $substitutions));
+    }
+  }
+
+  // we've been thanked, so you're welcome 'em.
+  if (preg_match("/^${addressed}thank(s| you)/i", $data->message)) {
+    $thankful_responses = explode("\n", variable_get('bot_agotchi_thankful_responses', _bot_agotchi_thankful_responses()));
+    $thankful_response_key = array_rand($thankful_responses); // of all our thankful responses, get a random one.
+    bot_message($to, strtr($thankful_responses[$thankful_response_key], $substitutions));
   }
 }
 
@@ -83,8 +99,26 @@ function bot_agotchi_settings() {
 
   $form['bot_agotchi_feeding_responses'] = array(
     '#default_value' => variable_get('bot_agotchi_feeding_responses', _bot_agotchi_feeding_responses()),
-    '#description'   => t('List the responses, one per line, your botagotchi will make when fed a botsnack.'),
+    '#description'   => t('List the responses, one per line, your botagotchi will say when fed a botsnack.'),
     '#title'         => t('Feeding responses'),
+    '#type'          => 'textarea',
+  );
+  $form['bot_agotchi_greeting_responses'] = array(
+    '#default_value' => variable_get('bot_agotchi_greeting_responses', _bot_agotchi_greeting_responses()),
+    '#description'   => t('List the responses, one per line, your botagotchi will say when it hears a greeting.'),
+    '#title'         => t('Greeting responses'),
+    '#type'          => 'textarea',
+  );
+  $form['bot_agotchi_greeting_randomness'] = array(
+    '#default_value' => variable_get('bot_agotchi_greeting_randomness', 65),
+    '#description'   => t('The percentage that your botagotchi will actually respond to a heard greeting.'),
+    '#title'         => t('Greeting randomness'),
+    '#type'          => 'textfield',
+  );
+  $form['bot_agotchi_thankful_responses'] = array(
+    '#default_value' => variable_get('bot_agotchi_thankful_responses', _bot_agotchi_thankful_responses()),
+    '#description'   => t('List the responses, one per line, your botagotchi will say when it has been thanked.'),
+    '#title'         => t('Thankful responses'),
     '#type'          => 'textarea',
   );
 
@@ -102,3 +136,37 @@ function _bot_agotchi_feeding_responses() {
   ));
 }
 
+/**
+ * Returns the default list of greeting responses.
+ */
+function _bot_agotchi_greeting_responses() {
+  return implode("\n", array(
+    'hi',
+    'hey',
+    'hola',
+    'hello', 
+    'salut',
+    'eh oh',
+    'niihau',
+    'privet',
+    'bonjour',
+    'que tal',
+    "what's up",
+  ));
+}
+
+/**
+ * Returns the default list of thankful responses.
+ */
+function _bot_agotchi_thankful_responses() {
+  return implode("\n", array(
+    'bitte',
+    'de nada',
+    'de rien',
+    'no problem',
+    'no worries',
+    'sure thing',
+    'my pleasure',
+    'pas de quoi',
+  ));
+}
