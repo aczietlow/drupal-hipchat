@@ -4,7 +4,10 @@ Todo:
  * bring in Frando's logger as a Seen-er too.
  * add that hook that allows bot responses to be logged.
  * find Druplicon's "anyone?", "only me" and add to botagotchi.
- 
+
+2006, December:
+ * issue metadata and IRC count per suggestions by ChrisKennedy.
+
 2006, November:
  * bot_drupal: "Bot Drupal URLs" renamed to just "Drupal URLs".
  * bot: bot/ URL now exists and displays connection/feature details.
