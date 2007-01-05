@@ -1,0 +1,56 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Enables users to find out the last time a channel member was active.
+ */
+
+/**
+ * Implementation of hook_help().
+ */
+function bot_seen_help($section) {
+  switch ($section) {
+    case 'irc:features':
+      return array(t('Seen'));
+    case 'irc:features#seen':
+      return t('If someone asks "seen peter", "seen peter? seen lois?", "have you seen sbippy?" or similar questions, the bot will report the last time they\'ve been seen, where, and what their last known message was. We\'ll only respond if the "seen NAME" trigger is followed by a question mark or if the message immediately ends thereafter.');
+  }
+}
+
+/**
+ * Listen for conversation directed at, or around, the bot.
+ *
+ * @param $data
+ *   The regular $data object prepared by the IRC library.
+ * @param $from_query
+ *   Boolean; whether this was a queried request.
+ */
+function bot_seen_irc_msg_channel($data, $from_query = 0) {
+  $to = $from_query ? $data->nick : $data->channel;
+
+  // log the message, whatever it is.
+  $count = db_result(db_query('SELECT nick FROM {bot_seen} WHERE nick = "%s"', drupal_strtolower($data->nick)));
+  if ($count) { db_query('UPDATE {bot_seen} SET channel = "%s", message = "%s", timestamp = %d WHERE nick = "%s"', $data->channel, $data->message, time(), drupal_strtolower($data->nick)); }
+  else { db_query('INSERT INTO {bot_seen} (nick, channel, message, timestamp) VALUES ("%s", "%s", "%s", %d)', drupal_strtolower($data->nick), $data->channel, $data->message, time()); }
+
+  // Match 'seen foo' and respond with the last message sent by foo.
+  // Only reacts if either 'seen foo' is followed by a question mark
+  // or if the message ends after the triggering construct. 
+  if (preg_match_all('!.*?seen ([a-zA-Z0-9\[\]\{\}\\\|\^\`\-\_]*)( ?\?|$| ?\,)!', $data->message, $matches)) {
+    foreach ($matches[1] as $match) { // for every construct we've found in our message, find the user.
+      $result = db_fetch_object(db_query_range('SELECT nick, channel, message, timestamp FROM {bot_seen} WHERE nick = "%s"', drupal_strtolower($match), 0, 1));
+      $message = isset($result->nick) // if we found a nick, great. otherwise, throw your hands up in an "i dunno" pose. we match on lowercase, but display inputted case.
+        ? t("!nick was last seen in !channel !this_long ago saying '!message'.", array('!nick' => $match, '!this_long' => format_interval(time() - $result->timestamp), '!channel' => $result->channel, '!message' => $result->message, ))
+        : t("Sorry, I haven't seen !match.", array('!match' => $match, ));
+      bot_message($to, $message);
+    }
+  }
+}
+
+/**
+ * All responses are available via a query.
+ */
+function bot_seen_irc_msg_query($data) {
+  bot_seen_irc_msg_channel($data, 1);
+}
