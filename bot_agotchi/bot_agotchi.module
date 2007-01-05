@@ -144,7 +144,7 @@ function _bot_agotchi_greeting_responses() {
     'hi',
     'hey',
     'hola',
-    'hello', 
+    'hello',
     'salut',
     'eh oh',
     'niihau',

@@ -70,8 +70,8 @@ function bot_drupal_irc_msg_channel($data, $from_query = 0) {
 
       // update with last seen, count, and title. times seen is displayed in messages.
       $count = db_result(db_query('SELECT count FROM {bot_urls} WHERE url = "%s"', $url));
-      if ($count) { db_query('UPDATE {bot_urls} SET title = "%s", count = count + 1, last_seen = %d WHERE url = "%s"', decode_entities($title_match[1]), time(), $url);
-      } else { db_query('INSERT INTO {bot_urls} (url, title, count, last_seen) VALUES ("%s", "%s", %d, %d)', $url, decode_entities($title_match[1]), 1, time()); }
+      if ($count) { db_query('UPDATE {bot_urls} SET title = "%s", count = count + 1, last_seen = %d WHERE url = "%s"', decode_entities($title_match[1]), time(), $url); }
+      else { db_query('INSERT INTO {bot_urls} (url, title, count, last_seen) VALUES ("%s", "%s", %d, %d)', $url, decode_entities($title_match[1]), 1, time()); }
       $count = $count ? $count : 1; // if this is the first time, set the count 1 for later display.
       $count = format_plural($count, '1 IRC mention', '@count IRC mentions'); // said later display.
       $message = "$url => ". decode_entities($title_match[1]) ." => $count";
@@ -85,7 +85,7 @@ function bot_drupal_irc_msg_channel($data, $from_query = 0) {
         $message = "$url => ". decode_entities($title_match[1]) .' => '. implode(', ', array($project_match[1], $component_match[1], $priority_match[1], $status_match[1], $count));
       }
 
-      bot_message($data->channel, $message);
+      bot_message($to, $message);
     }
   }
 }

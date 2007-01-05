@@ -21,7 +21,7 @@ function bot_drupal_install() {
         title varchar(128) NOT NULL default '',
         count integer NOT NULL default '0',
         last_seen integer NOT NULL default '0'
-      ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");
+      )");
       break;
   }
 }
@@ -42,7 +42,7 @@ function bot_drupal_update_1() {
         url varchar(255) NOT NULL default '',
         count integer NOT NULL default '0',
         last_seen integer NOT NULL default '0'
-      ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");
+      )");
       break;
   }
   return $ret;
