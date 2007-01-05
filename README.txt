@@ -82,7 +82,14 @@ worse case scenario (ie., there's no helper function in bot.module that will
 accomplish your desired tasks), you can use "global $irc;" to get the actual
 Net_SmartIRC object that represents the IRC connection. Under the most ideal
 conditions, you'd contribute back a patch to bot.module that'd let you
-accomplish your needs without using the $irc global.
+accomplish your needs without using the $irc global. Generally speaking,
+try not to use the $irc global.
+
+There is another hook available called irc_bot_reply (such that, in our above
+example, it'd be bot_example_irc_bot_reply()). This function allows you to
+act whenever the bot sends a message. Primarily, this was added to allow us
+to log bot responses in bot_log.module. If you use this, be sure NOT to use
+bot_message() within your implementation, else you'll cause an infinite loop./
 
 In addition to the actual utility of your module, you also should add a
 few lines describing how to use your module. This is done via Drupal's

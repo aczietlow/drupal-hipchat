@@ -103,6 +103,11 @@ function bot_message($to, $message) {
   global $irc; // from bot_start.php.
   $type = strpos($to, '#') == 0 ? 'CHANNEL' : 'QUERY';
   $irc->message(constant('SMARTIRC_TYPE_'.$type), $to, $message);
+
+  // allow modules to react to bot responses. do NOT use
+  // bot_message() in your implementation as you'll cause
+  // an infinite loop! and that'd look really really retarded.
+  module_invoke_all('irc_bot_reply', $to, $message);
 }
 
 /**
