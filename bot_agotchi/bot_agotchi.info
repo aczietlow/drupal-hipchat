@@ -3,4 +3,3 @@ name = Botagotchi
 package = Bot
 dependencies = bot
 description = "Proper care and feeding lets your botagotchi grow and be happy!"
-version = "$Name$"
