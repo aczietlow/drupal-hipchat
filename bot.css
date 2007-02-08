@@ -1,11 +1,4 @@
 
-/*  the default styling of admin/build/modules nearly ensures that any  */
-/*  module with more than one word in its name is going to wrap ugily.  */
-/*  this affects our plugins, so we add some more breathing room here.  */
-table.package .description {
-  width: 75%;
-}
-
 #bot_features .bot_feature {
   font-weight: bold;
 }
