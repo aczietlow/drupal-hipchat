@@ -60,7 +60,7 @@ function bot_menu($may_cache) {
  * @param $from_query
  *   Boolean; whether this was a queried request.
  */
-function bot_irc_msg_channel($data, $from_query = 0) {
+function bot_irc_msg_channel($data, $from_query = FALSE) {
   $addressed = $from_query ? '' : variable_get('bot_nickname', 'bot_module') .':? ?';
   $to = $from_query ? $data->nick : $data->channel;
 
@@ -83,7 +83,7 @@ function bot_irc_msg_channel($data, $from_query = 0) {
  * All responses are available via a query.
  */
 function bot_irc_msg_query($data) {
-  bot_irc_msg_channel($data, 1);
+  bot_irc_msg_channel($data, TRUE);
 }
 
 /**

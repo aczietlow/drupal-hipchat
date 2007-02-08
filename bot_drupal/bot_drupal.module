@@ -47,7 +47,7 @@ function bot_drupal_menu($may_cache) {
  * @param $from_query
  *   Boolean; whether this was a queried request.
  */
-function bot_drupal_irc_msg_channel($data, $from_query = 0) {
+function bot_drupal_irc_msg_channel($data, $from_query = FALSE) {
   $to = $from_query ? $data->nick : $data->channel;
   $message = $data->message;
 
@@ -94,7 +94,7 @@ function bot_drupal_irc_msg_channel($data, $from_query = 0) {
  * All responses are available via a query.
  */
 function bot_drupal_irc_msg_query($data) {
-  bot_drupal_irc_msg_channel($data, 1);
+  bot_drupal_irc_msg_channel($data, TRUE);
 }
 
 /**
