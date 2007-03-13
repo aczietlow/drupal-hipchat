@@ -14,7 +14,7 @@ function bot_seen_help($section) {
     case 'irc:features':
       return array(t('Seen'));
     case 'irc:features#seen':
-      return t('If someone asks "seen peter", "seen peter? seen lois?", "have you seen sbippy?" or similar questions, the bot will report the last time they\'ve been seen, where, and what their last known message was. We\'ll only respond if the "seen NAME" trigger is followed by a question mark or if the message immediately ends thereafter.');
+      return t('If someone asks "seen Morbus", the bot will report the last time they\'ve been seen, where, and what their last known message was. Directly addressing the bot will also allow the more complex syntax of "seen Morbus? seen UnConeD?", "have you seen sbp?" and similar forms.');
   }
 }
 
@@ -27,24 +27,38 @@ function bot_seen_help($section) {
  *   Boolean; whether this was a queried request.
  */
 function bot_seen_irc_msg_channel($data, $from_query = FALSE) {
+  $bot_name = variable_get('bot_nickname', 'bot_module');
+  $addressed = "$bot_name:? ?"; // bot name prefixed.
   $to = $from_query ? $data->nick : $data->channel;
+  $nicks = array(); // list of nicks to search for.
 
   // log the message, whatever it is.
   $count = db_result(db_query('SELECT nick FROM {bot_seen} WHERE nick = "%s"', drupal_strtolower($data->nick)));
   if ($count) { db_query('UPDATE {bot_seen} SET channel = "%s", message = "%s", timestamp = %d WHERE nick = "%s"', $data->channel, $data->message, time(), drupal_strtolower($data->nick)); }
   else { db_query('INSERT INTO {bot_seen} (nick, channel, message, timestamp) VALUES ("%s", "%s", "%s", %d)', drupal_strtolower($data->nick), $data->channel, $data->message, time()); }
 
-  // Match 'seen foo' and respond with the last message sent by foo.
-  // Only reacts if either 'seen foo' is followed by a question mark
-  // or if the message ends after the triggering construct. 
-  if (preg_match_all('!.*?seen ([a-zA-Z0-9\[\]\{\}\\\|\^\`\-\_]*)( ?\?|$| ?\,)!', $data->message, $matches)) {
-    foreach ($matches[1] as $match) { // for every construct we've found in our message, find the user.
-      $result = db_fetch_object(db_query_range('SELECT nick, channel, message, timestamp FROM {bot_seen} WHERE nick = "%s"', drupal_strtolower($match), 0, 1));
-      $message = isset($result->nick) // if we found a nick, great. otherwise, throw your hands up in an "i dunno" pose. we match on lowercase, but display inputted case.
-        ? t("!nick was last seen in !channel !this_long ago saying '!message'.", array('!nick' => $match, '!this_long' => format_interval(time() - $result->timestamp), '!channel' => $result->channel, '!message' => $result->message, ))
-        : t("Sorry, I haven't seen !match.", array('!match' => $match, ));
-      bot_message($to, $message);
+  // Match 'seen foo' in any mode, regardless if the bot was addressed.
+  if (preg_match("/^seen ([a-zA-Z0-9\[\]\{\}\\\|\^\`\-\_]*)( ?\?|$)/", $data->message, $matches)) {
+    $nicks[] = $matches[1]; // the bot will respond unaddressed, but only in the form of "seen <nick>*".
+  }
+
+  // Our more complicated regexp allows multiple types of syntax and
+  // more than one lookup per query, but require direct addressing.
+  if (preg_match("/^($addressed)/i", $data->message) || $from_query) {
+    if (preg_match_all('!.*?seen ([a-zA-Z0-9\[\]\{\}\\\|\^\`\-\_]*)( ?\?|$| ?\,)!', $data->message, $matches)) {
+      foreach ($matches[1] as $match) { // for every construct we've found in our message, find the user.
+        $nicks[] = $match; // the bot will respond addressed to multiple requests and styles in one query.
+      }
     }
+  }
+
+  // look up each nick and spit.
+  foreach ($nicks as $nick) {
+    $result = db_fetch_object(db_query_range('SELECT nick, channel, message, timestamp FROM {bot_seen} WHERE nick = "%s"', drupal_strtolower($nick), 0, 1));
+    $message = isset($result->nick) // if we found a nick, great. otherwise, throw your hands up in an "i dunno" pose. we match on lowercase, but display inputted case.
+      ? t("!nick was last seen in !channel !this_long ago saying '!message'.", array('!nick' => $nick, '!this_long' => format_interval(time() - $result->timestamp), '!channel' => $result->channel, '!message' => $result->message, ))
+      : t("Sorry, I haven't seen !match.", array('!match' => $nick, ));
+    bot_message($to, $message);
   }
 }
 
