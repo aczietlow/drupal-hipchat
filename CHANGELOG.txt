@@ -1,12 +1,19 @@
 // $Id$
 
-Todo:
- * bring in Frando's logger as a Seen-er too.
- * add that hook that allows bot responses to be logged.
- * find Druplicon's "anyone?", "only me" and add to botagotchi.
+TODO (which should really become Drupal issues):
+ * revise and commit Frando's bot_log.module.
+ * revise and commit Walkah's bot_karma.module.
 
+2007, April:
+ * 136856 and 136870 from Shiny: various PostgreSQL quote fixes.
+
+2007, March:
+ * bot_seen: now supports wildcard searches with *.
+ * bot_seen: freeform "seen?" syntax is moved to direct addressing only.
+ * hook_irc_bot_reply() exists to facilitate logging of own messages.
+ 
 2006, December:
- * issue metadata and IRC count per suggestions by ChrisKennedy.
+ * Issue metadata and IRC count per suggestions by ChrisKennedy.
 
 2006, November:
  * bot_drupal: "Bot Drupal URLs" renamed to just "Drupal URLs".

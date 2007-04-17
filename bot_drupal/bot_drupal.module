@@ -69,9 +69,9 @@ function bot_drupal_irc_msg_channel($data, $from_query = FALSE) {
       if (!$title_match[1]) { $title_match[1] = '<'.t('unable to determine title').'>'; }
 
       // update with last seen, count, and title. times seen is displayed in messages.
-      $count = db_result(db_query('SELECT count FROM {bot_urls} WHERE url = "%s"', $url));
-      if ($count) { db_query('UPDATE {bot_urls} SET title = "%s", count = count + 1, last_seen = %d WHERE url = "%s"', decode_entities($title_match[1]), time(), $url); }
-      else { db_query('INSERT INTO {bot_urls} (url, title, count, last_seen) VALUES ("%s", "%s", %d, %d)', $url, decode_entities($title_match[1]), 1, time()); }
+      $count = db_result(db_query("SELECT count FROM {bot_urls} WHERE url = '%s'", $url));
+      if ($count) { db_query("UPDATE {bot_urls} SET title = '%s', count = count + 1, last_seen = %d WHERE url = '%s'", decode_entities($title_match[1]), time(), $url); }
+      else { db_query("INSERT INTO {bot_urls} (url, title, count, last_seen) VALUES ('%s', '%s', %d, %d)", $url, decode_entities($title_match[1]), 1, time()); }
       $count = $count ? $count : 0; // if this is the first time, set the count to 0, pre-inc'd later.
       $count = format_plural(++$count, '1 IRC mention', '@count IRC mentions'); // said later display.
       $message = "$url => ". decode_entities($title_match[1]) ." => $count";
