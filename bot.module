@@ -53,6 +53,16 @@ function bot_menu($may_cache) {
 }
 
 /**
+ * Every five minutes, clear out some of the Drupal caches that are normally
+ * handled via page loads (which we never have as a forever-running process).
+ */
+function bot_irc_bot_cron() {
+  // recreates the variable cache.
+  variable_set('bot_cache_cleared', time());
+  $GLOBALS['conf'] = variable_init();
+}
+
+/**
  * Framework related messages and features.
  *
  * @param $data

@@ -89,7 +89,12 @@ There is another hook available called irc_bot_reply (such that, in our above
 example, it'd be bot_example_irc_bot_reply()). This function allows you to
 act whenever the bot sends a message. Primarily, this was added to allow us
 to log bot responses in bot_log.module. If you use this, be sure NOT to use
-bot_message() within your implementation, else you'll cause an infinite loop./
+bot_message() within your implementation, else you'll cause an infinite loop.
+
+The final hook of interest is irc_bot_cron, which is run every five minutes.
+This is very similar to Drupal's own hook_cron, but is intended only for
+bot-related operations (though, naturally, any hook_cron you add to your
+own bot plugins will function as expected).
 
 In addition to the actual utility of your module, you also should add a
 few lines describing how to use your module. This is done via Drupal's
@@ -115,14 +120,6 @@ by the bot under the following conditions:
   <Morbus>     bot_module: help Drupal URLs
 
   <bot_module> Displays the title of drupal.org URLs ...
-
-
-CACHE WARNING
--------------
-
-Since the IRC bot runs forever, some of Drupal's internal caching mechanisms
-(such as variable_get) actually flummox regular operation. We are still working
-on workarounds for these (normally desired) features.
 
 
 DESIGN DECISIONS

@@ -62,6 +62,10 @@ foreach ($irc_message_types as $irc_message_type) {
   $irc->registerActionhandler(constant('SMARTIRC_TYPE_'.$irc_message_type), '.*', $bot, 'invoke_irc_msg_'.strtolower($irc_message_type));
 }
 
+// set up a five minute timer similar to Drupal's hook_cron(). this
+// is primarily used in the shipped code to clear cached data.
+$irc->registerTimehandler(300000, $bot, 'invoke_irc_bot_cron');
+
 // connect and begin listening.
 $irc->connect( variable_get('bot_server', 'irc.freenode.net'), variable_get('bot_server_port', 6667) );
 $irc->login( variable_get('bot_nickname', 'bot_module'), variable_get('bot_nickname', 'bot_module').' :http://drupal.org/project/bot', 8, variable_get('bot_nickname', 'bot_module') );
@@ -71,6 +75,7 @@ $irc->disconnect(); // if we stop listening, disconnect properly.
 
 // pass off IRC messages to our modules via Drupal's hook system.
 class drupal_wrapper {
+  function invoke_irc_bot_cron(&$irc)                 { module_invoke_all('irc_bot_cron'); }
   function invoke_irc_msg_unknown(&$irc, &$data)      { module_invoke_all('irc_msg_unknown', $data); }
   function invoke_irc_msg_channel(&$irc, &$data)      { module_invoke_all('irc_msg_channel', $data); }
   function invoke_irc_msg_query(&$irc, &$data)        { module_invoke_all('irc_msg_query', $data); }

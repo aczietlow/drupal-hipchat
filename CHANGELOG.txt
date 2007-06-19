@@ -1,21 +1,14 @@
 // $Id$
 
-TODO (which should really become Drupal issues):
- * revise and commit Frando's bot_log.module.
- * revise and commit Walkah's bot_karma.module.
-
-2007, April:
- * 136856 and 136870 from Shiny: various PostgreSQL quote fixes.
-
-2007, March:
+Bot 5.x-1.0, 2007-??-??
+-----------------------
+ * hook_irc_bot_cron() now exists and runs every five minutes.
+ * #136856 and #136870 from Shiny: various PostgreSQL quote fixes.
+ * bot_seen: now properly reports when it hasn't seen something.
  * bot_seen: now supports wildcard searches with *.
  * bot_seen: freeform "seen?" syntax is moved to direct addressing only.
  * hook_irc_bot_reply() exists to facilitate logging of own messages.
- 
-2006, December:
  * Issue metadata and IRC count per suggestions by ChrisKennedy.
-
-2006, November:
  * bot_drupal: "Bot Drupal URLs" renamed to just "Drupal URLs".
  * bot: bot/ URL now exists and displays connection/feature details.
  * bot_agotchi: greeting and thankful responses added, user configurable.
