@@ -12,9 +12,11 @@
 function bot_drupal_help($section) {
   switch ($section) {
     case 'irc:features':
-      return array(t('Drupal URLs'));
+      return array(t('Drupal URLs'), t('Function Lookups'));
     case 'irc:features#drupal_urls':
       return t('Displays the title of drupal.org URLs; multiple URLs in a single message are acceptable. Also supports node IDs such as "#12345" or "4321", but only if that is the entirety of the message and the number is at least 4 digits. Popular and recent URLs are tracked at <!url>.', array('!url' => url('bot/drupal_urls', NULL, NULL, TRUE)));
+    case 'irc:features#function_lookups':
+      return t('If api.module is installed, the bot can provide function lookups, triggered by "<function>?", based on the host\'s installed branches (which must have "short names" that match api.drupal.org). Branches besides the default (currently "5", representing "Drupal 5") can be specified with "<function>:<branch>?".');
     case 'bot/drupal_urls':
       return '<p>'.t('View the most recent and popular URLs mentioned in the Drupal IRC channels.').'</p>';
   }
@@ -85,6 +87,19 @@ function bot_drupal_irc_msg_channel($data, $from_query = FALSE) {
         $message = "$url => ". decode_entities($title_match[1]) .' => '. implode(', ', array($project_match[1], $component_match[1], $priority_match[1], $status_match[1], $count));
       }
 
+      bot_message($to, $message);
+    }
+  }
+
+  // @todo add "Function Lookup" help for this and explain how it goes.
+  // if it's not a URL, check if it matches any api.module function.
+  if (module_exists('api') && preg_match('/^(.*)\?$/', $data->messageex[0])) {
+    $function = str_replace('?', '', $data->messageex[0]); // get rid of the question mark. useless comment ahoy!
+    // messageex is an already exploded-on-whitespace array for us - api lookups are a single "word" only, so this works nicely.
+    if ($result = db_fetch_object(db_query("SELECT ad.branch_name, ad.summary, af.signature FROM {api_function} af INNER JOIN {api_documentation} ad ON af.did = ad.did WHERE ad.object_type = 'function' AND ad.object_name = '%s'", $function))) {
+      $message = $result->branch_name != 'php' // if we've indexed the php functions, they're in branch 'php', so we'll spit out a slightly different format.
+        ? t('!function: !summary => !signature => !url', array('!function' => $function, '!signature' => $result->signature, '!summary' => $result->summary, '!url' => 'http://api.drupal.org/api/'. $result->branch_name .'/function/'. $function))
+        : t('!function: !url', array('!function' => $function, '!url' => 'http://php.net/'. $function));
       bot_message($to, $message);
     }
   }
