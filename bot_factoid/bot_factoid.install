@@ -1,0 +1,27 @@
+<?php
+// $Id$
+
+/**
+ * Implementation of hook_install().
+ */
+function bot_factoid_install() {
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      db_query("CREATE TABLE {bot_factoid} (
+        subject varchar(255) NOT NULL default '',
+        is_are varchar(3) NOT NULL default '',
+        statement text NOT NULL default '',
+        KEY (subject)
+      ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");
+      break;
+    case 'pgsql':
+      db_query("CREATE TABLE {bot_factoid} (
+        subject text NOT NULL default '',
+        is_are varchar(3) NOT NULL default '',
+        statement text NOT NULL default '',
+        KEY (subject)
+      )");
+      break;
+  }
+}

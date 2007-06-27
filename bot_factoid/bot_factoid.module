@@ -1,0 +1,268 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Enables the setting and retrieval of facts.
+ */
+
+/**
+ * Implementation of hook_help().
+ */
+function bot_factoid_help($section) {
+  switch ($section) {
+    case 'irc:features':
+      return array(t('Factoids'));
+    case 'irc:features#factoids':
+      return t('Set factoids with "BOTNAME: cats are furry", "BOTNAME: Drupal is great.", "No, BOTNAME, Morbus is awesome.", "BOTNAME: Drupal is also powerful.", "BOTNAME: cheer is <action>cheers!", or "BOTNAME: ping is <reply>WHAT?!". Retrieve factoids with: "Drupal?" or "BOTNAME: cheer!" Forget factoids with "BOTNAME: forget ping". Factoids can be browsed online at <!url>.', array('!url' => url('bot/factoids', NULL, NULL, TRUE)));
+    case 'bot/factoid':
+      return '<p>'. t('Browse all the factoids the bot knows about.') .'</p>';
+    case 'admin/settings/bot/factoid':
+      return '<p>'. t('Configure factoid learning with these settings.').'</p>';
+  }
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function bot_factoid_menu($may_cache) {
+  $items = array();
+
+  if ($may_cache) {
+    $items[] = array(
+      'access'             => user_access('access content'),
+      'callback'           => 'bot_factoid_overview',
+      'description'        => t('Browse all the factoids the bot knows about.'),
+      'path'               => 'bot/factoid',
+      'title'              => t('Factoids'),
+    );
+    $items[] = array(
+      'access'             => user_access('administer bot'),
+      'callback'           => 'drupal_get_form',
+      'callback arguments' => 'bot_factoid_settings',
+      'description'        => t('Configure factoid learning with these settings.'),
+      'path'               => 'admin/settings/bot/factoid',
+      'title'              => t('Bot Factoid'),
+    );
+  }
+
+  return $items;
+}
+
+/**
+ * Browse all the factoids the bot knows about.
+ */
+function bot_factoid_overview() {
+  $output = NULL; $headers = array(t('Subject'), t('Is/Are'), t('Statement'));
+
+  $results = pager_query('SELECT subject, is_are, statement FROM {bot_factoid} ORDER BY subject', 25);
+  $rows = array(); while ($result = db_fetch_object($results)) { // titles could possibly be blank.
+    $rows[] = array(array('data' => check_plain($result->subject), 'class' => 'subject'),
+      array('data' => check_plain($result->is_are), 'class' => 'is_are'),
+      array('data' => check_plain($result->statement), 'class' => 'statement'));
+  } $output .= theme('table', $headers, $rows, array('id' => 'factoids')) . theme('pager', NULL, 25, 1);
+
+  return $output;
+}
+
+/**
+ * Listen for conversation directed at, or about, the bot.
+ *
+ * @param $data
+ *   The regular $data object prepared by the IRC library.
+ * @param $from_query
+ *   Boolean; whether this was a queried request.
+ */
+function bot_factoid_irc_msg_channel($data, $from_query = FALSE) {
+  $bot_name = variable_get('bot_nickname', 'bot_module');
+  $addressed = "$bot_name:? ?"; // bot name prefixed.
+  $to = $from_query ? $data->nick : $data->channel;
+
+  // look for factoids to answer.
+  // @todo if addressed, give response if no known factoid.
+  if (preg_match("/^($addressed)?(.*)[!\?]+$/", $data->message, $matches)) {
+    if ($factoid = bot_factoid_load($matches[2], $data)) {
+      if (preg_match("/^\/me /", $factoid['result'])) {
+        bot_action($to, str_replace('/me ', '', $factoid['result']));
+      } else { bot_message($to, $factoid['result']); }
+    }
+  }
+
+  // @todo allow subject searching and return list of subjects that match?
+  // @todo allow "tell <nick> about <subject> private messaging?
+
+  // look for factoids to delete.
+  if (preg_match("/^($addressed)forget( about)? (.*)$/i", $data->message, $matches)) {
+    bot_factoid_delete($matches[3]); // good night, sweethard. baaah dum dum dum. it's time to GoOoOooOOoo.
+    bot_message($to, t("!nick: I've forgotten about !subject.", array('!nick' => $data->nick, '!subject' => $matches[3])));
+  } // @todo delete message should be customizable. this one sucks.
+
+  // look for factoids to learn.
+  if (bot_factoid_save($data->message)) {
+    bot_message($to, t("!nick: Okay.", array('!nick' => $data->nick)));
+    // @todo success message should be customizable. "Okay." sucks.
+  }
+}
+
+/**
+ * All responses are available via a query.
+ */
+function bot_factoid_irc_msg_query($data) {
+  bot_factoid_irc_msg_channel($data, TRUE);
+}
+
+/**
+ * Delete a factoid.
+ *
+ * @param $subject
+ *   The subject you'd like to delete.
+ */
+function bot_factoid_delete($subject) {
+  if (!$subject) { return 0; } // why do you not send me a subject? I like to reap, reap, reap.
+  db_query("DELETE FROM {bot_factoid} WHERE LOWER(subject) = '%s'", drupal_strtolower($subject));
+}
+
+/**
+ * Retrieve a factoid. Subjects can have multiple statements. We do NOT
+ * check_plain() this return string, since we expect it will be spit verbatim
+ * to IRC. If you plan to use this elsewhere, use check_plain(), kthx.
+ *
+ * @param $subject
+ *   The subject you'd like to fetch factoids for.
+ * @param $irc_data
+ *   The regular $data object prepared by the IRC library. Used to
+ *   perform substitutions for "!who" (the nick asking for the factoid)
+ *   and "!channel" (the channel the factoid is asked in.)
+ *
+ * @return $factoid
+ *   An object containing 'subject' (string), 'Is_are' (string), 
+ *   'statements' (array) and 'result' (string). The 'result' is
+ *   the logical processing of the individual parts and should be
+ *   ready for sending.
+ */
+function bot_factoid_load($subject, $data = NULL) {
+  $factoid = array(); // holds everything about the fact.
+  $is_are_counts = array(); // number of "is" "are" usage.
+
+  $results = db_query("SELECT is_are, statement FROM {bot_factoid} WHERE LOWER(subject) = '%s'", drupal_strtolower($subject));
+  while ($result = db_fetch_object($results)) { // Morbus flings his own poo. Not at people. But at glassware. GLASSSWARE!
+    if (strpos($result->statement, '<reply>') !== FALSE)  { $factoid['has_reply']++; }
+    if (strpos($result->statement, '<action>') !== FALSE) { $factoid['has_action']++; }
+
+    if ($data) { // if the irc object is here, try for some substitutions.
+      $substitutions = array('!who' => $data->nick, '!channel' => $data->channel);
+      $result->statement = strtr($result->statement, $substitutions);
+    }
+
+    $factoid['statements'][] = $result->statement;
+    $is_are_counts[$result->is_are]++;
+  }
+
+  // got facts?
+  if (count($factoid['statements'])) {
+    $factoid['subject'] = $subject;
+
+    // @todo support one|two|three as a random response syntax.
+
+    // if a subject has multiple statements, we can't knowingly pick the
+    // best $is_are, so we'll choose whichever one has the most matches.
+    $factoid['is_are'] = $is_are_counts['are'] > $is_are_counts['is'] ? 'are' : 'is';
+
+    // generate the final result. we try our hardest to make a final result for
+    // ready printing, but the ability to have multiple statements per subject,
+    // and multiple TYPES of statements (<action> and <reply>), causes complexities.
+    // we'll do what we can with the result, and munge it for any other case.
+    if (!$factoid['has_reply'] && !$factoid['has_action'] || (count($factoid['statements']) > 1 && ($factoid['has_reply'] || $factoid['has_action']))) {
+      // if we've got no actions and no replies, or we have actions and replies but more than one easy-to-logic statements, we'll just spit 'em verbatim.
+      $factoid['result'] = "$factoid[subject] $factoid[is_are] ". implode(" $factoid[subject] $factoid[is_are] also ", $factoid['statements']);
+    }
+    elseif ($factoid['has_reply'] && count($factoid['statements']) == 1) {
+      $factoid['result'] = str_replace('<reply>', '', array_shift($factoid['statements']));
+    }
+    elseif ($factoid['has_action'] && count($factoid['statements']) == 1) {
+      $factoid['result'] = str_replace('<action>', '/me ', array_shift($factoid['statements']));
+    }
+
+    return $factoid;
+  }
+
+  return 0;
+}
+
+/**
+ * Creates a factoid. We expect a raw string right from the IRC user
+ * - we'll handle all the checks for prefacing and "no," and "also", etc.
+ * Learning factoids will only happen if the bot name has been used.
+ *
+ * @param $string
+ *   The user string that should be parsed for action.
+ */
+function bot_factoid_save($string) {
+  $bot_name = variable_get('bot_nickname', 'bot_module');
+  $addressed = "$bot_name:? ?"; // bot name prefixed.
+
+  // only process the string if it's one of:
+  //   <Morbus> bot_module: cats are brown.
+  //   <Morbus> no, cats are blue.
+  //   <Morbus> no, bot_module, cats are grey.
+  //   <Morbus> bot_module: Morbus is teh awesome.
+  if (preg_match("/^(no,?\s+)?($addressed)/i", $string) && preg_match('/^(.*?)\s+(is|are)\s+(.*)$/i', $string, $matches)) {
+    $subject = $matches[1]; $is_are = $matches[2]; $statement = $matches[3];
+
+    // remove "no, " and "no, bot_module" from subject.
+    $subject = preg_replace("/^\s*$bot_name(:|,)?\s*/i", '', $subject);
+    $subject = preg_replace("/^no,?\s+($bot_name(:|,)?\s*)?/i", '', $subject);
+
+    // check that it's not one of our stopwords.
+    $stopwords = explode("\n", variable_get('bot_factoid_stopwords', _bot_factoid_stopwords()));
+    if (in_array($subject, $stopwords)) { return 0; } // bad users deserve no feedback.
+
+    // if "also" starts the statement, we're adding.
+    if (preg_match("/^also\s+/i", $statement)) {
+      $statement = preg_replace("/^also\s+/i", '', $statement);
+    } else { bot_factoid_delete($subject); }
+
+    db_query("INSERT INTO {bot_factoid} SET subject = '%s', is_are = '%s', statement = '%s'", $subject, $is_are, $statement);
+    return 1; // if we set something, send back a happy.
+  }
+
+  return 0;
+}
+
+/**
+ * Configures factoid learning; system_settings_form().
+ */
+function bot_factoid_settings() {
+  $form = array();
+
+  $form['#prefix'] = t('The following variables are available for use in responses: !who, !channel.');
+
+  $form['bot_factoid_stopwords'] = array(
+    '#default_value' => variable_get('bot_factoid_stopwords', _bot_factoid_stopwords()),
+    '#description'   => t('List the words that cannot be the subject of a factoid.'),
+    '#title'         => t('Stopwords'),
+    '#type'          => 'textarea',
+  );
+
+  return system_settings_form($form);
+}
+
+/**
+ * Returns the default list of stopwords.
+ */
+function _bot_factoid_stopwords() {
+  return implode("\n", array(
+    'here',
+    'how',
+    'it',
+    'something',
+    'that',
+    'this',
+    'what',
+    'when',
+    'where',
+    'which',
+    'who',
+    'why',
+  ));
+}
