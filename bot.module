@@ -60,9 +60,6 @@ function bot_irc_bot_cron() {
   // recreates the variable cache.
   variable_set('bot_cache_cleared', time());
   $GLOBALS['conf'] = variable_init();
-
-  db_query('SELECT 1'); // database keepalive.
-  // necessary for idle channels with infrequent traffic.
 }
 
 /**
