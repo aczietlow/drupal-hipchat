@@ -97,6 +97,24 @@ function bot_irc_msg_query($data) {
 }
 
 /**
+ * Send an action to a channel or user.
+ *
+ * @param $to
+ *   A channel or user.
+ * @param $action
+ *   The action to perform.
+ */
+function bot_action($to, $action) {
+  global $irc; // from bot_start.php.
+  $irc->message(SMARTIRC_TYPE_ACTION, $to, $action);
+
+  // allow modules to react to bot responses. do NOT use
+  // bot_action() in your implementation as you'll cause
+  // an infinite loop! and that'd look really really retarded.
+  module_invoke_all('irc_bot_reply_action', $to, $action);
+}
+
+/**
  * Send a message to a channel or user.
  *
  * @param $to
@@ -112,7 +130,7 @@ function bot_message($to, $message) {
   // allow modules to react to bot responses. do NOT use
   // bot_message() in your implementation as you'll cause
   // an infinite loop! and that'd look really really retarded.
-  module_invoke_all('irc_bot_reply', $to, $message);
+  module_invoke_all('irc_bot_reply_message', $to, $message);
 }
 
 /**
@@ -122,8 +140,8 @@ function bot_message($to, $message) {
  */
 function bot_overview() {
   drupal_add_css(drupal_get_path('module', 'bot') .'/bot.css');
-  $output = '<p>'.t('The bot connects to server %server as nick %name.', 
-    array('%server' => variable_get('bot_server', 'irc.freenode.net'), 
+  $output = '<p>'.t('The bot connects to server %server as nick %name.',
+    array('%server' => variable_get('bot_server', 'irc.freenode.net'),
       '%name' => variable_get('bot_nickname', 'bot_module'))).'</p>';
   $output .= '<ul id="bot_features">';
 

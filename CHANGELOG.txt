@@ -2,10 +2,11 @@
 
 Bot 5.x-1.0, 2007-??-??
 -----------------------
+ * bot_factoid.module added; an infobot clone.
  * hook_irc_bot_cron() now exists and runs every five minutes.
  * #136856 and #136870 from Shiny: various PostgreSQL quote fixes.
  * bot_seen: now properly reports when it hasn't seen something.
- * bot_seen: now supports wildcard searches with *.
+ * bot_seen: now supports wildcard searches with * (three char minimum).
  * bot_seen: freeform "seen?" syntax is moved to direct addressing only.
  * hook_irc_bot_reply() exists to facilitate logging of own messages.
  * Issue metadata and IRC count per suggestions by ChrisKennedy.

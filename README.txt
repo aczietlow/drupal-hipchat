@@ -31,14 +31,14 @@ INSTALLATION
 The bot.module is not like other Drupal modules and requires a bit more
 effort than normal to get going. Unlike a regular Drupal page load, an
 IRC bot has to run forever and, for reasons best explained elsewhere, this
-entails running the bot through a shell NOT through web browser access.
+entails running the bot through a shell, NOT through web browser access.
 
 1. This module REQUIRES Net_SmartIRC, a PHP class available from PEAR.
    In most cases, you can simply run "pear install Net_SmartIRC".
 
 2. Copy this bot/ directory to your sites/SITENAME/modules directory.
 
-3. Enable the module and configure admin/settings/bot.
+3. Enable the module(s) and then configure them at admin/settings/bot.
 
 4. Inside the bot/ directory is a bot_start.php script which is a wrapper
    around Drupal and the IRC network libraries. To run this script, you'll
@@ -53,6 +53,27 @@ entails running the bot through a shell NOT through web browser access.
    browser. It sets HTTP_HOST and PHP_SELF, as required by Drupal.
 
 5. Your bot is now started and is trying to connect.
+
+6. Once your bot is connected, you can query it for more information:
+
+     <Morbus> YOUR_BOTNAME: help
+
+     <YOUR_BOTNAME>: Detailed information is available by asking for
+       "help <feature>" where <feature> is one of: Botagotchi, Drupal URLs,
+       Factoids, Seen.
+
+     <Morbus> YOUR_BOTNAME: help Seen
+
+     <YOUR_BOTNAME> If someone asks "seen Morbus", the bot will report the
+       last time they've been seen, where, and what their last known message
+       was. Directly addressing the bot will also allow the more complex
+       syntax of "seen Morbus? seen d8uv?", "have you seen sbp?" and similar
+       forms. * can be used as a wildcard, but only with a minimum of three
+       other characters. A maximum of three results are displayed for any
+       one request.
+
+   You can also go to http://www.SITENAME.com/bot/ for a web-based version
+   of all the feature help available through the IRC syntax above.
 
 
 IRC API HOOKS
@@ -85,11 +106,12 @@ conditions, you'd contribute back a patch to bot.module that'd let you
 accomplish your needs without using the $irc global. Generally speaking,
 try not to use the $irc global.
 
-There is another hook available called irc_bot_reply (such that, in our above
-example, it'd be bot_example_irc_bot_reply()). This function allows you to
-act whenever the bot sends a message. Primarily, this was added to allow us
-to log bot responses in bot_log.module. If you use this, be sure NOT to use
-bot_message() within your implementation, else you'll cause an infinite loop.
+There is another hook available called irc_bot_reply_message (such that, in
+our above example, it'd be bot_example_irc_bot_reply_message()). This function
+allows you to act whenever the bot sends a message. Primarily, this was added
+to allow us to log bot responses in bot_log.module. If you use this, be sure
+NOT to use bot_message() within your implementation, else you'll cause an
+infinite loop. Another hook, irc_bot_reply_action, does the same for actions.
 
 The final hook of interest is irc_bot_cron, which is run every five minutes.
 This is very similar to Drupal's own hook_cron, but is intended only for
@@ -111,13 +133,13 @@ letter or number will be turned into an underscore. For an example in code,
 take a look at the shipped bot_drupal.module. This information is provided
 by the bot under the following conditions:
 
-  <Morbus>     bot_module: help
+  <Morbus> bot_module: help
 
   <bot_module> Detailed information is available by asking for
-               "help <feature>" where <feature> is one of:
-               Drupal URLs, dns, karma.
+    "help <feature>" where <feature> is one of:
+    Drupal URLs, dns, karma.
 
-  <Morbus>     bot_module: help Drupal URLs
+  <Morbus> bot_module: help Drupal URLs
 
   <bot_module> Displays the title of drupal.org URLs ...
 
