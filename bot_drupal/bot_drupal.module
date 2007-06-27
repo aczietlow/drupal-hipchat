@@ -16,9 +16,11 @@ function bot_drupal_help($section) {
     case 'irc:features#drupal_urls':
       return t('Displays the title of drupal.org URLs; multiple URLs in a single message are acceptable. Also supports node IDs such as "#12345" or "4321", but only if that is the entirety of the message and the number is at least 4 digits. Popular and recent URLs are tracked at <!url>.', array('!url' => url('bot/drupal_urls', NULL, NULL, TRUE)));
     case 'irc:features#function_lookups':
-      return t('If api.module is installed, the bot can provide function lookups, triggered by "<function>?", based on the host\'s installed branches (which must have "short names" that match api.drupal.org). Branches besides the default (currently "5", representing "Drupal 5") can be specified with "<function>:<branch>?".');
+      return t('If api.module is installed, the bot can provide function lookups, triggered by "<function>?", based on the host\'s installed branches (which must have "short names" that match api.drupal.org). Branches besides the default (currently "!branch") can be specified with "<function>:<branch>?".', array('!branch' => variable_get('bot_drupal_api_default_branch', NULL)));
     case 'bot/drupal_urls':
-      return '<p>'.t('View the most recent and popular URLs mentioned in the Drupal IRC channels.').'</p>';
+      return '<p>'. t('View the most recent and popular URLs mentioned in the Drupal IRC channels.'). '</p>';
+    case 'admin/settings/bot/drupal':
+      return '<p>'. t('Configure the Drupal developer features with these settings.'). '</p>';
   }
 }
 
@@ -36,6 +38,17 @@ function bot_drupal_menu($may_cache) {
       'path'               => 'bot/drupal_urls',
       'title'              => t('Drupal URLs'),
     );
+
+    if (module_exists('api')) {
+      $items[] = array(
+        'access'             => user_access('administer bot'),
+        'callback'           => 'drupal_get_form',
+        'callback arguments' => 'bot_drupal_settings',
+        'description'        => t('Configure the Drupal developer features with these settings.'),
+        'path'               => 'admin/settings/bot/drupal',
+        'title'              => t('Bot Drupal'),
+      );
+    }
   }
 
   return $items;
@@ -91,12 +104,10 @@ function bot_drupal_irc_msg_channel($data, $from_query = FALSE) {
     }
   }
 
-  // @todo add "Function Lookup" help for this and explain how it goes.
   // if it's not a URL, check if it matches any api.module function.
-  if (module_exists('api') && preg_match('/^(.*)\?$/', $data->messageex[0])) {
-    $function = str_replace('?', '', $data->messageex[0]); // get rid of the question mark. useless comment ahoy!
-    // messageex is an already exploded-on-whitespace array for us - api lookups are a single "word" only, so this works nicely.
-    if ($result = db_fetch_object(db_query("SELECT ad.branch_name, ad.summary, af.signature FROM {api_function} af INNER JOIN {api_documentation} ad ON af.did = ad.did WHERE ad.object_type = 'function' AND ad.object_name = '%s'", $function))) {
+  if (module_exists('api') && preg_match('/^(\w*):?(\w*)\?$/', $data->messageex[0], $matches)) {
+    $function = $matches[1]; $branch = $matches[2] ? $matches[2] : variable_get('bot_drupal_api_default_branch', NULL);
+    if ($result = db_fetch_object(db_query("SELECT ad.branch_name, ad.summary, af.signature FROM {api_function} af INNER JOIN {api_documentation} ad ON af.did = ad.did WHERE ad.object_type = 'function' AND ad.object_name = '%s' AND (ad.branch_name = '%s' OR ad.branch_name = 'php')", $function, $branch))) {
       $message = $result->branch_name != 'php' // if we've indexed the php functions, they're in branch 'php', so we'll spit out a slightly different format.
         ? t('!function: !summary => !signature => !url', array('!function' => $function, '!signature' => $result->signature, '!summary' => $result->summary, '!url' => 'http://api.drupal.org/api/'. $result->branch_name .'/function/'. $function))
         : t('!function: !url', array('!function' => $function, '!url' => 'http://php.net/'. $function));
@@ -134,5 +145,24 @@ function bot_drupal_urls_overview() {
   } $output .= theme('table', $headers, $rows, array('id' => 'drupal_urls_recent')) . theme('pager', NULL, 10, 2);
 
   return $output;
+}
+
+/**
+ * Configures the Drupal developer features; system_settings_form().
+ */
+function bot_drupal_settings() {
+  $form = array();
+
+  $results = db_query('SELECT branch_name, title FROM {api_branch} ORDER BY title');
+  $branches = array(); while ($result = db_fetch_object($results)) { $branches[$result->branch_name] = $result->title; }
+  $form['bot_drupal_api_default_branch'] = array(
+    '#default_value' => variable_get('bot_drupal_api_default_branch', NULL),
+    '#description'   => t('Choose the default branch that will be used for non-specific function lookups.'),
+    '#options'       => $branches,
+    '#title'         => t('Default API Branch'),
+    '#type'          => 'select',
+  );
+
+  return system_settings_form($form);
 }
 

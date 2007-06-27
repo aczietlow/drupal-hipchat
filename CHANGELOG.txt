@@ -2,7 +2,7 @@
 
 Bot 5.x-1.0, 2007-??-??
 -----------------------
- * bot_drupal, from Bdragon: integrate with api.module.
+ * bot_drupal from Bdragon: integrate with api.module.
  * bot_factoid.module added; an infobot clone with all the fixins.
  * hook_irc_bot_cron() now exists and runs every five minutes.
  * #136856 and #136870 from Shiny: various PostgreSQL quote fixes.
