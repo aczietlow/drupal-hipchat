@@ -2,6 +2,8 @@
 
 Bot 5.x-1.0, 2007-??-??
 -----------------------
+ * bot: the db is now pinged regularly to prevent connect timeouts.
+ * bot_drupal: better handling of improper Doxygen summaries.
  * bot_drupal from Bdragon: integrate with api.module.
  * bot_factoid.module added; an infobot clone with all the fixins.
  * hook_irc_bot_cron() now exists and runs every five minutes.

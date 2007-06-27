@@ -208,6 +208,7 @@ function bot_factoid_save($string) {
   //   <Morbus> bot_module: Morbus is teh awesome.
   if (preg_match("/^(no,?\s+)?($addressed)/i", $string) && preg_match('/^(.*?)\s+(is|are)\s+(.*)$/i', $string, $matches)) {
     $subject = $matches[1]; $is_are = $matches[2]; $statement = $matches[3];
+    if ($subject == '') { return 0; } // you cheeky monkey, stop firing blanks.
 
     // remove "no, " and "no, bot_module" from subject.
     $subject = preg_replace("/^\s*$bot_name(:|,)?\s*/i", '', $subject);

@@ -108,6 +108,7 @@ function bot_drupal_irc_msg_channel($data, $from_query = FALSE) {
   if (module_exists('api') && preg_match('/^(\w*):?(\w*)\?$/', $data->messageex[0], $matches)) {
     $function = $matches[1]; $branch = $matches[2] ? $matches[2] : variable_get('bot_drupal_api_default_branch', NULL);
     if ($result = db_fetch_object(db_query("SELECT ad.branch_name, ad.summary, af.signature FROM {api_function} af INNER JOIN {api_documentation} ad ON af.did = ad.did WHERE ad.object_type = 'function' AND ad.object_name = '%s' AND (ad.branch_name = '%s' OR ad.branch_name = 'php')", $function, $branch))) {
+      if (preg_match("/\n/", $result->summary) && $result->branch_name != 'php') { $result->summary = '[Doxygen summary is not one line. This is a bug. File core patch.]'; }
       $message = $result->branch_name != 'php' // if we've indexed the php functions, they're in branch 'php', so we'll spit out a slightly different format.
         ? t('!function: !summary => !signature => !url', array('!function' => $function, '!signature' => $result->signature, '!summary' => $result->summary, '!url' => 'http://api.drupal.org/api/'. $result->branch_name .'/function/'. $function))
         : t('!function: !url', array('!function' => $function, '!url' => 'http://php.net/'. $function));
@@ -162,6 +163,8 @@ function bot_drupal_settings() {
     '#title'         => t('Default API Branch'),
     '#type'          => 'select',
   );
+
+  // @todo add in hostname to set the function lookup URLs too.
 
   return system_settings_form($form);
 }
