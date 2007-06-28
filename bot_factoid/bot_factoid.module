@@ -14,7 +14,7 @@ function bot_factoid_help($section) {
     case 'irc:features':
       return array(t('Factoids'));
     case 'irc:features#factoids':
-      return t('Set factoids with "BOTNAME: cats are furry", "BOTNAME: Drupal is great.", "No, BOTNAME, Morbus is awesome.", "BOTNAME: Drupal is also powerful.", "BOTNAME: cheer is <action>cheers!", or "BOTNAME: ping is <reply>WHAT?!". Retrieve factoids with: "Drupal?" or "BOTNAME: cheer!" Forget factoids with "BOTNAME: forget ping". Factoids can be browsed online at <!url>.', array('!url' => url('bot/factoids', NULL, NULL, TRUE)));
+      return t('Set factoids with "BOTNAME: cats are furry", "BOTNAME: Drupal is great.", "No, BOTNAME, Morbus is awesome.", "BOTNAME: Drupal is also powerful.", "BOTNAME: cheer is <action>cheers!", or "BOTNAME: ping is <reply>WHAT?!". Retrieve factoids with: "Drupal?" or "BOTNAME: cheer!" Forget factoids with "BOTNAME: forget ping". Factoids can be browsed online at <!url>.', array('!url' => url('bot/factoid', NULL, NULL, TRUE)));
     case 'bot/factoid':
       return '<p>'. t('Browse all the factoids the bot knows about.') .'</p>';
     case 'admin/settings/bot/factoid':
@@ -81,6 +81,9 @@ function bot_factoid_irc_msg_channel($data, $from_query = FALSE) {
   // look for factoids to answer.
   // @todo if addressed, give response if no known factoid.
   if (preg_match("/^($addressed)?(.*)[!\?]+$/", $data->message, $matches)) {
+
+    // @todo "BOTNAME?" fails as a factoid, due to $addressed above.
+
     if ($factoid = bot_factoid_load($matches[2], $data)) {
       if (preg_match("/^\/me /", $factoid['result'])) {
         bot_action($to, str_replace('/me ', '', $factoid['result']));
@@ -174,7 +177,7 @@ function bot_factoid_load($subject, $data = NULL) {
     // we'll do what we can with the result, and munge it for any other case.
     if (!$factoid['has_reply'] && !$factoid['has_action'] || (count($factoid['statements']) > 1 && ($factoid['has_reply'] || $factoid['has_action']))) {
       // if we've got no actions and no replies, or we have actions and replies but more than one easy-to-logic statements, we'll just spit 'em verbatim.
-      $factoid['result'] = "$factoid[subject] $factoid[is_are] ". implode(" $factoid[subject] $factoid[is_are] also ", $factoid['statements']);
+      $factoid['result'] = "$factoid[subject] $factoid[is_are] ". implode(" and $factoid[is_are] also ", $factoid['statements']);
     }
     elseif ($factoid['has_reply'] && count($factoid['statements']) == 1) {
       $factoid['result'] = str_replace('<reply>', '', array_shift($factoid['statements']));
@@ -206,13 +209,15 @@ function bot_factoid_save($string) {
   //   <Morbus> no, cats are blue.
   //   <Morbus> no, bot_module, cats are grey.
   //   <Morbus> bot_module: Morbus is teh awesome.
+  //
+  // @todo "Druplicon is gay" creates a blank subject.
   if (preg_match("/^(no,?\s+)?($addressed)/i", $string) && preg_match('/^(.*?)\s+(is|are)\s+(.*)$/i', $string, $matches)) {
     $subject = $matches[1]; $is_are = $matches[2]; $statement = $matches[3];
-    if ($subject == '') { return 0; } // you cheeky monkey, stop firing blanks.
 
     // remove "no, " and "no, bot_module" from subject.
     $subject = preg_replace("/^\s*$bot_name(:|,)?\s*/i", '', $subject);
     $subject = preg_replace("/^no,?\s+($bot_name(:|,)?\s*)?/i", '', $subject);
+    if (preg_match('/^\s+$/', $subject)) { return 0; } // stop firing blanks.
 
     // check that it's not one of our stopwords.
     $stopwords = explode("\n", variable_get('bot_factoid_stopwords', _bot_factoid_stopwords()));

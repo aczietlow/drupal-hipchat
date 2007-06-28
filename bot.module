@@ -180,9 +180,15 @@ function bot_settings() {
     '#title'         => t('Bot nickname'),
     '#type'          => 'textfield',
   );
+  $form['bot_password'] = array(
+    '#default_value' => variable_get('bot_password', ''),
+    '#description'   => t('(Optional) Enter the password the bot will login to the server with.'),
+    '#title'         => t('Bot password'),
+    '#type'          => 'textfield',
+  );
   $form['bot_channels'] = array(
     '#default_value' => variable_get('bot_channels', '#test'),
-    '#description'   => t('Enter a comma-separated list of channels the bot will automatically join.'),
+    '#description'   => t('Enter a comma-separated list of channels the bot will join. For channels with a key, use "&lt;#channel> &lt;key>".'),
     '#rows'          => 3,
     '#title'         => t('Bot channels'),
     '#type'          => 'textarea',

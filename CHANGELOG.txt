@@ -2,6 +2,7 @@
 
 Bot 5.x-1.0, 2007-??-??
 -----------------------
+ * bot: supports server passwords and channel keys, thanks to Bdragon.
  * bot_drupal: better handling of improper Doxygen summaries.
  * bot_drupal from Bdragon: integrate with api.module.
  * bot_factoid.module added; an infobot clone with all the fixins.
