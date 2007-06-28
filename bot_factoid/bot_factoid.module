@@ -60,7 +60,7 @@ function bot_factoid_overview() {
     $rows[] = array(array('data' => check_plain($result->subject), 'class' => 'subject'),
       array('data' => check_plain($result->is_are), 'class' => 'is_are'),
       array('data' => check_plain($result->statement), 'class' => 'statement'));
-  } $output .= theme('table', $headers, $rows, array('id' => 'factoids')) . theme('pager', NULL, 25, 1);
+  } $output .= theme('table', $headers, $rows, array('id' => 'factoids')) . theme('pager', NULL, 25, 0);
 
   return $output;
 }
