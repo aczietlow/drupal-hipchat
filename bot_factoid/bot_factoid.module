@@ -14,7 +14,7 @@ function bot_factoid_help($section) {
     case 'irc:features':
       return array(t('Factoids'));
     case 'irc:features#factoids':
-      return t('Set factoids with "BOTNAME: cats are furry", "BOTNAME: Drupal is great.", "No, BOTNAME, Morbus is awesome.", "BOTNAME: Drupal is also powerful.", "BOTNAME: cheer is <action>cheers!", or "BOTNAME: ping is <reply>WHAT?!". Retrieve factoids with: "Drupal?" or "BOTNAME: cheer!" Forget factoids with "BOTNAME: forget ping". Factoids can be browsed online at <!url>.', array('!url' => url('bot/factoid', NULL, NULL, TRUE)));
+      return t('Set factoids with "BOTNAME: cats are furry", "BOTNAME: Drupal is great.", "No, BOTNAME, Morbus is awesome.", "BOTNAME: Drupal is also powerful.", "BOTNAME: cheer is <action>cheers for !who in !channel!", or "BOTNAME: ping is <reply>WHAT?!". Retrieve factoids with: "Drupal?" or "BOTNAME: cheer!" Forget factoids with "BOTNAME: forget ping". Factoids can be browsed online at <!url>.', array('!url' => url('bot/factoid', NULL, NULL, TRUE)));
     case 'bot/factoid':
       return '<p>'. t('Browse all the factoids the bot knows about.') .'</p>';
     case 'admin/settings/bot/factoid':
@@ -75,16 +75,17 @@ function bot_factoid_overview() {
  */
 function bot_factoid_irc_msg_channel($data, $from_query = FALSE) {
   $bot_name = variable_get('bot_nickname', 'bot_module');
-  $addressed = "$bot_name:? ?"; // bot name prefixed.
+  $addressed = "\s*${bot_name}[\:,-]\s*"; // bot mentioned?
   $to = $from_query ? $data->nick : $data->channel;
 
   // look for factoids to answer.
   // @todo if addressed, give response if no known factoid.
-  if (preg_match("/^($addressed)?(.*)[!\?]+$/", $data->message, $matches)) {
+  if (preg_match("/^($addressed)?(.*)[!\?]+$/i", $data->message, $matches)) {
 
-    // @todo "BOTNAME?" fails as a factoid, due to $addressed above.
+    // "BOTNAME?" fails as a factoid. this fixes it.
+    $subject = $matches[2] ? $matches[2] : $matches[1];
 
-    if ($factoid = bot_factoid_load($matches[2], $data)) {
+    if ($factoid = bot_factoid_load($subject, $data)) {
       if (preg_match("/^\/me /", $factoid['result'])) {
         bot_action($to, str_replace('/me ', '', $factoid['result']));
       } else { bot_message($to, $factoid['result']); }
@@ -96,7 +97,7 @@ function bot_factoid_irc_msg_channel($data, $from_query = FALSE) {
 
   // look for factoids to delete.
   if (preg_match("/^($addressed)forget( about)? (.*)$/i", $data->message, $matches)) {
-    bot_factoid_delete($matches[3]); // good night, sweethard. baaah dum dum dum. it's time to GoOoOooOOoo.
+    bot_factoid_delete($matches[3]); // good night, sweetheart. baaah dum dum dum. it's time to GoOoOooOOoo.
     bot_message($to, t("!nick: I've forgotten about !subject.", array('!nick' => $data->nick, '!subject' => $matches[3])));
   } // @todo delete message should be customizable. this one sucks.
 
@@ -202,22 +203,20 @@ function bot_factoid_load($subject, $data = NULL) {
  */
 function bot_factoid_save($string) {
   $bot_name = variable_get('bot_nickname', 'bot_module');
-  $addressed = "$bot_name:? ?"; // bot name prefixed.
+  $addressed = "\s*${bot_name}[\:,-]\s*"; // bot mentioned?
 
   // only process the string if it's one of:
   //   <Morbus> bot_module: cats are brown.
-  //   <Morbus> no, cats are blue.
+  //   <Morbus> bot_module: no, cats are blue.
   //   <Morbus> no, bot_module, cats are grey.
   //   <Morbus> bot_module: Morbus is teh awesome.
-  //
-  // @todo "Druplicon is gay" creates a blank subject.
-  if (preg_match("/^(no,?\s+)?($addressed)/i", $string) && preg_match('/^(.*?)\s+(is|are)\s+(.*)$/i', $string, $matches)) {
+  if (preg_match("/^(no[,; ])?$addressed/i", $string) && preg_match('/^(.*?)\s+(is|are)\s+(.*)$/i', $string, $matches)) {
     $subject = $matches[1]; $is_are = $matches[2]; $statement = $matches[3];
 
-    // remove "no, " and "no, bot_module" from subject.
-    $subject = preg_replace("/^\s*$bot_name(:|,)?\s*/i", '', $subject);
-    $subject = preg_replace("/^no,?\s+($bot_name(:|,)?\s*)?/i", '', $subject);
-    if (preg_match('/^\s+$/', $subject)) { return 0; } // stop firing blanks.
+    // remove "botmodule: no," and "no, bot_module".
+    $subject = preg_replace("/^$addressed/i", '', $subject);
+    $subject = preg_replace("/^no[,; ]\s*($addressed)?/i", '', $subject);
+    if (preg_match('/^\s*$/', $subject)) { return 0; } // stop firing blanks.
 
     // check that it's not one of our stopwords.
     $stopwords = explode("\n", variable_get('bot_factoid_stopwords', _bot_factoid_stopwords()));
