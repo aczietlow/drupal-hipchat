@@ -39,6 +39,9 @@ require_once './includes/bootstrap.inc';
 drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
 require_once('Net/SmartIRC.php');
 
+// prevent MySQL timeouts on slow channels.
+db_query('SET SESSION wait_timeout = %d', 24*60*60);
+
 // initialize the bot with some sane defaults.
 global $irc; $bot = new drupal_wrapper(); $irc = new Net_SmartIRC();
 $irc->setDebug( variable_get('bot_debugging', 0) ? SMARTIRC_DEBUG_ALL : SMARTIRC_DEBUG_NONE );
