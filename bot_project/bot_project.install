@@ -4,7 +4,7 @@
 /**
  * Implementation of hook_install().
  */
-function bot_drupal_install() {
+function bot_project_install() {
   switch ($GLOBALS['db_type']) {
     case 'mysql':
     case 'mysqli':
@@ -26,7 +26,7 @@ function bot_drupal_install() {
   }
 }
 
-function bot_drupal_update_1() {
+function bot_project_update_1() {
   $ret = array();
   switch ($GLOBALS['db_type']) {
     case 'mysql':
@@ -48,7 +48,7 @@ function bot_drupal_update_1() {
   return $ret;
 }
 
-function bot_drupal_update_2() {
+function bot_project_update_2() {
   $ret = array();
   switch ($GLOBALS['db_type']) {
     case 'mysql':

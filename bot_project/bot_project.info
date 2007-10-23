@@ -1,0 +1,5 @@
+; $Id$
+name = Bot Project
+package = Bot
+dependencies = bot
+description = Enables various project toolkit compatible actions.

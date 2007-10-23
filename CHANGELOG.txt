@@ -2,6 +2,9 @@
 
 Bot 5.x-1.0, 2007-??-??
 -----------------------
+ * bot_project now has configurable project.module scraping.
+ * bot_project can now define URL endpoints per api branch.
+ * bot_drupal renamed to bot_project, made much more generic.
  * bot: supports server passwords and channel keys, thanks to Bdragon.
  * bot_drupal: better handling of improper Doxygen summaries.
  * bot_drupal from Bdragon: integrate with api.module.
