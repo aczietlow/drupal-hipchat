@@ -123,6 +123,7 @@ function bot_project_irc_msg_channel($data, $from_query = FALSE) {
       // @todo I'm too lazy to recompile PHP with SSL support, and too Drupal-oriented to switch to cURL. I'm awesome.
 
       $result = drupal_http_request($url);
+      if ($result->code != 200) { continue; }
 
       // we'll always display a title, so grab that first for db storage.
       preg_match('/<title>(.*?) \|.*?<\/title>/', $result->data, $title_match);
@@ -179,6 +180,7 @@ function bot_project_irc_msg_channel($data, $from_query = FALSE) {
       // @todo I'm too lazy to recompile PHP with SSL support, and too Drupal-oriented to switch to cURL. I'm awesome.
 
       $result = drupal_http_request($url);
+      if ($result->code != 200) { continue; }
 
       // if the URL is a tab export, it's a ticket.
       if (strpos($url, '?format=tab') !== FALSE) {
