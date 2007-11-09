@@ -243,7 +243,7 @@ function theme_bot_log_day($channel, $date, $logs, $format = 'html') {
 
     foreach ($logs as $log) {
       $fragment = 'T'. $log['id']; // our timestamps will be linked to the internal ID, providing permanent URLs for conversations.
-      $permalink = l(format_date($log['timestamp'], 'custom', '[H:i:s]'), 'bot/log/'. $channel .'/'. $day, array('id' => $fragment), NULL, $fragment);
+      $permalink = l(format_date($log['timestamp'], 'custom', '[H:i:s]'), 'bot/log/'. $channel .'/'. $date, array('id' => $fragment), NULL, $fragment);
 
       // change row color based on the speaker.
       $last_nick = $last_nick ? $last_nick : $log['nick'];
