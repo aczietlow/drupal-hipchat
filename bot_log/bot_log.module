@@ -191,12 +191,14 @@ function bot_log_day($channel = NULL, $day = NULL) {
   if (!$channel) { // ... we'll show a list of all we're logging.
     $output = '<p>'. t('Choose the IRC channel whose logs you want to view:') .'</p><ul>';
     foreach (variable_get('bot_log_channels', array()) as $available_channel) { // RUN AWAY!
-      $output .= '<li>'. l($available_channel, 'bot/log/'. substr($available_channel, 1)) .'</li>';
+      if (user_access("view bot logs: $available_channel")) { // unleashed spirits of the war dead.
+        $output .= '<li>'. l($available_channel, 'bot/log/'. substr($available_channel, 1)) .'</li>';
+      } // you'll be popular, but just not quite as popular asSSs MmE.eEEe.
     } $output .= '</ul>'; // someday, someone will yell "code style!" BUGGER.
   }
 
   // there is a channel! and the user can view it! holy crap!
-  if (isset($channel) && user_access('view bot logs: #$channel"')) {
+  if (isset($channel) && user_access("view bot logs: #$channel")) {
     // all time calcs are in GMT.
     $day = $day ? $day : date('Y-m-d');
     $day_start = strtotime("$day GMT");
