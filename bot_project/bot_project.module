@@ -242,7 +242,39 @@ function bot_project_urls_overview() {
 }
 
 /**
- * Configures the project toolkit features; system_settings_form().
+ * Quickie branch URL generation, without url().
+ *
+ * @param $branch
+ *   The name of the branch to create a URL to.
+ * @return $url
+ *   A FQDN with %function ready to be replaced.
+ */
+function bot_project_branch_url($branch) {
+  global $base_url; // we don't use url() so that it doesn't URL-encode the !function interpolated.
+  return variable_get('bot_project_api_branch_'. $branch .'_url', $base_url . base_path() .'api/function/!function/'. $branch);
+}
+
+/**
+ * Log a URL into the database and return its seen count.
+ *
+ * @param $url
+ *   The URL to log.
+ * @param $title
+ *   The title of the retrieved URL.
+ * @return $count
+ *   A string representing the number of times seen.
+ */
+function bot_project_url_save($url, $title) {
+  $count = db_result(db_query("SELECT count FROM {bot_urls} WHERE url = '%s'", $url));
+  if ($count) { db_query("UPDATE {bot_urls} SET title = '%s', count = count + 1, last_seen = %d WHERE url = '%s'", decode_entities($title), time(), $url); }
+  else { db_query("INSERT INTO {bot_urls} (url, title, count, last_seen) VALUES ('%s', '%s', %d, %d)", $url, decode_entities($title), 1, time()); }
+  $count = $count ? $count : 0; // if this is the first time, set the count to 0, pre-inc'd later.
+  $count = format_plural(++$count, '1 IRC mention', '@count IRC mentions'); // said later display.
+  return $count;
+}
+
+/**
+ * Configures the project toolkit features.
  */
 function bot_project_settings() {
   $form = array();
@@ -345,36 +377,3 @@ function bot_project_settings() {
 
   return system_settings_form($form);
 }
-
-/**
- * Quickie branch URL generation, without url().
- *
- * @param $branch
- *   The name of the branch to create a URL to.
- * @return $url
- *   A FQDN with %function ready to be replaced.
- */
-function bot_project_branch_url($branch) {
-  global $base_url; // we don't use url() so that it doesn't URL-encode the !function interpolated.
-  return variable_get('bot_project_api_branch_'. $branch .'_url', $base_url . base_path() .'api/function/!function/'. $branch);
-}
-
-/**
- * Log a URL into the database and return its seen count.
- *
- * @param $url
- *   The URL to log.
- * @param $title
- *   The title of the retrieved URL.
- * @return $count
- *   A string representing the number of times seen.
- */
-function bot_project_url_save($url, $title) {
-  $count = db_result(db_query("SELECT count FROM {bot_urls} WHERE url = '%s'", $url));
-  if ($count) { db_query("UPDATE {bot_urls} SET title = '%s', count = count + 1, last_seen = %d WHERE url = '%s'", decode_entities($title), time(), $url); }
-  else { db_query("INSERT INTO {bot_urls} (url, title, count, last_seen) VALUES ('%s', '%s', %d, %d)", $url, decode_entities($title), 1, time()); }
-  $count = $count ? $count : 0; // if this is the first time, set the count to 0, pre-inc'd later.
-  $count = format_plural(++$count, '1 IRC mention', '@count IRC mentions'); // said later display.
-  return $count;
-}
-

@@ -13,7 +13,7 @@ function bot_seen_install() {
         channel varchar(60) NOT NULL default '',
         message text NOT NULL default '',
         timestamp int NOT NULL default '0',
-        PRIMARY KEY (nick)
+        KEY (nick)
       ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");
       break;
     case 'pgsql':
@@ -22,7 +22,7 @@ function bot_seen_install() {
         channel varchar(60) NOT NULL default '',
         message text NOT NULL default '',
         timestamp integer NOT NULL default '0',
-        PRIMARY KEY (nick)
+        KEY (nick)
       )");
       break;
   }

@@ -240,8 +240,6 @@ function bot_factoid_save($string) {
 function bot_factoid_settings() {
   $form = array();
 
-  $form['#prefix'] = t('The following variables are available for use in responses: !who, !channel.');
-
   $form['bot_factoid_stopwords'] = array(
     '#default_value' => variable_get('bot_factoid_stopwords', _bot_factoid_stopwords()),
     '#description'   => t('List the words that cannot be the subject of a factoid.'),

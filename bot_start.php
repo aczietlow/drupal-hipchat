@@ -76,11 +76,10 @@ $irc->login(variable_get('bot_nickname', 'bot_module'), variable_get('bot_nickna
 // to support passwords, we have to make a single join per channel.
 $channels = preg_split('/\s*,\s*/', variable_get('bot_channels', '#test'));
 foreach ($channels as $channel) {
-  $channel_parts = explode(' ', $channel);
+  $channel_parts = explode(' ', $channel); // use a password if it's defined.
   $irc->join($channel_parts[0], isset($channel_parts[1]) ? $channel_parts[1] : NULL);
 }
 
-$irc->join(preg_split('/\s*,\s*/', variable_get('bot_channels', '#test')));
 $irc->listen(); // go into the forever loop - no code after this is run.
 $irc->disconnect(); // if we stop listening, disconnect properly.
 
