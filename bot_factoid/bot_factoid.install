@@ -17,7 +17,7 @@ function bot_factoid_install() {
       break;
     case 'pgsql':
       db_query("CREATE TABLE {bot_factoid} (
-        subject text NOT NULL default '',
+        subject varchar(255) NOT NULL default '',
         is_are varchar(3) NOT NULL default '',
         statement text NOT NULL default '',
         KEY (subject)

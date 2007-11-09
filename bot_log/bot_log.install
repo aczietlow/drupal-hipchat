@@ -12,7 +12,7 @@ function bot_log_install() {
         id bigint(20) unsigned NOT NULL auto_increment,
         type int NOT NULL default '0',
         timestamp int NOT NULL default '0',
-        channel varchar(60) default NULL,
+        channel varchar(255) default NULL,
         nick varchar(60) default NULL,
         message text,
         KEY (id))");
@@ -22,7 +22,7 @@ function bot_log_install() {
         id serial NOT NULL,
         type integer NOT NULL default '0',
         timestamp integer NOT NULL default '0',
-        channel varchar(60) default NULL,
+        channel varchar(255) default NULL,
         nick varchar(60) default NULL,
         message text,
         KEY (id))");

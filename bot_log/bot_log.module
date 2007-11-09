@@ -165,8 +165,13 @@ function bot_log_irc_msg_who($data) {
  *   The actual message itself.
  */
 function bot_log_insert($type, $channel, $nick, $message) {
-  if (isset($channel) && !in_array($channel, variable_get('bot_log_channels', array()))) { return FALSE; }
-  db_query("INSERT INTO {bot_log} (type, timestamp, channel, nick, message) VALUES ('%s', %d, '%s', '%s', '%s')", $type, time(), $channel, $nick, $message);
+  $logged_channels = variable_get('bot_log_channels', array());
+  if (strpos($channel, ' ') !== FALSE) { $incoming_channels = array_flip(explode(' ', $channel)); }
+  // if $channel is space-separated, this is a NICKCHANGE or QUIT that needs all relevant channels.
+
+  if (isset($channel) && (in_array($channel, $logged_channels)) || array_intersect_key($incoming_channels, $logged_channels)) {
+    db_query("INSERT INTO {bot_log} (type, timestamp, channel, nick, message) VALUES ('%s', %d, '%s', '%s', '%s')", $type, time(), $channel, $nick, $message);
+  }
 }
 
 /**
@@ -190,17 +195,21 @@ function bot_log_day($channel = NULL, $day = NULL) {
     } $output .= '</ul>'; // someday, someone will yell "code style!" BUGGER.
   }
 
-  // there is a channel! yay.
-  if (isset($channel)) {
+  // there is a channel! and the user can view it! holy crap!
+  if (isset($channel) && user_access('view bot logs: #$channel"')) {
     // all time calcs are in GMT.
     $day = $day ? $day : date('Y-m-d');
     $day_start = strtotime("$day GMT");
     $day_end   = $day_start + (60 * 60 * 24);
 
     // see bot_log_irc_msg_quit() for why we use a LIKE %#channel here for lookups.
-    $results = db_query("SELECT * FROM {bot_log} WHERE channel LIKE '%s' AND (timestamp >= %d AND timestamp <= %d) ORDER BY id", '%#'. $channel, $day_start, $day_end);
+    $results = db_query("SELECT * FROM {bot_log} WHERE channel REGEXP '.*#%s ?' AND (timestamp >= %d AND timestamp <= %d) ORDER BY id", $channel, $day_start, $day_end);
     $logs = array(); while ($result = db_fetch_array($results)) { $logs[] = $result; }
     $output .= theme('bot_log_day', $channel, $day, $logs);
+    return $output;
+  }
+  elseif (isset($channel) && !user_access('view bot logs: #$channel"')) {
+    drupal_access_denied(); // HOW DAR EYOU INTERRUPT MY CYBER SEXORING!
   }
 
   return $output;
