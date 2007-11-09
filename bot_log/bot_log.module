@@ -361,7 +361,7 @@ function bot_log_settings(){
     '#description'   => t('Select the channels to log.'),
     '#multiple'      => TRUE,
     '#options'       => $channel_options,
-    '#size'          => 5,
+    '#size'          => 10,
     '#type'          => 'select',
     '#title'         => t('IRC channels'),
   );
