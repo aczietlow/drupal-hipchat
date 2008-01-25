@@ -317,7 +317,7 @@ function bot_project_settings() {
   );
   $form['bot_project_project']['bot_project_project_url_regexp'] = array(
     '#default_value' => variable_get('bot_project_project_url_regexp', NULL),
-    '#description'   => t('Lookup issues when matched in conversation (ex. %example).', array('%example' => 'http://.*drupal.org/node/\d+')),
+    '#description'   => t('Lookup issues when matched in conversation (ex. %example).', array('%example' => 'http://[\w\d\-]*?\.?drupal\.org/node/\d+')),
     '#title'         => t('URL regexp for issue lookups'),
     '#type'          => 'textfield',
   );
