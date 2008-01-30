@@ -1,7 +1,10 @@
 // $Id$
 
-Bot 5.x-1.0, 2007-??-??
+Bot 5.x-1.0, 2008-??-??
 -----------------------
+
+Bot 5.x-1.0, year 2007
+----------------------
  * bot_log.module added; Logs multiple channels, day browsing, etc.
  * bot_project now has Trac integration (for tickets and revisions).
  * added another MySQL timeout preventer, thanks to killes.
