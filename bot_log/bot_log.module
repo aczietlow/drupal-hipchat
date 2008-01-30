@@ -283,7 +283,7 @@ function theme_bot_log_day($channel, $date, $logs, $format = 'html') {
       }
 
       // if there are URLs, make them links and shorten them if they're long.
-      if (variable_get('bot_log_dont_change_the_content', TRUE)) {
+      if (!variable_get('bot_log_dont_change_the_content', FALSE)) {
         $message = filter_filter('process', 3, 'bot_log', $message);
       }
 

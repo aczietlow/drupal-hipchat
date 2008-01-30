@@ -27,3 +27,10 @@ function bot_seen_install() {
       break;
   }
 }
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function bot_seen_uninstall() {
+  db_query('DROP TABLE {bot_seen}');
+}

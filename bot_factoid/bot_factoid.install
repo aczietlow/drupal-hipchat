@@ -25,3 +25,11 @@ function bot_factoid_install() {
       break;
   }
 }
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function bot_factoid_uninstall() {
+  db_query('DROP TABLE {bot_factoid}');
+  variable_del('bot_factoid_stopwords');
+}

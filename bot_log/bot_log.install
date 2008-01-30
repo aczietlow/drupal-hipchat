@@ -33,3 +33,12 @@ function bot_log_install() {
   // where a bot factoid response will log BEFORE the actual factoid trigger.
   db_query("UPDATE {system} SET weight = -10 WHERE name = 'bot_log'");
 }
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function bot_log_uninstall() {
+  db_query('DROP TABLE {bot_log}');
+  variable_del('bot_log_channels');
+  variable_del('bot_log_dont_change_the_content');
+}

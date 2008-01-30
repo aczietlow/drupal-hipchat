@@ -2,6 +2,7 @@
 
 Bot 5.x-1.0, 2008-??-??
 -----------------------
+ * added hook_uninstall() to everything.
 
 Bot 5.x-1.0, year 2007
 ----------------------

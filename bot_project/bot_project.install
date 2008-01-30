@@ -26,6 +26,31 @@ function bot_project_install() {
   }
 }
 
+/**
+ * Implementation of hook_uninstall().
+ */
+function bot_project_uninstall() {
+  db_query('DROP TABLE {bot_urls}');
+  variable_del('bot_project_api_default_branch');
+  variable_del('bot_project_project_enable');
+  variable_del('bot_project_project_nid_min');
+  variable_del('bot_project_project_nid_max');
+  variable_del('bot_project_project_url');
+  variable_del('bot_project_project_url_regexp');
+  variable_del('bot_project_too_lazy_to_recompile_for_ssl');
+  variable_del('bot_project_trac_enable');
+  variable_del('bot_project_trac_num_min');
+  variable_del('bot_project_trac_num_max');
+  variable_del('bot_project_trac_url');
+  variable_del('bot_project_trac_url_regexp');
+
+  // branch names create dynamic variables. get 'em all here.
+  db_query("DELETE FROM {variable} WHERE name LIKE 'bot_project_api_branch_%'");
+}
+
+/**
+ * Initial database table creation.
+ */
 function bot_project_update_1() {
   $ret = array();
   switch ($GLOBALS['db_type']) {
@@ -48,6 +73,9 @@ function bot_project_update_1() {
   return $ret;
 }
 
+/**
+ * Store the title of the grabbed URLs.
+ */
 function bot_project_update_2() {
   $ret = array();
   switch ($GLOBALS['db_type']) {
