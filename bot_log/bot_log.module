@@ -165,6 +165,7 @@ function bot_log_irc_msg_who($data) {
  *   The actual message itself.
  */
 function bot_log_insert($type, $channel, $nick, $message) {
+  $incoming_channels = array(); // predeclare for intersect.
   $logged_channels = variable_get('bot_log_channels', array());
   if (strpos($channel, ' ') !== FALSE) { $incoming_channels = array_flip(explode(' ', $channel)); }
   // if $channel is space-separated, this is a NICKCHANGE or QUIT that needs all relevant channels.
