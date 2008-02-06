@@ -66,7 +66,7 @@ function bot_seen_irc_msg_channel($data, $from_query = FALSE) {
     if (strlen(str_replace('*', '', $nick)) >= 3) { $nick = str_replace('*', '%', $nick); }
     $results = db_query("SELECT nick, channel, message, timestamp FROM {bot_seen} WHERE LOWER(nick) LIKE '%s' ORDER BY timestamp DESC", drupal_strtolower($nick));
     while ($result = db_fetch_object($results)) { // throw 'em on the bar-b... we'll shrink the result set later. to keep it relevant, we order by timestamp.
-      $message = preg_replace($all_nicks, "_[$0]_", $result->message); // prevent seen-pings by obfuscating the nick and hope they're not pattern matching on anything but exact.
+      $message = preg_replace($all_nicks, "[_$0_]", $result->message); // prevent seen-pings by obfuscating the nick and hope they're not pattern matching on anything but exact.
       $messages[] = t("!nick was last seen in !channel !this_long ago saying '!message'.", array('!nick' => $result->nick, '!this_long' => format_interval(time() - $result->timestamp), '!channel' => $result->channel, '!message' => $message, ));
     } if (count($messages) == 0) { $messages[] = t("Sorry, I haven't seen !match.", array('!match' => str_replace('%', '*', $nick), )); }
   }
