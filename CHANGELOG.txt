@@ -2,6 +2,9 @@
 
 Bot 5.x-1.0, 2008-??-??
 -----------------------
+ * #155045: bot_seen no longer fails with "asd%" on fuzzy matching.
+ * #106993: bot_seen ignores messages and actions sent to the bot.
+ * #106992: bot_seen now logs actions as seenable offenses.
  * added hook_uninstall() to everything.
 
 Bot 5.x-1.0, year 2007

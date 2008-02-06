@@ -129,18 +129,18 @@ hook_help(), and the use of two special strings:
 
 FEATURE_NAME will be lowercased, trimmed of whitespace, and anything not a
 letter or number will be turned into an underscore. For an example in code,
-take a look at the shipped bot_drupal.module. This information is provided
+take a look at the shipped bot_project.module. This information is provided
 by the bot under the following conditions:
 
   <Morbus> bot_module: help
 
   <bot_module> Detailed information is available by asking for
     "help <feature>" where <feature> is one of:
-    Drupal URLs, dns, karma.
+    Project URLs, dns, karma.
 
-  <Morbus> bot_module: help Drupal URLs
+  <Morbus> bot_module: help Project URLs
 
-  <bot_module> Displays the title of drupal.org URLs ...
+  <bot_module> Displays the title of project URLs ...
 
 
 DESIGN DECISIONS
