@@ -279,10 +279,10 @@ function bot_project_url_save($url, $title) {
 function bot_project_settings() {
   $form = array();
 
-  $results = db_query('SELECT branch_name, title FROM {api_branch} ORDER BY title');
-  $branches = array(); while ($result = db_fetch_object($results)) { $branches[$result->branch_name] = $result->title; }
-
   if (module_exists('api')) {
+    $results = db_query('SELECT branch_name, title FROM {api_branch} ORDER BY title');
+    $branches = array(); while ($result = db_fetch_object($results)) { $branches[$result->branch_name] = $result->title; }
+
     $form['bot_project_api'] = array(
       '#collapsible'   => TRUE,
       '#title'         => t('api.module integration'),
