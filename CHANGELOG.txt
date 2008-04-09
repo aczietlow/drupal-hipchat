@@ -1,6 +1,10 @@
-. // $Id$
+// $Id$
 
-Bot 5.x-1.0, 2008-??-??
+Bot 6.x-1.x, 2008-??-??
+-----------------------
+
+
+Bot 5.x-1.0, 2008-04-08
 -----------------------
  * #193209: an attempt at solving seen pings has been implemented.
  * #155045: bot_seen no longer fails with "asd%" on fuzzy matching.
