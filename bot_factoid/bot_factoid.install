@@ -2,34 +2,51 @@
 // $Id$
 
 /**
+ * Implementation of hook_schema().
+ */
+function bot_factoid_schema() {
+  $schema['bot_factoid'] = array(
+    'description' => t('The single table necessary for factoid storage.'),
+    'fields' => array(
+      'subject' => array(
+        'default'     => '',
+        'description' => t('The word or phrase this factoid is about.'),
+        'length'      => 255,
+        'not null'    => TRUE,
+        'type'        => 'varchar',
+      ),
+      'is_are' => array(
+        'default'     => '',
+        'description' => t('The determinant of whether this factoid is singular or plural.'),
+        'length'      => 3,
+        'not null'    => TRUE,
+        'type'        => 'varchar',
+      ),
+      'statement' => array(
+        'default'     => '',
+        'description' => t('The factoid defined for this subject.'),
+        'not null'    => TRUE,
+        'size'        => 'medium',
+        'type'        => 'text',
+      ),
+    ),
+    'primary key' => array('subject'),
+  );
+
+  return $schema;
+}
+
+/**
  * Implementation of hook_install().
  */
 function bot_factoid_install() {
-  switch ($GLOBALS['db_type']) {
-    case 'mysql':
-    case 'mysqli':
-      db_query("CREATE TABLE {bot_factoid} (
-        subject varchar(255) NOT NULL default '',
-        is_are varchar(3) NOT NULL default '',
-        statement text NOT NULL default '',
-        KEY (subject)
-      ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");
-      break;
-    case 'pgsql':
-      db_query("CREATE TABLE {bot_factoid} (
-        subject varchar(255) NOT NULL default '',
-        is_are varchar(3) NOT NULL default '',
-        statement text NOT NULL default '',
-        KEY (subject)
-      )");
-      break;
-  }
+  drupal_install_schema('bot_factoid');
 }
 
 /**
  * Implementation of hook_uninstall().
  */
 function bot_factoid_uninstall() {
-  db_query('DROP TABLE {bot_factoid}');
+  drupal_uninstall_schema('bot_factoid');
   variable_del('bot_factoid_stopwords');
 }
