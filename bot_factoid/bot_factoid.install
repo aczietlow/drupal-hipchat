@@ -30,7 +30,7 @@ function bot_factoid_schema() {
         'type'        => 'text',
       ),
     ),
-    'primary key' => array('subject'),
+    'key' => array('subject'),
   );
 
   return $schema;

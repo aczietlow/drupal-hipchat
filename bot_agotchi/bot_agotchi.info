@@ -1,6 +1,6 @@
 ; $Id$
 name = Botagotchi
 package = Bot
-dependencies = bot
+dependencies[] = bot
 description = "Proper care and feeding lets your botagotchi grow and be happy!"
 core = 6.x

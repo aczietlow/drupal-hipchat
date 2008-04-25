@@ -14,7 +14,7 @@ function bot_factoid_help($path, $arg) {
     case 'irc:features':
       return array(t('Factoids'));
     case 'irc:features#factoids':
-      return t('Set factoids with "BOTNAME: cats are furry", "BOTNAME: Drupal is great.", "No, BOTNAME, Morbus is awesome.", "BOTNAME: Drupal is also powerful.", "BOTNAME: cheer is <action>cheers for !who in !channel!", or "BOTNAME: ping is <reply>WHAT?!". Retrieve factoids with: "Drupal?" or "BOTNAME: cheer!" Forget factoids with "BOTNAME: forget ping". Factoids can be browsed online at <!url>.', array('!url' => url('bot/factoid', array('absolute' => TRUE))));
+      return t('Set factoids with "BOTNAME: cats are furry", "BOTNAME: Drupal is great.", "No, BOTNAME, Morbus is awesome.", "BOTNAME: Drupal is also powerful.", "BOTNAME: cheer is <action>cheers for !who in !channel!", or "BOTNAME: ping is <reply>WHAT?!". Retrieve factoids with: "Drupal?" or "BOTNAME: cheer!" Forget factoids with "BOTNAME: forget ping". Factoids are also online at <!url>.', array('!url' => url('bot/factoid', array('absolute' => TRUE))));
     case 'bot/factoid':
       return '<p>'. t('Browse all the factoids the bot knows about.') .'</p>';
     case 'admin/settings/bot/factoid':
@@ -25,7 +25,7 @@ function bot_factoid_help($path, $arg) {
 /**
  * Implementation of hook_menu().
  */
-function bot_factoid_menu($may_cache) {
+function bot_factoid_menu() {
   $items['bot/factoid'] = array(
     'access arguments'  => array('access content'),
     'description'       => "Browse all the factoids the bot knows about.",
@@ -227,6 +227,7 @@ function bot_factoid_save($string) {
     // if "also" starts the statement, we're adding.
     if (preg_match("/^also\s+/i", $statement)) {
       $statement = preg_replace("/^also\s+/i", '', $statement);
+print $statement;
     } else { bot_factoid_delete($subject); }
 
     db_query("INSERT INTO {bot_factoid} SET subject = '%s', is_are = '%s', statement = '%s'", $subject, $is_are, $statement);

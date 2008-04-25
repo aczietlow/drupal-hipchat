@@ -1,6 +1,6 @@
 ; $Id$
 name = Bot Factoid
 package = Bot
-dependencies = bot
+dependencies[] = bot
 description = "Enables the setting and retrieval of facts."
 core = 6.x
