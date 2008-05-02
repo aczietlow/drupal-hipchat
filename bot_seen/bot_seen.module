@@ -9,8 +9,8 @@
 /**
  * Implementation of hook_help().
  */
-function bot_seen_help($section) {
-  switch ($section) {
+function bot_seen_help($path, $arg) {
+  switch ($path) {
     case 'irc:features':
       return array(t('Seen'));
     case 'irc:features#seen':

@@ -2,35 +2,56 @@
 // $Id$
 
 /**
+ * Implementation of hook_schema().
+ */
+function bot_seen_schema() {
+  $schema['bot_seen'] = array(
+    'description' => t('The single table necessary for user seen state.'),
+    'fields' => array(
+      'nick' => array(
+        'default'     => '',
+        'description' => t('The IRC user that we know seen state for.'),
+        'length'      => 60,
+        'not null'    => TRUE,
+        'type'        => 'varchar',
+      ),
+      'channel' => array(
+        'default'     => '',
+        'description' => t('The IRC channel where the user was last seen.'),
+        'length'      => 255,
+        'not null'    => TRUE,
+        'type'        => 'varchar',
+      ),
+      'message' => array(
+        'default'     => '',
+        'description' => t('The last message or action of the IRC user.'),
+        'not null'    => TRUE,
+        'type'        => 'text',
+      ),
+      'timestamp' => array(
+        'default'     => 0,
+        'description' => t('The Unix timestamp when this IRC user was last seen.'),
+        'not null'    => TRUE,
+        'type'        => 'int',
+        'unsigned'    => TRUE,
+      ),
+    ),
+    'key' => array('nick'),
+  );
+
+  return $schema;
+}
+
+/**
  * Implementation of hook_install().
  */
 function bot_seen_install() {
-  switch ($GLOBALS['db_type']) {
-    case 'mysql':
-    case 'mysqli':
-      db_query("CREATE TABLE {bot_seen} (
-        nick varchar(60) NOT NULL default '',
-        channel varchar(60) NOT NULL default '',
-        message text NOT NULL default '',
-        timestamp int NOT NULL default '0',
-        KEY (nick)
-      ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");
-      break;
-    case 'pgsql':
-      db_query("CREATE TABLE {bot_seen} (
-        nick varchar(60) NOT NULL default '',
-        channel varchar(60) NOT NULL default '',
-        message text NOT NULL default '',
-        timestamp integer NOT NULL default '0',
-        KEY (nick)
-      )");
-      break;
-  }
+  drupal_install_schema('bot_seen');
 }
 
 /**
  * Implementation of hook_uninstall().
  */
 function bot_seen_uninstall() {
-  db_query('DROP TABLE {bot_seen}');
+  drupal_uninstall_schema('bot_seen');
 }

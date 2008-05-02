@@ -26,7 +26,6 @@ function bot_factoid_schema() {
         'default'     => '',
         'description' => t('The factoid defined for this subject.'),
         'not null'    => TRUE,
-        'size'        => 'medium',
         'type'        => 'text',
       ),
     ),
