@@ -57,7 +57,7 @@ function bot_agotchi_irc_msg_channel($data, $from_query = FALSE) {
   if (preg_match("/^($addressed)?(bot(\s|\-)?snack)/i", $data->message)) {
     $feeding_responses = explode("\n", variable_get('bot_agotchi_feeding_responses', _bot_agotchi_feeding_responses()));
     $feeding_response_key = array_rand($feeding_responses); // of all our feeding responses, get a random one.
-    bot_message($to, strtr($feeding_responses[$feeding_response_key], $substitutions));
+    bot_message($to, strtr(trim($feeding_responses[$feeding_response_key]), $substitutions));
   }
 
   // spit out a greeting in response to another (addressed or not).
@@ -66,7 +66,7 @@ function bot_agotchi_irc_msg_channel($data, $from_query = FALSE) {
     if (rand(0, 100) < variable_get('bot_agotchi_greeting_randomness', 65)) {
       $greeting_responses = explode("\n", variable_get('bot_agotchi_greeting_responses', _bot_agotchi_greeting_responses()));
       $greeting_response_key = array_rand($greeting_responses); // of all our greeting responses, get a random one.
-      bot_message($to, strtr($greeting_responses[$greeting_response_key], $substitutions));
+      bot_message($to, strtr(trim($greeting_responses[$greeting_response_key]), $substitutions));
     }
   }
 
@@ -74,7 +74,7 @@ function bot_agotchi_irc_msg_channel($data, $from_query = FALSE) {
   if (preg_match("/^($addressed)thank(s| you)/i", $data->message)) {
     $thankful_responses = explode("\n", variable_get('bot_agotchi_thankful_responses', _bot_agotchi_thankful_responses()));
     $thankful_response_key = array_rand($thankful_responses); // of all our thankful responses, get a random one.
-    bot_message($to, strtr($thankful_responses[$thankful_response_key], $substitutions));
+    bot_message($to, strtr(trim($thankful_responses[$thankful_response_key]), $substitutions));
   }
 }
 

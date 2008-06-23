@@ -224,7 +224,7 @@ function bot_factoid_save($string) {
     if (preg_match('/^\s*$/', $subject)) { return 0; } // stop firing blanks.
 
     // check that it's not one of our stopwords.
-    $stopwords = explode("\n", variable_get('bot_factoid_stopwords', _bot_factoid_stopwords()));
+    $stopwords = array_map('trim', explode("\n", variable_get('bot_factoid_stopwords', _bot_factoid_stopwords())));
     if (in_array(drupal_strtolower($subject), array_map('drupal_strtolower', $stopwords))) {
       return 0;  // bad users deserve no feedback, so just return. UNHAPPILY.
     }
