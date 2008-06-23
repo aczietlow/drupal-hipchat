@@ -16,7 +16,7 @@ function bot_log_help($path, $arg) {
     case 'irc:features#logging':
       return t('Logging has been enabled for some or all channels at <!url>.', array('!url' => url('bot/log', array('absolute' => TRUE))));
     case 'admin/settings/bot/log':
-      return '<p>'.t('Configure bot logging with these settings.').'</p>';
+      return '<p>' . t('Configure bot logging with these settings.') . '</p>';
   }
 }
 
@@ -196,10 +196,10 @@ function bot_log_day($channel = NULL, $day = NULL) {
 
   // if there's no channel...
   if (!$channel) { // ... we'll show a list of all we're logging.
-    $output = '<p>'. t('Choose the IRC channel whose logs you want to view:') .'</p><ul>';
+    $output = '<p>' . t('Choose the IRC channel whose logs you want to view:') . '</p><ul>';
     foreach (variable_get('bot_log_channels', array()) as $available_channel) { // RUN AWAY!
       if (user_access("view bot logs: $available_channel")) { // unleashed spirits of the war dead.
-        $output .= '<li>'. l($available_channel, 'bot/log/'. substr($available_channel, 1)) .'</li>';
+        $output .= '<li>' . l($available_channel, 'bot/log/' . substr($available_channel, 1)) . '</li>';
       } // you'll be popular, but just not quite as popular asSSs MmE.eEEe.
     } $output .= '</ul>'; // someday, someone will yell "code style!" BUGGER.
   }
@@ -250,7 +250,7 @@ function theme_bot_log_day($channel, $date, $logs, $format = 'html') {
 
     foreach ($logs as $log) {
       $fragment = 'T'. $log['id']; // our timestamps will be linked to the internal ID, providing permanent URLs for conversations.
-      $permalink = l(format_date($log['timestamp'], 'custom', '[H:i:s]'), 'bot/log/'. $channel .'/'. $date, array('attributes' => array('id' => $fragment), 'fragment' => $fragment));
+      $permalink = l(format_date($log['timestamp'], 'custom', '[H:i:s]'), 'bot/log/' . $channel . '/' . $date, array('attributes' => array('id' => $fragment), 'fragment' => $fragment));
 
       // change row color based on the speaker.
       $last_nick = $last_nick ? $last_nick : $log['nick'];
@@ -298,7 +298,7 @@ function theme_bot_log_day($channel, $date, $logs, $format = 'html') {
       if ($log['type'] == SMARTIRC_TYPE_CHANNEL) { 
         $rows[] = array('class' => $nick_class, 'data' => array(
           array('class' => 'bot-log-time', 'data' => $permalink),
-          array('class' => 'bot-log-nick', 'data' => '&lt;'. check_plain($log['nick']) .'>'),
+          array('class' => 'bot-log-nick', 'data' => '&lt;' . check_plain($log['nick']) . '>'),
           array('class' => 'bot-log-message', 'data' => $message),
         ));
       }
@@ -335,7 +335,7 @@ function bot_log_filter_form(&$form_state, $channel, $date = NULL) {
 
   $form['bot_log_date'] = array(
     '#default_value' => array('year' => date('Y', $date), 'month'=> date('n', $date),'day' => date('j', $date)),
-    '#prefix'        => '<div class="container-inline">&lsaquo; '. l($day_before_date, 'bot/log/'. $channel .'/'. $day_before_date),
+    '#prefix'        => '<div class="container-inline">&lsaquo; ' . l($day_before_date, 'bot/log/' . $channel . '/' . $day_before_date),
     '#type'          => 'date',
   );
   $form['bot_log_channel'] = array(
@@ -343,7 +343,7 @@ function bot_log_filter_form(&$form_state, $channel, $date = NULL) {
     '#value'         => $channel,
   );
   $form['bot_log_submit'] = array(
-    '#suffix'        => l($day_after_date, 'bot/log/'. $channel .'/'. $day_after_date) .' &rsaquo;</div>',
+    '#suffix'        => l($day_after_date, 'bot/log/' . $channel . '/' . $day_after_date) . ' &rsaquo;</div>',
     '#type'          => 'submit',
     '#value'         => t('Apply'),
   );
@@ -355,7 +355,7 @@ function bot_log_filter_form(&$form_state, $channel, $date = NULL) {
  * FormAPI #submit callback for redirecting to a channel by day.
  */
 function bot_log_filter_form_submit($form, &$form_state) {
- $form_state['redirect'] = 'bot/log/'. $form_state['values']['bot_log_channel'] .'/'. date('Y-m-d', mktime(0, 0, 0, $form_state['values']['bot_log_date']['month'], $form_state['values']['bot_log_date']['day'], $form_state['values']['bot_log_date']['year']));
+  $form_state['redirect'] = 'bot/log/' . $form_state['values']['bot_log_channel'] . '/' . date('Y-m-d', mktime(0, 0, 0, $form_state['values']['bot_log_date']['month'], $form_state['values']['bot_log_date']['day'], $form_state['values']['bot_log_date']['year']));
 }
 
 /**
@@ -364,7 +364,8 @@ function bot_log_filter_form_submit($form, &$form_state) {
 function bot_log_settings(){
   // get a list of all joined channels, sans passwords.
   $joined_channels = preg_split('/\s*,\s*/', variable_get('bot_channels', '#test'));
-  $channel_options = array(); foreach ($joined_channels as $k => $v) {
+  $channel_options = array(); // HOW MAY I HELP YOU!?
+  foreach ($joined_channels as $k => $v) {
     $channel = preg_replace('/(.*) .*/', '\1', $v);
     $channel_options[$channel] = $channel;
   }

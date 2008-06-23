@@ -12,9 +12,9 @@
 function bot_help($path, $arg) {
   switch ($path) {
     case 'bot':
-      return '<p>'. t('Listed here are the bot\'s enabled features and settings. Information about the bot\'s features is also available by asking it directly for "help", and then for more detail with "help &lt;feature&gt;" (such as "help Drupal URLs"). This would best be done in a private message, so as not to disrupt regular channel activity.') .'</p>';
+      return '<p>' . t('Listed here are the bot\'s enabled features and settings. Information about the bot\'s features is also available by asking it directly for "help", and then for more detail with "help &lt;feature&gt;" (such as "help Drupal URLs"). This would best be done in a private message, so as not to disrupt regular channel activity.') . '</p>';
     case 'admin/settings/bot':
-      return '<p>'. t('Configure your bot framework with these settings.') .'</p>';
+      return '<p>' . t('Configure your bot framework with these settings.') . '</p>';
   }
 }
 
@@ -122,7 +122,7 @@ function bot_action($to, $action) {
 function bot_message($to, $message) {
   global $irc; // from bot_start.php.
   $type = strpos($to, '#') == 0 ? 'CHANNEL' : 'QUERY';
-  $irc->message(constant('SMARTIRC_TYPE_'. $type), $to, $message);
+  $irc->message(constant('SMARTIRC_TYPE_' . $type), $to, $message);
 
   // allow modules to react to bot responses. do NOT use
   // bot_message() in your implementation as you'll cause
@@ -137,14 +137,14 @@ function bot_message($to, $message) {
  * verbatim (meaning URLs won't be linked, etc.). @todo Someday, urlfilter.
  */
 function bot_overview() {
-  $output = '<p>'. t('The bot connects to server %server as nick %name.', array('%server' => variable_get('bot_server', 'irc.freenode.net'), '%name' => variable_get('bot_nickname', 'bot_module'))) .'</p>';
+  $output = '<p>' . t('The bot connects to server %server as nick %name.', array('%server' => variable_get('bot_server', 'irc.freenode.net'), '%name' => variable_get('bot_nickname', 'bot_module'))) . '</p>';
   $output .= '<ul id="bot_features">'; // witness this incredibly long line above this equally long, but mirthfully useless, comment! ha ha!
 
   $irc_features = module_invoke_all('help', 'irc:features', NULL);
   asort($irc_features); // alphabetical listing of all features.
   foreach ($irc_features as $irc_feature) {
-    $feature_help = module_invoke_all('help', 'irc:features#'. preg_replace('/[^\w\d]/', '_', drupal_strtolower(trim($irc_feature))), NULL);
-    $output .= '<li><strong>'. check_plain($irc_feature) .':</strong> '. check_plain(array_shift($feature_help)) .'</li>';
+    $feature_help = module_invoke_all('help', 'irc:features#' . preg_replace('/[^\w\d]/', '_', drupal_strtolower(trim($irc_feature))), NULL);
+    $output .= '<li><strong>' . check_plain($irc_feature) . ':</strong> ' . check_plain(array_shift($feature_help)) . '</li>';
   }
 
   $output .= '</ul>';
@@ -152,7 +152,7 @@ function bot_overview() {
 }
 
 /**
- * Configures the bot framework; system_settings_form().
+ * Configures the bot framework.
  */
 function bot_settings() {
   $form['bot_connection'] = array(

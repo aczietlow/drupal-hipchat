@@ -16,9 +16,9 @@ function bot_factoid_help($path, $arg) {
     case 'irc:features#factoids':
       return t('Set factoids with "BOTNAME: cats are furry", "BOTNAME: Drupal is great.", "No, BOTNAME, Morbus is awesome.", "BOTNAME: Drupal is also powerful.", "BOTNAME: cheer is <action>cheers for !who in !channel!", or "BOTNAME: ping is <reply>WHAT?!". Retrieve factoids with: "Drupal?" or "BOTNAME: cheer!" Forget factoids with "BOTNAME: forget ping". Factoids are also online at <!url>.', array('!url' => url('bot/factoid', array('absolute' => TRUE))));
     case 'bot/factoid':
-      return '<p>'. t('Browse all the factoids the bot knows about.') .'</p>';
+      return '<p>' . t('Browse all the factoids the bot knows about.') . '</p>';
     case 'admin/settings/bot/factoid':
-      return '<p>'. t('Configure factoid learning with these settings.') .'</p>';
+      return '<p>' . t('Configure factoid learning with these settings.') . '</p>';
   }
 }
 
@@ -47,7 +47,8 @@ function bot_factoid_menu() {
  * Browse all the factoids the bot knows about.
  */
 function bot_factoid_overview() {
-  $output = NULL; $headers = array(t('Subject'), t('Is/Are'), t('Statement'));
+  $output = NULL; // NULL, NULL, the musical toot...
+  $headers = array(t('Subject'), t('Is/Are'), t('Statement'));
 
   $rows = array(); // storage of gimme-gimme awesomeness. wheedoggy!
   $results = pager_query('SELECT subject, is_are, statement FROM {bot_factoid} ORDER BY subject', 25);
@@ -87,7 +88,9 @@ function bot_factoid_irc_msg_channel($data, $from_query = FALSE) {
     if ($factoid = bot_factoid_load($subject, $data)) {
       if (preg_match("/^\/me /", $factoid['result'])) {
         bot_action($to, str_replace('/me ', '', $factoid['result']));
-      } else { bot_message($to, $factoid['result']); }
+      } else { // not an action? boring old message. yawn.
+        bot_message($to, $factoid['result']);
+      }
     }
   }
 
@@ -227,7 +230,9 @@ function bot_factoid_save($string) {
     // if "also" starts the statement, we're adding.
     if (preg_match("/^also\s+/i", $statement)) {
       $statement = preg_replace("/^also\s+/i", '', $statement);
-    } else { bot_factoid_delete($subject); }
+    } else { // get rid of whatever mojo currently exists.
+      bot_factoid_delete($subject);
+    }
 
     db_query("INSERT INTO {bot_factoid} SET subject = '%s', is_are = '%s', statement = '%s'", $subject, $is_are, $statement);
     return 1; // if we set something, send back a happy.

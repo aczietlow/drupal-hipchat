@@ -19,8 +19,7 @@ while ($param = array_shift($_SERVER['argv'])) {
   switch ($param) {
     case '--root':
       $drupal_root = array_shift($_SERVER['argv']);
-      if (is_dir($drupal_root)) { chdir($drupal_root); }
-      else { exit("ERROR: $drupal_root not found.\n"); }
+      is_dir($drupal_root) ? chdir($drupal_root) : exit("ERROR: $drupal_root not found.\n");
       break;
 
     case '--url':
@@ -45,7 +44,9 @@ require_once('Net/SmartIRC.php');
 db_query('SET SESSION wait_timeout = %d', 24*60*60);
 
 // initialize the bot with some sane defaults.
-global $irc; $bot = new drupal_wrapper(); $irc = new Net_SmartIRC();
+global $irc; // allow it to be slurped by Drupal modules if need be.
+$bot = new drupal_wrapper(); // wrapper that integrates with Drupal hooks.
+$irc = new Net_SmartIRC(); // MmmmmmM. The IRC object itself. Magick happens here.
 $irc->setDebug( variable_get('bot_debugging', 0) ? SMARTIRC_DEBUG_ALL : SMARTIRC_DEBUG_NONE );
 // the (boolean) here is required, as Net_SmartIRC doesn't respect a FAPI checkbox value of 1, only TRUE.
 $irc->setAutoReconnect((boolean)variable_get('bot_auto_reconnect', 1)); // reconnect to the server if disconnected.
@@ -65,7 +66,7 @@ $irc_message_types = array(
 );
 
 foreach ($irc_message_types as $irc_message_type) {
-  $irc->registerActionhandler(constant('SMARTIRC_TYPE_'.$irc_message_type), '.*', $bot, 'invoke_irc_msg_'.strtolower($irc_message_type));
+  $irc->registerActionhandler(constant('SMARTIRC_TYPE_' . $irc_message_type), '.*', $bot, 'invoke_irc_msg_' . strtolower($irc_message_type));
 }
 
 // set up a five minute timer similar to Drupal's hook_cron(). this
@@ -74,7 +75,7 @@ $irc->registerTimehandler(300000, $bot, 'invoke_irc_bot_cron');
 
 // connect and begin listening.
 $irc->connect(variable_get('bot_server', 'irc.freenode.net'), variable_get('bot_server_port', 6667));
-$irc->login(variable_get('bot_nickname', 'bot_module'), variable_get('bot_nickname', 'bot_module').' :http://drupal.org/project/bot', 8, variable_get('bot_nickname', 'bot_module'), (variable_get('bot_password', '') != '') ? variable_get('bot_password', '') : NULL);
+$irc->login(variable_get('bot_nickname', 'bot_module'), variable_get('bot_nickname', 'bot_module') . ' :http://drupal.org/project/bot', 8, variable_get('bot_nickname', 'bot_module'), (variable_get('bot_password', '') != '') ? variable_get('bot_password', '') : NULL);
 
 // to support passwords, we have to make a single join per channel.
 $channels = preg_split('/\s*,\s*/', variable_get('bot_channels', '#test'));

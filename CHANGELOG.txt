@@ -2,11 +2,12 @@
 
 Bot 6.x-1.1, 2008-xx-xx
 -----------------------
+  * #187137: Drupal 7 style concats, and other style fixes (thanks dmitrig01).
   * #167097: fixed undefined index and better host check (thanks czarphanguye).
   * #142812: auto reconnect and retry are now configurable (Morbus/Shiny).
   * bot_project: replaced module_exists('api') with db_table_exists().
 
-Bot 6.x-1.x, 2008-05-01
+Bot 6.x-1.0, 2008-05-01
 -----------------------
   * First release for Drupal 6.x; equivalent to 5.x-1.0.
 
@@ -18,7 +19,7 @@ Bot 5.x-1.0, 2008-04-08
   * #106992: bot_seen now logs actions as seenable offenses.
   * added hook_uninstall() to everything.
 
-Bot 5.x-1.0, year 2007
+Bot 5.x-1.x, year 2007
 ----------------------
   * bot_log.module added; Logs multiple channels, day browsing, etc.
   * bot_project now has Trac integration (for tickets and revisions).

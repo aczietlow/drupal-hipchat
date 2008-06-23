@@ -91,7 +91,7 @@ function bot_seen_irc_msg_query($data) {
 function bot_seen_irc_msg_action($data) {
   if (strpos($data->channel, '#') === FALSE) { return; } // ignore actions PM'd to the bot.
   db_query("DELETE FROM {bot_seen} WHERE LOWER(nick) = '%s'", drupal_strtolower($data->nick));
-  $message = preg_replace('/^ACTION/', '* '. $data->nick, trim($data->message, '')); // odd bits.
+  $message = preg_replace('/^ACTION/', '* ' . $data->nick, trim($data->message, '')); // odd bits.
   db_query("INSERT INTO {bot_seen} (nick, channel, message, timestamp) VALUES ('%s', '%s', '%s', %d)", $data->nick, $data->channel, $message, time());
 }
 
@@ -104,7 +104,7 @@ function bot_seen_all_nicks_for_regexp() {
     foreach ($irc->channel[$channel_name]->users as $nick_name => $data) {
       $nick_name = preg_replace('/\W/', '\\\\$0', $nick_name);
       $nick_name = preg_replace('/^(.)(.*)/', '(\1)(\2)', $nick_name);
-      $nicks[] = '/'. $nick_name .'/i';
+      $nicks[] = '/' . $nick_name . '/i';
     }
   }
 
