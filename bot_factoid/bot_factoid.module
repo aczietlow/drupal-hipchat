@@ -139,7 +139,7 @@ function bot_factoid_delete($subject) {
  *   perform substitutions for "!who" (the nick asking for the factoid)
  *   and "!channel" (the channel the factoid is asked in.)
  * @return $factoid
- *   An object containing 'subject' (string), 'Is_are' (string), 
+ *   An object containing 'subject' (string), 'is_are' (string),
  *   'statements' (array) and 'result' (string). The 'result' is
  *   the logical processing of the individual parts and should be
  *   ready for sending.

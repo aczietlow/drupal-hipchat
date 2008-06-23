@@ -2,6 +2,7 @@
 
 Bot 6.x-1.1, 2008-xx-xx
 -----------------------
+  * #167097: fixed undefined index and better host check (thanks czarphanguye).
   * #142812: auto reconnect and retry are now configurable (Morbus/Shiny).
   * bot_project: replaced module_exists('api') with db_table_exists().
 

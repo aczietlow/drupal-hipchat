@@ -20,13 +20,15 @@ while ($param = array_shift($_SERVER['argv'])) {
     case '--root':
       $drupal_root = array_shift($_SERVER['argv']);
       if (is_dir($drupal_root)) { chdir($drupal_root); }
-      else { die("ERROR: $drupal_root not found.\n"); }
+      else { exit("ERROR: $drupal_root not found.\n"); }
       break;
 
     case '--url':
       $drupal_base_url = parse_url(array_shift($_SERVER['argv']));
-      $_SERVER['HTTP_HOST'] = $drupal_base_url['host'];
-      $_SERVER['PHP_SELF'] = $drupal_base_url['path'].'/'.$script_name;
+      if (!$drupal_base_url || !$drupal_base_url['host']) { exit("ERROR: No URL was passed via --url.\n"); }
+      $drupal_base_url['path'] = isset($drupal_base_url['path']) ? $drupal_base_url['path'] : '/';
+      $_SERVER['HTTP_HOST'] = $drupal_base_url['host']; // this is all very boring, no?
+      $_SERVER['PHP_SELF'] = $drupal_base_url['path'] . '/' . $script_name;
       $_SERVER['REQUEST_URI'] = $_SERVER['SCRIPT_NAME'] = $_SERVER['PHP_SELF'];
       $_SERVER['REMOTE_ADDR'] = NULL; // any values here do rather...
       $_SERVER['REQUEST_METHOD'] = NULL; // ...odd things. uh huh.
