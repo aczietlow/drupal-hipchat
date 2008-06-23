@@ -5,6 +5,8 @@
  * Implementation of hook_uninstall().
  */
 function bot_uninstall() {
+  variable_del('bot_auto_retry');
+  variable_del('bot_auto_reconnect');
   variable_del('bot_cache_cleared');
   variable_del('bot_channels');
   variable_del('bot_debugging');

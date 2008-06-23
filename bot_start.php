@@ -45,10 +45,11 @@ db_query('SET SESSION wait_timeout = %d', 24*60*60);
 // initialize the bot with some sane defaults.
 global $irc; $bot = new drupal_wrapper(); $irc = new Net_SmartIRC();
 $irc->setDebug( variable_get('bot_debugging', 0) ? SMARTIRC_DEBUG_ALL : SMARTIRC_DEBUG_NONE );
-$irc->setAutoReconnect(TRUE);  // reconnect to the server if disconnected.
-$irc->setAutoRetry(TRUE);      // retry if a server connection fails.
+// the (boolean) here is required, as Net_SmartIRC doesn't respect a FAPI checkbox value of 1, only TRUE.
+$irc->setAutoReconnect((boolean)variable_get('bot_auto_reconnect', 1)); // reconnect to the server if disconnected.
+$irc->setAutoRetry((boolean)variable_get('bot_auto_retry', 1)); // retry if a server connection fails.
 $irc->setChannelSyncing(TRUE); // keep a list of joined users per channel.
-$irc->setUseSockets(TRUE);     // uses real sockets instead of fsock().
+$irc->setUseSockets(TRUE); // uses real sockets instead of fsock().
 
 // send every message type the library supports to our wrapper class.
 // we can automate the creation of these actionhandlers, but not the
