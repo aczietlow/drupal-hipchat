@@ -225,7 +225,9 @@ function bot_factoid_save($string) {
 
     // check that it's not one of our stopwords.
     $stopwords = explode("\n", variable_get('bot_factoid_stopwords', _bot_factoid_stopwords()));
-    if (in_array($subject, $stopwords)) { return 0; } // bad users deserve no feedback.
+    if (in_array(drupal_strtolower($subject), array_map('drupal_strtolower', $stopwords))) {
+      return 0;  // bad users deserve no feedback, so just return. UNHAPPILY.
+    }
 
     // if "also" starts the statement, we're adding.
     if (preg_match("/^also\s+/i", $statement)) {
