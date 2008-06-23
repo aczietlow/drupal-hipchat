@@ -68,7 +68,7 @@ function bot_irc_bot_cron() {
  */
 function bot_irc_msg_channel($data, $from_query = FALSE) {
   $bot_name = variable_get('bot_nickname', 'bot_module');
-  $addressed = "\s*${bot_name}[\:,-]\s*"; // bot mentioned?
+  $addressed = "\s*${bot_name}[:,-]\s*"; // bot mentioned?
   $to = $from_query ? $data->nick : $data->channel;
 
   // our IRC help interface which piggybacks off of Drupal's hook_help().

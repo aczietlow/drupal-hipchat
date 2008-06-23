@@ -50,7 +50,7 @@ function bot_agotchi_menu() {
 function bot_agotchi_irc_msg_channel($data, $from_query = FALSE) {
   $substitutions = array('!who' => $data->nick, '!channel' => $data->channel);
   $bot_name = variable_get('bot_nickname', 'bot_module');
-  $addressed = "\s*${bot_name}[\:,-]\s*"; // bot mentioned?
+  $addressed = "\s*${bot_name}[:,-]\s*"; // bot mentioned?
   $to = $from_query ? $data->nick : $data->channel;
 
   // feeding makes the bot's tumbly less rumbly.
