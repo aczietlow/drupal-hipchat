@@ -2,6 +2,7 @@
 
 Bot 6.x-1.1, 2008-xx-xx
 -----------------------
+  * #245610: bot_agotchi greeting triggers now customizable (thanks Alan Evans).
   * #184032: ignore improper hook_help implementations (thanks John Morahan).
   * #229880: bot_factoid stopwords were case sensitive (thanks John Morahan).
   * #187137: Drupal 7 style concats, and other style fixes (thanks dmitrig01).

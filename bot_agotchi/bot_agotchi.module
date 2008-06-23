@@ -61,7 +61,8 @@ function bot_agotchi_irc_msg_channel($data, $from_query = FALSE) {
   }
 
   // spit out a greeting in response to another (addressed or not).
-  if (preg_match("/^\s*(h(ello|i( there)?|owdy|ey|ola)|salut|bonjour|niihau|que\s*tal)( $bot_name)?\s*$/i", $data->message)) {
+  $greeting_triggers = str_replace(array("\r\n", "\r", "\n"), '|', variable_get('bot_agotchi_greeting_triggers', _bot_agotchi_greeting_triggers()));
+  if (preg_match("/^\s*($greeting_triggers)( $bot_name)?\s*$/i", $data->message)) { // turn the triggers into a suitable pipe-delimited expression.
     if (rand(0, 100) < variable_get('bot_agotchi_greeting_randomness', 65)) {
       $greeting_responses = explode("\n", variable_get('bot_agotchi_greeting_responses', _bot_agotchi_greeting_responses()));
       $greeting_response_key = array_rand($greeting_responses); // of all our greeting responses, get a random one.
@@ -96,6 +97,12 @@ function bot_agotchi_settings() {
     '#title'         => t('Feeding responses'),
     '#type'          => 'textarea',
   );
+  $form['bot_agotchi_greeting_triggers'] = array(
+    '#default_value' => variable_get('bot_agotchi_greeting_triggers', _bot_agotchi_greeting_triggers()),
+    '#description'   => t('List the triggers, one per line, which your botagotchi will consider a greeting. Regular expressions are OK.'),
+    '#title'         => t('Greeting triggers'),
+    '#type'          => 'textarea',
+  );
   $form['bot_agotchi_greeting_responses'] = array(
     '#default_value' => variable_get('bot_agotchi_greeting_responses', _bot_agotchi_greeting_responses()),
     '#description'   => t('List the responses, one per line, your botagotchi will say when it hears a greeting.'),
@@ -126,6 +133,19 @@ function _bot_agotchi_feeding_responses() {
     'this is why I love !channel',
     'thanks !who :)',
     ':)',
+  ));
+}
+
+/**
+ * Returns the default list of greeting triggers.
+ */
+function _bot_agotchi_greeting_triggers() {
+  return implode("\n", array(
+    'h([aeu]llo|i( there)?|owdy|ey|ola)',
+    'salut',
+    'bonjour',
+    'niihau',
+    'que\s*tal',
   ));
 }
 

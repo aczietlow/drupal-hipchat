@@ -6,6 +6,7 @@
  */
 function bot_agotchi_uninstall() {
   variable_del('bot_agotchi_feeding_responses');
+  variable_del('bot_agotchi_greeting_triggers');
   variable_del('bot_agotchi_greeting_randomness');
   variable_del('bot_agotchi_greeting_responses');
   variable_del('bot_agotchi_thankful_responses');
