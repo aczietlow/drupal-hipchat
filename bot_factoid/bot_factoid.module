@@ -244,7 +244,7 @@ function bot_factoid_save($string) {
 }
 
 /**
- * Configures factoid learning; system_settings_form().
+ * Configures factoid learning.
  */
 function bot_factoid_settings() {
   $form['bot_factoid_stopwords'] = array(

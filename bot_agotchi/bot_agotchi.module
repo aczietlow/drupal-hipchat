@@ -86,14 +86,14 @@ function bot_agotchi_irc_msg_query($data) {
 }
 
 /**
- * Configures the botagotchi's personality; system_settings_form().
+ * Configures the botagotchi's personality.
  */
 function bot_agotchi_settings() {
   $form['#prefix'] = t('The following variables are available for use in responses: !who, !channel.');
 
   $form['bot_agotchi_feeding_responses'] = array(
     '#default_value' => variable_get('bot_agotchi_feeding_responses', _bot_agotchi_feeding_responses()),
-    '#description'   => t('List the responses, one per line, your botagotchi will say when fed a botsnack.'),
+    '#description'   => t('List the randomized responses, one per line, your botagotchi will say when fed a botsnack.'),
     '#title'         => t('Feeding responses'),
     '#type'          => 'textarea',
   );
@@ -105,7 +105,7 @@ function bot_agotchi_settings() {
   );
   $form['bot_agotchi_greeting_responses'] = array(
     '#default_value' => variable_get('bot_agotchi_greeting_responses', _bot_agotchi_greeting_responses()),
-    '#description'   => t('List the responses, one per line, your botagotchi will say when it hears a greeting.'),
+    '#description'   => t('List the randomized responses, one per line, your botagotchi will say when it hears a greeting.'),
     '#title'         => t('Greeting responses'),
     '#type'          => 'textarea',
   );
@@ -117,7 +117,7 @@ function bot_agotchi_settings() {
   );
   $form['bot_agotchi_thankful_responses'] = array(
     '#default_value' => variable_get('bot_agotchi_thankful_responses', _bot_agotchi_thankful_responses()),
-    '#description'   => t('List the responses, one per line, your botagotchi will say when it has been thanked.'),
+    '#description'   => t('List the randomized responses, one per line, your botagotchi will say when it has been thanked.'),
     '#title'         => t('Thankful responses'),
     '#type'          => 'textarea',
   );
