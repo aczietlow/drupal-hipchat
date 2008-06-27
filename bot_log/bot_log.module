@@ -14,7 +14,7 @@ function bot_log_help($path, $arg) {
     case 'irc:features':
       return array(t('Logging'));
     case 'irc:features#logging':
-      return t('Logging has been enabled for some or all channels at <!url>.', array('!url' => url('bot/log', array('absolute' => TRUE))));
+      return t('Logging has been enabled for some or all channels at <!url>. A URL to the current log and timestamp is retrievable with "BOTNAME: log pointer?" or "BOTNAME: log bookmark?"', array('!url' => url('bot/log', array('absolute' => TRUE))));
     case 'admin/settings/bot/log':
       return '<p>' . t('Configure bot logging with these settings.') . '</p>';
   }
@@ -66,7 +66,21 @@ function bot_log_theme() {
  * Log regular channel communications.
  */
 function bot_log_irc_msg_channel($data) {
-  bot_log_insert($data->type, $data->channel, $data->nick, $data->message);
+  $addressed = bot_name_regexp();
+
+  // slurp, slurp, slurp.
+  $log_id = bot_log_insert($data->type, $data->channel, $data->nick, $data->message);
+
+  // we've been asked for a bookmark to the current log. never accessible from PMs.
+  if (preg_match("/^${addressed}log (bookmark|pointer)\s*[!\?\.]*\s*$/i", $data->message)) {
+    if (in_array($data->channel, variable_get('bot_log_channels', array()))) {
+      $path = 'bot/log/' . str_replace('#', '', $data->channel) . '/' . gmdate('Y-m-d');
+      bot_message($data->channel, url($path, array('fragment' => 'T' . $log_id, 'absolute' => TRUE)));
+    }
+    else {
+      bot_message($data->channel, t('!channel is not logged; no URL exists.', array('!channel' => $data->channel)));
+    }
+  }
 }
 
 /**
@@ -169,6 +183,8 @@ function bot_log_irc_msg_who($data) {
  *   (Optional) Who caused this message to occur.
  * @param $message
  *   The actual message itself.
+ * @return $log_id
+ *   The unique log ID for this entry.
  */
 function bot_log_insert($type, $channel, $nick, $message) {
   $incoming_channels = array(); // predeclare for intersect.
@@ -179,6 +195,8 @@ function bot_log_insert($type, $channel, $nick, $message) {
   if (isset($channel) && (in_array($channel, $logged_channels)) || array_intersect_key($incoming_channels, $logged_channels)) {
     db_query("INSERT INTO {bot_log} (type, timestamp, channel, nick, message) VALUES ('%s', %d, '%s', '%s', '%s')", $type, time(), $channel, $nick, $message);
   }
+
+  return db_last_insert_id('bot_log', 'id');
 }
 
 /**
