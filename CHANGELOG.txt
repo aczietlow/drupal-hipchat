@@ -11,6 +11,7 @@ Bot 6.x-1.1, 2008-xx-xx
     - drupal_write_record is your friend; get used to using it!
     - "BOTNAME: karma foo?" is required to prevent bad parsing.
     - highest/lowest karmas are available at example.com/bot/karma.
+    - terms less than 3 and more than 15 characters are ignored.
   * #267560: OS-specific newlines broke comparisons (thanks Gurpartap Singh).
   * #245610: bot_agotchi greeting triggers now customizable (thanks Alan Evans).
   * #184032: ignore improper hook_help implementations (thanks John Morahan).
