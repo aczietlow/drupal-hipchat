@@ -74,16 +74,15 @@ function bot_factoid_overview() {
  *   Boolean; whether this was a queried request.
  */
 function bot_factoid_irc_msg_channel($data, $from_query = FALSE) {
-  $bot_name = variable_get('bot_nickname', 'bot_module');
-  $addressed = "\s*${bot_name}[:,-]\s*"; // bot mentioned?
   $to = $from_query ? $data->nick : $data->channel;
+  $addressed = bot_name_regexp();
 
   // look for factoids to answer.
   // @todo if addressed, give response if no known factoid.
   if (preg_match("/^($addressed)?(.*)[!\?]+$/i", $data->message, $matches)) {
 
     // "BOTNAME?" fails as a factoid. this fixes it.
-    $subject = $matches[2] ? $matches[2] : $matches[1];
+    $subject = $matches[3] ? $matches[3] : $matches[2];
 
     if ($factoid = bot_factoid_load($subject, $data)) {
       if (preg_match("/^\/me /", $factoid['result'])) {
@@ -99,8 +98,8 @@ function bot_factoid_irc_msg_channel($data, $from_query = FALSE) {
 
   // look for factoids to delete.
   if (preg_match("/^($addressed)forget( about)? (.*)$/i", $data->message, $matches)) {
-    bot_factoid_delete($matches[3]); // good night, sweetheart. baaah dum dum dum. it's time to GoOoOooOOoo.
-    bot_message($to, t("!nick: I've forgotten about !subject.", array('!nick' => $data->nick, '!subject' => $matches[3])));
+    bot_factoid_delete($matches[4]); // good night, sweetheart. baaah dum dum dum. it's time to GoOoOooOOoo.
+    bot_message($to, t("!nick: I've forgotten about !subject.", array('!nick' => $data->nick, '!subject' => $matches[4])));
   } // @todo delete message should be customizable. this one sucks.
 
   // look for factoids to learn.
@@ -207,20 +206,19 @@ function bot_factoid_load($subject, $data = NULL) {
  *   The user string that should be parsed for action.
  */
 function bot_factoid_save($string) {
-  $bot_name = variable_get('bot_nickname', 'bot_module');
-  $addressed = "\s*${bot_name}[:,-]\s*"; // bot mentioned?
+  $addressed = bot_name_regexp();
 
   // only process the string if it's one of:
   //   <Morbus> bot_module: cats are brown.
   //   <Morbus> bot_module: no, cats are blue.
   //   <Morbus> no, bot_module, cats are grey.
   //   <Morbus> bot_module: Morbus is teh awesome.
-  if (preg_match("/^(no[,; ])?$addressed/i", $string) && preg_match('/^(.*?)\s+(is|are)\s+(.*)$/i', $string, $matches)) {
+  if (preg_match("/^(no[:;,-]\s*)?$addressed/i", $string) && preg_match('/^(.*?)\s+(is|are)\s+(.*)$/i', $string, $matches)) {
     $subject = $matches[1]; $is_are = $matches[2]; $statement = $matches[3];
 
     // remove "botmodule: no," and "no, bot_module".
     $subject = preg_replace("/^$addressed/i", '', $subject);
-    $subject = preg_replace("/^no[,; ]\s*($addressed)?/i", '', $subject);
+    $subject = preg_replace("/^no[:;,-]\s*($addressed)?/i", '', $subject);
     if (preg_match('/^\s*$/', $subject)) { return 0; } // stop firing blanks.
 
     // check that it's not one of our stopwords.

@@ -67,12 +67,11 @@ function bot_irc_bot_cron() {
  *   Boolean; whether this was a queried request.
  */
 function bot_irc_msg_channel($data, $from_query = FALSE) {
-  $bot_name = variable_get('bot_nickname', 'bot_module');
-  $addressed = "\s*${bot_name}[:,-]\s*"; // bot mentioned?
   $to = $from_query ? $data->nick : $data->channel;
+  $addressed = bot_name_regexp();
 
   // our IRC help interface which piggybacks off of Drupal's hook_help().
-  if (preg_match("/^($addressed)help\s*([^\?]*)\s*\??/i", $data->message, $help_matches)) {
+  if (preg_match("/^${addressed}help\s*([^\?]*)\s*\??/i", $data->message, $help_matches)) {
     if (!$help_matches[2]) { // no specific help was asked for so give 'em a list.
       $irc_features = array_filter(module_invoke_all('help', 'irc:features', NULL));
       asort($irc_features); // alphabetical listing of features. the chainsaw is family.
@@ -149,6 +148,31 @@ function bot_overview() {
 
   $output .= '</ul>';
   return $output;
+}
+
+/**
+ * Returns a regexp suitable for matching the bot's name.
+ *
+ * Handles escaping (for "BOTNAME|Work"), various suffixes ("BOTNAME: ahem",
+ * "BOTNAME, ahem", "BOTNAME ahem", etc.), and nickname clashes (matching
+ * both the configured bot name, but also the /connected/ bot name).
+ *
+ * This function does NOT care about placement (if you want to enforce
+ * boundaries, use ^ and $ yourself). Since, however, it does match against
+ * potentially MORE THAN ONE BOT NAME, it DOES capture the name, so you
+ * will have to worry about that in preg_match $matches results.
+ */
+function bot_name_regexp() {
+  global $irc; // to get the connected name.
+  $names[] = $irc->_nick; // said connected name.
+  $names[] = variable_get('bot_nickname', 'bot_module');
+  $names = array_unique($names); // remove duplicates.
+  foreach ($names as $index => $name) {
+    $names[$index] = preg_replace('/\W/', '\\\\$0', $name);
+  } // escape any non-word entities in the bot name.
+
+  $names = implode('|', $names);
+  return "\s*(${names})[:;,-]?\s*";
 }
 
 /**

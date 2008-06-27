@@ -2,11 +2,15 @@
 
 Bot 6.x-1.1, 2008-xx-xx
 -----------------------
+  * bot_name_regexp() now exists for matching inside a regular expression.
+    - #117876: if bot has a nick clash, it now responds to both nicks.
+    - #184015: bot name with non-word characters failed regexp addressing.
   * #137171: bot_karma.module added (thanks Rob Loach/walkah). Additions:
     - patch supported only words: committed version supports phrases.
     - if someone tries to karma themselves, the response is customizable.
     - drupal_write_record is your friend; get used to using it!
     - "BOTNAME: karma foo?" is required to prevent bad parsing.
+    - highest/lowest karmas are available at example.com/bot/karma.
   * #267560: OS-specific newlines broke comparisons (thanks Gurpartap Singh).
   * #245610: bot_agotchi greeting triggers now customizable (thanks Alan Evans).
   * #184032: ignore improper hook_help implementations (thanks John Morahan).
