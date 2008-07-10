@@ -2,6 +2,7 @@
 
 Bot 6.x-1.1, 2008-xx-xx
 -----------------------
+  * bot_factoid: PM a factoid with "BOTNAME: tell <who> about <factoid>".
   * #190825: Get URL to current logged discussion with "BOTNAME: log pointer?"
   * bot_name_regexp() now exists for matching inside a regular expression.
     - #117876: if bot has a nick clash, it now responds to both nicks.

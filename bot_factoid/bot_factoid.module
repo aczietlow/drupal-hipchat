@@ -14,7 +14,7 @@ function bot_factoid_help($path, $arg) {
     case 'irc:features':
       return array(t('Factoids'));
     case 'irc:features#factoids':
-      return t('Set factoids with "BOTNAME: cats are furry", "BOTNAME: Drupal is great.", "No, BOTNAME, Morbus is awesome.", "BOTNAME: Drupal is also powerful.", "BOTNAME: cheer is <action>cheers for !who in !channel!", or "BOTNAME: ping is <reply>WHAT?!". Retrieve with "Drupal?" or "BOTNAME: cheer!" Forget factoids with "BOTNAME: forget ping". Factoids are also online at <!url>.', array('!url' => url('bot/factoid', array('absolute' => TRUE))));
+      return t('Set factoids with "BOTNAME: Drupal is great.", "No, BOTNAME, cats are furry.", "BOTNAME: Drupal is also powerful.", "BOTNAME: cheer is <action>cheers for !who in !channel!", or "BOTNAME: ping is <reply>WHAT?!". Retrieve with "Drupal?" or "BOTNAME: cheer!" Forget with "BOTNAME: forget ping". Private message with "BOTNAME: tell newb about support". Browsable at <!url>.', array('!url' => url('bot/factoid', array('absolute' => TRUE))));
     case 'bot/factoid':
       return '<p>' . t('Browse all the factoids the bot knows about.') . '</p>';
     case 'admin/settings/bot/factoid':
@@ -77,24 +77,30 @@ function bot_factoid_irc_msg_channel($data, $from_query = FALSE) {
   $to = $from_query ? $data->nick : $data->channel;
   $addressed = bot_name_regexp();
 
-  // look for factoids to answer.
-  // @todo if addressed, give response if no known factoid.
+  // look for factoids to answer wherever we can.
   if (preg_match("/^($addressed)?(.*)[!\?]+$/i", $data->message, $matches)) {
 
     // "BOTNAME?" fails as a factoid. this fixes it.
     $subject = $matches[3] ? $matches[3] : $matches[2];
+    $factoid = bot_factoid_load($subject, $data);
+  }
 
-    if ($factoid = bot_factoid_load($subject, $data)) {
-      if (preg_match("/^\/me /", $factoid['result'])) {
-        bot_action($to, str_replace('/me ', '', $factoid['result']));
-      } else { // not an action? boring old message. yawn.
-        bot_message($to, $factoid['result']);
-      }
+  // allow "tell <nick> about <subject>" private messaging.
+  if (preg_match("/^($addressed)tell ([a-zA-Z0-9\[\]\{\}\\\|\^\`\-\_\*]*)( about)? (.*)$/i", $data->message, $matches)) {
+    $factoid = bot_factoid_load($matches[5]);
+    $to = $matches[3]; // specified user.
+  }
+
+  // a known factoid was requested...
+  if ($factoid) { // so spit it to $to. puh-wease.
+    if (preg_match("/^\/me /", $factoid['result'])) {
+      bot_action($to, str_replace('/me ', '', $factoid['result']));
+    } else { // not an action? boring old message. yawn.
+      bot_message($to, $factoid['result']);
     }
   }
 
   // @todo allow subject searching and return list of subjects that match?
-  // @todo allow "tell <nick> about <subject>" private messaging?
 
   // look for factoids to delete.
   if (preg_match("/^($addressed)forget( about)? (.*)$/i", $data->message, $matches)) {
