@@ -2,12 +2,14 @@
 
 Bot 6.x-1.1, 2008-xx-xx
 -----------------------
+  * #218577: bot_tell.module added (thanks Rob Loach). Additions/changes:
+    - pending message queue now exists to remove SELECT on every message.
   * bot_factoid: PM a factoid with "BOTNAME: tell <who> about <factoid>".
   * #190825: Get URL to current logged discussion with "BOTNAME: log pointer?"
   * bot_name_regexp() now exists for matching inside a regular expression.
     - #117876: if bot has a nick clash, it now responds to both nicks.
     - #184015: bot name with non-word characters failed regexp addressing.
-  * #137171: bot_karma.module added (thanks Rob Loach/walkah). Additions:
+  * #137171: bot_karma.module added (thanks walkah/Rob Loach). Additions:
     - patch supported only words: committed version supports phrases.
     - if someone tries to karma themselves, the response is customizable.
     - drupal_write_record is your friend; get used to using it!

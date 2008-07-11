@@ -1,0 +1,6 @@
+; $Id$
+name = Bot Tell
+package = Bot
+description = "Enables queued messages for unavailable users."
+dependencies[] = bot
+core = 6.x
