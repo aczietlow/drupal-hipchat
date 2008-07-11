@@ -34,8 +34,8 @@ function bot_tell_irc_msg_channel($data, $from_query = FALSE) {
   $messages = bot_tell_load($data->nick);
   if (!empty($messages)) { // mmMMmMMm.
     foreach ($messages as $message) {
-      bot_message($to, t('!nick: !timestamp <!author> !message', array(
-        '!nick'       => $data->nick,
+      bot_message($to, t('!recipient: !timestamp <!author> !message', array(
+        '!recipient'  => $data->nick, // use their case, not author's.
         '!timestamp'  => format_date($message->timestamp, 'small'),
         '!author'     => $message->author,
         '!message'    => $message->message,
@@ -76,7 +76,7 @@ function bot_tell_irc_msg_query($data) {
  *   The recipient whose messages are being deleted.
  */
 function bot_tell_delete($recipient) {
-  db_query("DELETE FROM {bot_tell_queue} WHERE recipient = '%s'", $recipient);
+  db_query("DELETE FROM {bot_tell_queue} WHERE LOWER(recipient) = '%s'", drupal_strtolower($recipient));
   bot_tell_pending_cache($recipient, 'delete'); // maintain the static cache.
 }
 
@@ -106,7 +106,7 @@ function bot_tell_load($recipient) {
  * Saves a queued message to be sent later.
  *
  * @param $author
- *   The IRC user that is writing this message to another user.
+ *   The IRC user that is writing this message to the recipient.
  * @param $recipient
  *   The IRC user who is to be delivered the message.
  * @param $message
