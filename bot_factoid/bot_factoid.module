@@ -97,7 +97,14 @@ function bot_factoid_irc_msg_channel($data, $from_query = FALSE) {
       bot_action($to, str_replace('/me ', '', $factoid['result']));
     } else { // not an action? boring old message. yawn.
       bot_message($to, $factoid['result']);
-    }
+    } // no further processing, thanks.
+    return;
+  }
+
+  // due to interaction with bot_tell, we need to ignore factoids that look like they
+  // could be messages left for bot_tell. hardcoding sucks, but this is best for now.
+  if (module_exists('bot_tell') && preg_match("/^($addressed)tell ([a-zA-Z0-9\[\]\{\}\\\|\^\`\-\_\*]*)( about)? (.*)$/i", $data->message)) {
+    return; // if we're this far in processing, the after "about" stuff is NOT a factoid; it's probably a bot_tell.
   }
 
   // @todo allow subject searching and return list of subjects that match?

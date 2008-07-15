@@ -34,9 +34,9 @@ function bot_tell_irc_msg_channel($data, $from_query = FALSE) {
   $messages = bot_tell_load($data->nick);
   if (!empty($messages)) { // mmMMmMMm.
     foreach ($messages as $message) {
-      bot_message($to, t('!recipient: !timestamp <!author> !message', array(
+      bot_message($to, t('!recipient: !timestamp ago <!author> !message', array(
         '!recipient'  => $data->nick, // use their case, not author's.
-        '!timestamp'  => format_date($message->timestamp, 'small'),
+        '!timestamp'  => format_interval(time() - $message->timestamp),
         '!author'     => $message->author,
         '!message'    => $message->message,
       )));
@@ -57,7 +57,7 @@ function bot_tell_irc_msg_channel($data, $from_query = FALSE) {
     }
 
     // queued message accepted, keptin.
-    bot_tell_save($data->nick, $matches[3], $data->message); // see that? it's saved! in one line! wow!
+    bot_tell_save($data->nick, $matches[3], preg_replace("/^($addressed)\s*/", '', $data->message)); // see that? it's saved! in one line!
     bot_message($to, t("!nick: I'll pass that on when !recipient is around.", array('!nick' => $data->nick, '!recipient' => $matches[3])));
   }
 }
