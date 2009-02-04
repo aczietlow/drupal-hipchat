@@ -63,9 +63,7 @@ function bot_project_irc_msg_channel($data, $from_query = FALSE) {
   // ======================================================================== */
   // if api.module issue lookups are enabled...                               */
   // ======================================================================== */
-  // @todo api.module doesn't yet exist for Drupal 6, but see if the user has previous configs.
-  // if (module_exists('api') && preg_match('/^(\w*):?(\w*)\?$/', $data->messageex[0], $matches)) {
-  if (db_table_exists('api_function') && preg_match('/^(\w*):?(\w*)\?$/', $data->messageex[0], $matches)) {
+  if (module_exists('api') && preg_match('/^(\w*):?(\w*)\?$/', $data->messageex[0], $matches)) {
     $function_name = $matches[1]; $branch = $matches[2] ? $matches[2] : variable_get('bot_project_api_default_branch', NULL);
     if (!$function_name) { return; } // some modules have bad docs that allow "?" to match incorrectly.
 
