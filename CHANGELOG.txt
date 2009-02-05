@@ -1,6 +1,6 @@
 // $Id$
 
-Bot 6.x-1.1, 2008-xx-xx
+Bot 6.x-1.1, 2009-xx-xx
 -----------------------
   * #218577: bot_tell.module added (thanks Rob Loach). Additions/changes:
     - pending message queue now exists to remove SELECT on every message.

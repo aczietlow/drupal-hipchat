@@ -184,7 +184,7 @@ function bot_log_irc_msg_who($data) {
  * @param $message
  *   The actual message itself.
  * @return $log_id
- *   The unique log ID for this entry.
+ *   The unique log ID for this entry; 0 otherwise.
  */
 function bot_log_insert($type, $channel, $nick, $message) {
   $incoming_channels = array(); // predeclare for intersect.
@@ -193,10 +193,17 @@ function bot_log_insert($type, $channel, $nick, $message) {
   // if $channel is space-separated, this is a NICKCHANGE or QUIT that needs all relevant channels.
 
   if (isset($channel) && (in_array($channel, $logged_channels)) || array_intersect_key($incoming_channels, $logged_channels)) {
-    db_query("INSERT INTO {bot_log} (type, timestamp, channel, nick, message) VALUES ('%s', %d, '%s', '%s', '%s')", $type, time(), $channel, $nick, $message);
+    $log = new stdClass();
+    $log->type      = $type;
+    $log->timestamp = time();
+    $log->channel   = $channel;
+    $log->nick      = $nick;
+    $log->message   = $message;
+    drupal_write_record('bot_log', $log);
+    return $log->id;
   }
 
-  return db_last_insert_id('bot_log', 'id');
+  return 0;
 }
 
 /**

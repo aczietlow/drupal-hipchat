@@ -227,28 +227,32 @@ function bot_factoid_save($string) {
   //   <Morbus> no, bot_module, cats are grey.
   //   <Morbus> bot_module: Morbus is teh awesome.
   if (preg_match("/^(no[:;,-]\s*)?$addressed/i", $string) && preg_match('/^(.*?)\s+(is|are)\s+(.*)$/i', $string, $matches)) {
-    $subject = $matches[1]; $is_are = $matches[2]; $statement = $matches[3];
+    $factoid = new stdClass();
+    $factoid->subject   = $matches[1];
+    $factoid->is_are    = $matches[2];
+    $factoid->statement = $matches[3];
 
     // remove "botmodule: no," and "no, bot_module".
-    $subject = preg_replace("/^$addressed/i", '', $subject);
-    $subject = preg_replace("/^no[:;,-]\s*($addressed)?/i", '', $subject);
-    if (preg_match('/^\s*$/', $subject)) { return 0; } // stop firing blanks.
+    $factoid->subject = preg_replace("/^$addressed/i", '', $factoid->subject);
+    $factoid->subject = preg_replace("/^no[:;,-]\s*($addressed)?/i", '', $factoid->subject);
+    if (preg_match('/^\s*$/', $factoid->subject)) { return 0; } // stop firing blanks.
 
     // check that it's not one of our stopwords.
     $stopwords = array_map('trim', explode("\n", variable_get('bot_factoid_stopwords', _bot_factoid_stopwords())));
-    if (in_array(drupal_strtolower($subject), array_map('drupal_strtolower', $stopwords))) {
+    if (in_array(drupal_strtolower($factoid->subject), array_map('drupal_strtolower', $stopwords))) {
       return 0;  // bad users deserve no feedback, so just return. UNHAPPILY.
     }
 
     // if "also" starts the statement, we're adding.
-    if (preg_match("/^also\s+/i", $statement)) {
-      $statement = preg_replace("/^also\s+/i", '', $statement);
-    } else { // get rid of whatever mojo currently exists.
-      bot_factoid_delete($subject);
+    if (preg_match("/^also\s+/i", $factoid->statement)) {
+      $factoid->statement = preg_replace("/^also\s+/i", '', $factoid->statement);
+    }
+    else { // get rid of existing mojo.
+      bot_factoid_delete($factoid->subject);
     }
 
-    db_query("INSERT INTO {bot_factoid} SET subject = '%s', is_are = '%s', statement = '%s'", $subject, $is_are, $statement);
-    return 1; // if we set something, send back a happy.
+    drupal_write_record('bot_factoid', $factoid);
+    return 1; // if we set something, be happy.
   }
 
   return 0;

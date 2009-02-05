@@ -260,11 +260,16 @@ function bot_project_branch_url($branch) {
  */
 function bot_project_url_save($url, $title) {
   $count = db_result(db_query("SELECT count FROM {bot_urls} WHERE url = '%s'", $url));
-  if ($count) { db_query("UPDATE {bot_urls} SET title = '%s', count = count + 1, last_seen = %d WHERE url = '%s'", decode_entities($title), time(), $url); }
-  else { db_query("INSERT INTO {bot_urls} (url, title, count, last_seen) VALUES ('%s', '%s', %d, %d)", $url, decode_entities($title), 1, time()); }
-  $count = $count ? $count : 0; // if this is the first time, set the count to 0, pre-inc'd later.
-  $count = format_plural(++$count, '1 IRC mention', '@count IRC mentions'); // said later display.
-  return $count;
+  $update = !empty($count) ? array('url') : array(); // update based on an existing count.
+
+  $record = new stdClass();
+  $record->url        = $url;
+  $record->title      = decode_entities($title);
+  $record->count      = !empty($count) ? ++$count : 1;
+  $record->last_seen  = time();
+  drupal_write_record('bot_urls', $record, $update);
+
+  return format_plural($record->count, '1 IRC mention', '@count IRC mentions');
 }
 
 /**
