@@ -2,6 +2,7 @@
 
 Bot 6.x-1.1, 2009-xx-xx
 -----------------------
+  * #338723: Missing decode_entities() on project statuses (thanks RobLoach).
   * #313025: Better regex for log filtering to prevent substring matches.
   * #300206: Better factoid-ignoring of tell-like messages (thanks RobLoach).
   * #275042: Randomized messages now centralized in bot_randomized_choice().
