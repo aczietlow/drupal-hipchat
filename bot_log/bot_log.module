@@ -237,7 +237,7 @@ function bot_log_day($channel = NULL, $day = NULL) {
     $day_end   = $day_start + (60 * 60 * 24);
 
     // see bot_log_irc_msg_quit() for why we use a regexp on channels for lookups.
-    $results = db_query("SELECT * FROM {bot_log} WHERE channel REGEXP '.*#%s ?' AND (timestamp >= %d AND timestamp <= %d) ORDER BY id", $channel, $day_start, $day_end);
+    $results = db_query("SELECT * FROM {bot_log} WHERE channel REGEXP '.*#%s( |$)' AND (timestamp >= %d AND timestamp <= %d) ORDER BY id", $channel, $day_start, $day_end);
     $logs = array(); while ($result = db_fetch_array($results)) { $logs[] = $result; }
     $output .= theme('bot_log_day', $channel, $day, $logs);
     return $output;
