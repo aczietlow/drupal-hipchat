@@ -168,7 +168,7 @@ function bot_name_regexp() {
   $names[] = variable_get('bot_nickname', 'bot_module');
   $names = array_unique($names); // remove duplicates.
   foreach ($names as $index => $name) {
-    $names[$index] = preg_replace('/\W/', '\\\\$0', $name);
+    $names[$index] = preg_quote($name, '/');
   } // escape any non-word entities in the bot name.
 
   $names = implode('|', $names);
