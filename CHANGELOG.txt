@@ -2,6 +2,7 @@
 
 Bot 6.x-1.1, 2009-xx-xx
 -----------------------
+  * #349245: bot_tell doesn't consume username whitespace (thanks drewish).
   * #356003: bot_tell sorts queued messages by oldest first (thanks litwol).
   * #343245: Better regex for usernames like betz--; supports betz---- now.
   * #338723: Missing decode_entities() on project statuses (thanks RobLoach).
@@ -44,8 +45,8 @@ Bot 5.x-1.0, 2008-04-08
   * #106992: bot_seen now logs actions as seenable offenses.
   * added hook_uninstall() to everything.
 
-Bot 5.x-1.x, year 2007
-----------------------
+Bot 5.x-1.x, 2007
+-----------------
   * bot_log.module added; Logs multiple channels, day browsing, etc.
   * bot_project now has Trac integration (for tickets and revisions).
   * added another MySQL timeout preventer, thanks to killes.
