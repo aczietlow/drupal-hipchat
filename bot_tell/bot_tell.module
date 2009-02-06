@@ -113,8 +113,13 @@ function bot_tell_load($recipient) {
  *   The entirety of the message being sent.
  */
 function bot_tell_save($author, $recipient, $message) {
-  db_query("INSERT INTO {bot_tell_queue} SET author = '%s', recipient = '%s', message = '%s', timestamp = %d", $author, $recipient, $message, time());
-  bot_tell_pending_cache($recipient, 'insert'); // maintain the static cache.
+  $tell = new stdClass();
+  $tell->author     = $author;
+  $tell->recipient  = $recipient;
+  $tell->message    = $message;
+  $tell->timestamp  = time();
+  drupal_write_record('bot_tell_queue', $tell);
+  bot_tell_pending_cache($recipient, 'insert');
 }
 
 /**
