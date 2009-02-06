@@ -65,15 +65,12 @@ function bot_karma_irc_msg_channel($data, $from_query = FALSE) {
   // someone has affected the cosmos! modify the karma!
   elseif (preg_match('/(.*?)(\+\+|--)/', $data->message, $matches)) {
     $term = trim(drupal_strtolower($matches[1])); // always store it lowercase.
-
     if (strlen($term) < 3 || strlen($term) > 15) { return; } // skip odd sizes.
 
     // a user has tried to karma themselves.
     if (drupal_strtolower($data->nick) == $term) {
       $substitutions = array('!who' => $data->nick, '!channel' => $data->channel);
-      $self_responses = explode("\n", variable_get('bot_karma_self_responses', _bot_karma_self_responses()));
-      $self_response_key = array_rand($self_responses); // of all our self-karma responses, get a random one.
-      bot_message($to, strtr(trim($self_responses[$self_response_key]), $substitutions));
+      bot_message($to, bot_randomized_choice($substitutions, variable_get('bot_karma_self_responses', _bot_karma_self_responses())));
       return;
     }
 

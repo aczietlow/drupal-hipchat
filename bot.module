@@ -176,6 +176,26 @@ function bot_name_regexp() {
 }
 
 /**
+ * Given a list of possible responses, randomize one with substitutions.
+ *
+ * @param $substitutions
+ *   An array of substitution keys and values to be replaced in the response.
+ * @param $possibilities
+ *   An array of possibilities to randomize one out of. If a string is passed
+ *   in, we assume it is a newline-separated list of values to explode().
+ * @return $message
+ *   A message ready for printing with bot_message().
+ */
+function bot_randomized_choice($substitutions, $possibilities) {
+  if (!is_array($possibilities)) {
+    $possibilities = explode("\n", $possibilities);
+  }
+
+  $chosen = array_rand($possibilities);
+  return strtr(trim($possibilities[$chosen]), $substitutions);
+}
+
+/**
  * Configures the bot framework.
  */
 function bot_settings() {

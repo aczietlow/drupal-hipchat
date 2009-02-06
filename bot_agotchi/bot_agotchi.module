@@ -54,26 +54,20 @@ function bot_agotchi_irc_msg_channel($data, $from_query = FALSE) {
 
   // feeding makes the bot's tumbly less rumbly.
   if (preg_match("/^($addressed)?(bot(\s|\-)?snack)/i", $data->message)) {
-    $feeding_responses = explode("\n", variable_get('bot_agotchi_feeding_responses', _bot_agotchi_feeding_responses()));
-    $feeding_response_key = array_rand($feeding_responses); // of all our feeding responses, get a random one.
-    bot_message($to, strtr(trim($feeding_responses[$feeding_response_key]), $substitutions));
+    bot_message($to, bot_randomized_choice($substitutions, variable_get('bot_agotchi_feeding_responses', _bot_agotchi_feeding_responses())));
   }
 
   // spit out a greeting in response to another (addressed or not).
   $greeting_triggers = str_replace(array("\r\n", "\r", "\n"), '|', variable_get('bot_agotchi_greeting_triggers', _bot_agotchi_greeting_triggers()));
   if (preg_match("/^\s*($greeting_triggers)($addressed)?[!\?\.]*$/i", $data->message)) { // turn the triggers into a suitable pipe-delimited expression.
     if (rand(0, 100) < variable_get('bot_agotchi_greeting_randomness', 65)) {
-      $greeting_responses = explode("\n", variable_get('bot_agotchi_greeting_responses', _bot_agotchi_greeting_responses()));
-      $greeting_response_key = array_rand($greeting_responses); // of all our greeting responses, get a random one.
-      bot_message($to, strtr(trim($greeting_responses[$greeting_response_key]), $substitutions));
+      bot_message($to, bot_randomized_choice($substitutions, variable_get('bot_agotchi_greeting_responses', _bot_agotchi_greeting_responses())));
     }
   }
 
   // we've been thanked, so you're welcome 'em.
   if (preg_match("/^($addressed)thank(s| you)/i", $data->message)) {
-    $thankful_responses = explode("\n", variable_get('bot_agotchi_thankful_responses', _bot_agotchi_thankful_responses()));
-    $thankful_response_key = array_rand($thankful_responses); // of all our thankful responses, get a random one.
-    bot_message($to, strtr(trim($thankful_responses[$thankful_response_key]), $substitutions));
+    bot_message($to, bot_randomized_choice($substitutions, variable_get('bot_agotchi_thankful_responses', _bot_agotchi_thankful_responses())));
   }
 }
 

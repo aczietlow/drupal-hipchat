@@ -2,6 +2,8 @@
 
 Bot 6.x-1.1, 2009-xx-xx
 -----------------------
+  * #275042: Randomized messages now centralized in bot_randomized_choice().
+  * #274888: Move all INSERTs and UPDATEs to use drupal_write_record().
   * #218577: bot_tell.module added (thanks Rob Loach). Additions/changes:
     - pending message queue now exists to remove SELECT on every message.
     - received messages use format_interval(), not a date (thanks litwol).
