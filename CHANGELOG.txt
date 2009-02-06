@@ -2,6 +2,7 @@
 
 Bot 6.x-1.1, 2009-xx-xx
 -----------------------
+  * #343245: Better regex for usernames like betz--; supports betz---- now.
   * #338723: Missing decode_entities() on project statuses (thanks RobLoach).
   * #313025: Better regex for log filtering to prevent substring matches.
   * #300206: Better factoid-ignoring of tell-like messages (thanks RobLoach).
@@ -18,7 +19,7 @@ Bot 6.x-1.1, 2009-xx-xx
   * #137171: bot_karma.module added (thanks walkah/Rob Loach). Additions:
     - patch supported only words: committed version supports phrases.
     - if someone tries to karma themselves, the response is customizable.
-    - drupal_write_record is your friend; get used to using it!
+    - drupal_write_record() is your friend; get used to using it!
     - "BOTNAME: karma foo?" is required to prevent bad parsing.
     - highest/lowest karmas are available at example.com/bot/karma.
     - terms less than 3 and more than 15 characters are ignored.

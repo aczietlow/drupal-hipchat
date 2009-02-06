@@ -63,8 +63,8 @@ function bot_karma_irc_msg_channel($data, $from_query = FALSE) {
   }
 
   // someone has affected the cosmos! modify the karma!
-  elseif (preg_match('/(.*?)(\+\+|--)/', $data->message, $matches)) {
-    $term = trim(drupal_strtolower($matches[1])); // always store it lowercase.
+  elseif (preg_match("/^($addressed)?(.*?)(\+\+|--)$/", $data->message, $matches)) {
+    $term = trim(drupal_strtolower($matches[3])); // always store it lowercase.
     if (strlen($term) < 3 || strlen($term) > 15) { return; } // skip odd sizes.
 
     // a user has tried to karma themselves.
@@ -76,7 +76,7 @@ function bot_karma_irc_msg_channel($data, $from_query = FALSE) {
 
     // load in the karma item, if it exists, then increment or decrement its value. bOOOroiIIng.
     $result = db_fetch_object(db_query("SELECT term, karma FROM {bot_karma} WHERE term = '%s'", $term));
-    $result->karma = ($matches[2] == '++') ? $result->karma + 1 : $result->karma - 1;
+    $result->karma = ($matches[4] == '++') ? $result->karma + 1 : $result->karma - 1;
 
     if (!$result->term) {
       $result->term = $term;
