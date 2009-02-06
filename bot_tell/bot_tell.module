@@ -92,7 +92,7 @@ function bot_tell_load($recipient) {
   $messages = array();
 
   if (bot_tell_pending_cache($recipient)) {
-    $results = db_query("SELECT * FROM {bot_tell_queue} WHERE LOWER(recipient) = '%s'", drupal_strtolower($recipient));
+    $results = db_query("SELECT * FROM {bot_tell_queue} WHERE LOWER(recipient) = '%s' ORDER BY timestamp ASC", drupal_strtolower($recipient));
 
     while ($result = db_fetch_object($results)) {
       $messages[] = $result;

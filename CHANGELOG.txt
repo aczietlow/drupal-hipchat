@@ -2,7 +2,7 @@
 
 Bot 6.x-1.1, 2009-xx-xx
 -----------------------
-  * #356003: bot_tell now sorts queued messages by oldest first (thanks litwol).
+  * #356003: bot_tell sorts queued messages by oldest first (thanks litwol).
   * #343245: Better regex for usernames like betz--; supports betz---- now.
   * #338723: Missing decode_entities() on project statuses (thanks RobLoach).
   * #313025: Better regex for log filtering to prevent substring matches.
