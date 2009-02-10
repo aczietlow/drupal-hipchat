@@ -1,6 +1,6 @@
 // $Id$
 
-Bot 6.x-1.1, 2009-xx-xx
+Bot 6.x-1.1, 2009-02-10
 -----------------------
   * bot_seen ping prevention matched inside strings; now only word boundaries.
   * #284666: We now use preg_quote() for various nickname escaping.
