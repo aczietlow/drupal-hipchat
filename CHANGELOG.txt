@@ -1,5 +1,9 @@
 // $Id$
 
+Bot 6.x-1.x, xxxx-xx-xx
+-----------------------
+  * #391916: bot_log needed another index for speedier table SELECTs.
+
 Bot 6.x-1.1, 2009-02-10
 -----------------------
   * bot_seen ping prevention matched inside strings; now only word boundaries.

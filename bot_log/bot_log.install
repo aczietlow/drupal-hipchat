@@ -74,3 +74,12 @@ function bot_log_uninstall() {
   variable_del('bot_log_channels');
   variable_del('bot_log_dont_change_the_content');
 }
+
+/**
+ * Add index to 'timestamp'.
+ */
+function bot_log_update_6100() {
+  $ret = array(); // mah server was getting creamed with logs.
+  db_add_index($ret, 'bot_log', 'timestamp', array('timestamp'));
+  return $ret;
+}
