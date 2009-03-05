@@ -2,6 +2,7 @@
 
 Bot 6.x-1.x, xxxx-xx-xx
 -----------------------
+  * #380330: Added perms for factoids, karma, and project (thanks lut4rp).
   * #391916: bot_log needed another index for speedier table SELECTs.
 
 Bot 6.x-1.1, 2009-02-10
