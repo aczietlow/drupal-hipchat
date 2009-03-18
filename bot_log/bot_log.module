@@ -73,7 +73,8 @@ function bot_log_irc_msg_channel($data) {
 
   // we've been asked for a bookmark to the current log. never accessible from PMs.
   if (preg_match("/^${addressed}log (bookmark|pointer)\s*[!\?\.]*\s*$/i", $data->message)) {
-    if (in_array($data->channel, variable_get('bot_log_channels', array()))) {
+    $logged_channels = array_map('drupal_strtolower', variable_get('bot_log_channels', array()));
+    if (in_array(drupal_strtolower($data->channel), $logged_channels)) { // clients can send case.
       $path = 'bot/log/' . str_replace('#', '', $data->channel) . '/' . gmdate('Y-m-d');
       bot_message($data->channel, url($path, array('fragment' => 'T' . $log_id, 'absolute' => TRUE)));
     }
@@ -191,6 +192,10 @@ function bot_log_insert($type, $channel, $nick, $message) {
   $logged_channels = variable_get('bot_log_channels', array());
   if (strpos($channel, ' ') !== FALSE) { $incoming_channels = array_flip(explode(' ', $channel)); }
   // if $channel is space-separated, this is a NICKCHANGE or QUIT that needs all relevant channels.
+  // we need to lowercase all channels for these lookups; clients pass around sensitivity, servers don't.
+  $logged_channels    = array_map('drupal_strtolower', $logged_channels);
+  $incoming_channels  = array_map('drupal_strtolower', $incoming_channels);
+  $channel = drupal_strtolower($channel);
 
   if (isset($channel) && (in_array($channel, $logged_channels)) || array_intersect_key($incoming_channels, $logged_channels)) {
     $log = new stdClass();
