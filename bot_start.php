@@ -69,19 +69,18 @@ foreach ($irc_message_types as $irc_message_type) {
   $irc->registerActionhandler(constant('SMARTIRC_TYPE_' . $irc_message_type), '.*', $bot, 'invoke_irc_msg_' . strtolower($irc_message_type));
 }
 
-// set up a five minute timer similar to Drupal's hook_cron().
-$irc->registerTimehandler(300000, $bot, 'invoke_irc_bot_cron');
+// set up a timers similar to Drupal's hook_cron(), multiple types. I would have
+// liked to just pass a parameter to a single function, but SmartIRC can't do that.
+$irc->registerTimehandler(300000, $bot, 'invoke_irc_bot_cron');           // 5 minutes.
+$irc->registerTimehandler(60000, $bot,  'invoke_irc_bot_cron_faster');    // 1 minute.
+$irc->registerTimehandler(15000, $bot,  'invoke_irc_bot_cron_fastest');   // 15 seconds.
 
 // connect and begin listening.
 $irc->connect(variable_get('bot_server', 'irc.freenode.net'), variable_get('bot_server_port', 6667));
 $irc->login(variable_get('bot_nickname', 'bot_module'), variable_get('bot_nickname', 'bot_module') . ' :http://drupal.org/project/bot', 8, variable_get('bot_nickname', 'bot_module'), (variable_get('bot_password', '') != '') ? variable_get('bot_password', '') : NULL);
 
-// to support passwords, we have to make a single join per channel.
-$channels = preg_split('/\s*,\s*/', variable_get('bot_channels', '#test'));
-foreach ($channels as $channel) {
-  $channel_parts = explode(' ', $channel); // use a password if it's defined.
-  $irc->join($channel_parts[0], isset($channel_parts[1]) ? $channel_parts[1] : NULL);
-}
+// channel joining has moved to bot_irc_bot_cron_fastest().
+// read that function for the rationale, and what we gain from it.
 
 $irc->listen(); // go into the forever loop - no code after this is run.
 $irc->disconnect(); // if we stop listening, disconnect properly.
@@ -89,6 +88,8 @@ $irc->disconnect(); // if we stop listening, disconnect properly.
 // pass off IRC messages to our modules via Drupal's hook system.
 class drupal_wrapper {
   function invoke_irc_bot_cron(&$irc)                 { module_invoke_all('irc_bot_cron'); }
+  function invoke_irc_bot_cron_faster(&$irc)          { module_invoke_all('irc_bot_cron_faster'); }
+  function invoke_irc_bot_cron_fastest(&$irc)         { module_invoke_all('irc_bot_cron_fastest'); }
   function invoke_irc_msg_unknown(&$irc, &$data)      { module_invoke_all('irc_msg_unknown', $data); }
   function invoke_irc_msg_channel(&$irc, &$data)      { module_invoke_all('irc_msg_channel', $data); }
   function invoke_irc_msg_query(&$irc, &$data)        { module_invoke_all('irc_msg_query', $data); }

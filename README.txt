@@ -115,7 +115,8 @@ infinite loop. Another hook, irc_bot_reply_action, does the same for actions.
 The final hook of interest is irc_bot_cron, which is run every five minutes.
 This is very similar to Drupal's own hook_cron, but is intended only for
 bot-related operations (though, naturally, any hook_cron you add to your
-own bot plugins will function as expected).
+own bot plugins will function as expected). irc_bot_cron_faster (one minute)
+and irc_bot_cron_fastest (15 seconds) are also available.
 
 In addition to the actual utility of your module, you also should add a
 few lines describing how to use your module. This is done via Drupal's

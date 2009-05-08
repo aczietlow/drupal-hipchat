@@ -69,9 +69,6 @@ function bot_overview() {
 
 /**
  * Run an IRC-only crontab every five minutes.
- *
- * Here, we clear out some of the Drupal caches that are normally
- * flushed via page loads (which we never have via IRC operations).
  */
 function bot_irc_bot_cron() {
   // recreates the variable cache.
@@ -80,6 +77,31 @@ function bot_irc_bot_cron() {
 
   // attempt to always be the nick configured...
   bot_name_check(); // ...in our settings.
+}
+
+/**
+ * Run an IRC-only crontab every 15 seconds.
+ */
+function bot_irc_bot_cron_fastest() {
+  // When the bot has a number of channels to join (nearing 20+), the initial
+  // connection handshake, where it retrieves information about every user in
+  // every channel, can cause it to overload and disconnect. To solve this,
+  // we join channels every 15 seconds instead, which gives some breathing
+  // room for the nick caching to take place. A nice side-effect of this is
+  // that if the bot errors out of a channel, or a new channel is added to
+  // the list, it'll automatically (re)connect without needing a restart.
+  global $irc;
+
+  // to support passwords, we have to make a single join per channel.
+  $channels = preg_split('/\s*,\s*/', variable_get('bot_channels', '#test'));
+
+  foreach ($channels as $channel) { // for every one we're configured to join...
+    $channel_parts = explode(' ', $channel); // passwords are space-separated on list.
+    if (!$irc->channel($channel_parts[0])) { // ... check to see if we're in it. if not...
+      $irc->join($channel_parts[0], isset($channel_parts[1]) ? $channel_parts[1] : NULL);
+      break; // we only join one channel per 15 seconds, to prevent overloading.
+    }
+  }
 }
 
 /**

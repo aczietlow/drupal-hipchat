@@ -2,6 +2,7 @@
 
 Bot 6.x-1.x, xxxx-xx-xx
 -----------------------
+  * Channels are now joined every 15 seconds instead of at initial connection.
   * Logging checks for channels are now case-insensitive (thanks mozillamonks).
   * #362661: Attempt to GHOST and IDENTIFY on nick clashes (thanks seutje).
   * #380330: Added perms for factoids, karma, and project (thanks lut4rp).
