@@ -2,6 +2,7 @@
 
 Bot 6.x-1.x, xxxx-xx-xx
 -----------------------
+  * #564524: bot_project now reports comment counts on d.o URLs (thanks killes).
   * bot_tell now accepts :;, after a told nick (thanks webchick).
   * Channels are now joined every 15 seconds instead of at initial connection.
   * Logging checks for channels are now case-insensitive (thanks mozillamonks).
