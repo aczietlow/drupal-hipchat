@@ -2,6 +2,8 @@
 
 Bot 6.x-1.x, xxxx-xx-xx
 -----------------------
+  * If we receive an error containing "flood", we slow down our sends.
+  * If the server or client library receives an error, we'll watchdog it.
   * If a channel bans us, it is now permanently removed from the join list.
   * #648606: Chinese "ni hao" is mis-spelled in greetings (thanks JohnAlbin).
   * Advanced/debugging option added: whether to use real sockets or not.
