@@ -324,6 +324,12 @@ function bot_settings() {
     '#title'          => t('Reconnect to the IRC server if disconnected'),
     '#type'           => 'checkbox',
   );
+  $form['bot_connection']['bot_real_sockets'] = array(
+    '#default_value'  => variable_get('bot_real_sockets', 1), // prefer socket_connect.
+    '#description'    => t('If the bot is having connection problems, try disabling this to use fsockopen() instead.'),
+    '#title'          => t('Use real sockets for IRC server connection'),
+    '#type'           => 'checkbox',
+  );
   $form['bot_connection']['bot_debugging'] = array(
     '#default_value'  => variable_get('bot_debugging', 0), // spits out a TON of (useful) stuff.
     '#description'    => t('Low-level reporting by Net_SmartIRC\'s SMARTIRC_DEBUG_ALL.'),
