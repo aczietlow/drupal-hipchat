@@ -73,13 +73,14 @@ function bot_log_irc_msg_channel($data) {
 
   // we've been asked for a bookmark to the current log. never accessible from PMs.
   if (preg_match("/^${addressed}log (bookmark|pointer)\s*[!\?\.]*\s*$/i", $data->message)) {
+    $lc_channel = drupal_strtolower($data->channel); // lowercase the channel everywhere.
     $logged_channels = array_map('drupal_strtolower', variable_get('bot_log_channels', array()));
-    if (in_array(drupal_strtolower($data->channel), $logged_channels)) { // clients can send case.
-      $path = 'bot/log/' . str_replace('#', '', $data->channel) . '/' . gmdate('Y-m-d');
+    if (in_array($lc_channel, $logged_channels)) { // clients can send case; we always LC.
+      $path = 'bot/log/' . str_replace('#', '', $lc_channel) . '/' . gmdate('Y-m-d');
       bot_message($data->channel, url($path, array('fragment' => 'T' . $log_id, 'absolute' => TRUE)));
     }
     else {
-      bot_message($data->channel, t('!channel is not logged; no URL exists.', array('!channel' => $data->channel)));
+      bot_message($data->channel, t('!channel is not logged; no URL exists.', array('!channel' => $lc_channel)));
     }
   }
 }
