@@ -2,6 +2,9 @@
 
 Bot 6.x-1.x, xxxx-xx-xx
 -----------------------
+  * bot_aggregator.module added (thanks cwgordon7/snufkin). Additions:
+    - Configuration has been moved to the feed config form, not our own.
+    - Different feeds can now be sent to different channels, based on config.
   * If we receive an error containing "flood", we slow down our sends.
   * If the server or client library receives an error, we'll watchdog it.
   * If a channel bans us, it is now permanently removed from the join list.
