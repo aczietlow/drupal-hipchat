@@ -137,7 +137,7 @@ function _bot_agotchi_greeting_triggers() {
     'h([aeu]llo|i( there)?|owdy|ey|ola)',
     'salut',
     'bonjour',
-    'niihau',
+    'ni hao',
     'que\s*tal',
   ));
 }
@@ -153,7 +153,7 @@ function _bot_agotchi_greeting_responses() {
     'hello',
     'salut',
     'eh oh',
-    'niihau',
+    'ni hao',
     'privet',
     'bonjour',
     'que tal',
