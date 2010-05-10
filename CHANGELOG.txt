@@ -2,6 +2,7 @@
 
 Bot 6.x-1.x, xxxx-xx-xx
 -----------------------
+  * If a channel bans us, it is now permanently removed from the join list.
   * #648606: Chinese "ni hao" is mis-spelled in greetings (thanks JohnAlbin).
   * Advanced/debugging option added: whether to use real sockets or not.
   * bot_project: fixed broken Trac metadata from ticket/revision exports.

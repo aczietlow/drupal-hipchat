@@ -159,6 +159,33 @@ function bot_irc_msg_nickchange($data) {
 }
 
 /**
+ * Implementation of hook_irc_msg_error() {
+ */
+function bot_irc_msg_error($data) {
+
+}
+
+/**
+ * Implementation of hook_irc_msg_unknown() {
+ */
+function bot_irc_msg_unknown($data) {
+  // if we're banned from a channel, remove it from joins.
+  if ($data->rawmessageex[1] == SMARTIRC_ERR_BANNEDFROMCHAN) {
+    $channels = preg_split('/\s*,\s*/', variable_get('bot_channels', '#test'));
+    foreach ($channels as $index => $channel) {
+      if (strpos($channel, $data->rawmessageex[3]) !== FALSE) {
+        unset($channels[$index]); // there's not a whole lot we can do at this point, so wave goodbye to the banners.
+        watchdog('bot', '@channel has banned the bot. Removing from joins.', array('@channel' => $data->rawmessageex[3]));
+      }
+    }
+
+    // resave the new channels list without banned chans.
+    variable_set('bot_channels', implode(", ", $channels));
+    bot_irc_bot_cron(); // resets our settings caches.
+  }
+}
+
+/**
  * Send an action to a channel or user.
  *
  * @param $to
