@@ -14,7 +14,7 @@ function bot_potpourri_help($path, $arg) {
     case 'irc:features':
       return array(t('Timezones'));
     case 'irc:features#timezones':
-      return t('Display timezones with "BOTNAME: timezone BST". Convert timezones with "tz 10AM MST to EST" or "14:27 UTC in Europe/London". Timestamps are allowed if combined and with no spaces: "2010-10-23T10:00 EST to UTC". All returned dates are DST-aware.');
+      return t('Display timezones with "BOTNAME: timezone BST". Convert timezones with "tz 10AM MST to EST" or "tz 14:27 UTC in Europe/London". Timestamps are allowed if combined and with no spaces: "tz 2010-10-23T10:00 EST to UTC". All returned dates are DST-aware.');
   }
 }
 
