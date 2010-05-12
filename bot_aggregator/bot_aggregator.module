@@ -51,7 +51,7 @@ function bot_aggregator_irc_bot_cron_fastest() {
 
   while ($result = db_fetch_object($results)) {
     if (isset($channels[$result->fid])) {
-      $message = t('!feed => !title => !link',array(
+      $message = t('!feed => !title => !link', array(
         '!feed'   => decode_entities(strip_tags($result->feed_title)),
         '!title'  => decode_entities(strip_tags($result->title)),
         '!link'   => decode_entities(strip_tags($result->link)),

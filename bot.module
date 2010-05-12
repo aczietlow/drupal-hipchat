@@ -121,7 +121,7 @@ function bot_irc_msg_channel($data, $from_query = FALSE) {
     if (!$help_matches[2]) { // no specific help was asked for so give 'em a list.
       $irc_features = array_filter(module_invoke_all('help', 'irc:features', NULL));
       asort($irc_features); // alphabetical listing of features. the chainsaw is family.
-      bot_message($to, t('Detailed information is available by asking for "help <feature>" where <feature> is one of: !features.', array('!features' => implode(', ', $irc_features))));
+      bot_message($to, t('Detailed information is available with "BOTNAME: help <feature>" where <feature> is one of: !features.', array('!features' => implode(', ', $irc_features))));
     }
     else { // a specific type of help was required, so load up just that bit of text.
       $feature_name = 'irc:features#'. preg_replace('/[^\w\d]/', '_', drupal_strtolower(trim($help_matches[2])));
