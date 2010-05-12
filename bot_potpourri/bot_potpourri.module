@@ -74,19 +74,22 @@ function bot_potpourri_timezone($string) {
     $dst_zone = $string;
   }
 
+  // for reasons I have yet to determine, these catches are NOT firing
+  // from within a Drupal bootstrap. Compensate by checking existence.
+
   try {
     $src_dtzone = new DateTimeZone($src_zone);
     $src_dttime = new DateTime($src_time, $src_dtzone);
-  }
-  catch(Exception $e) {
-    return(t('!nick: unknown or bad source timezone.'));
+  } catch(Exception $e) { } // sadness for the emptiness.
+  if (!isset($src_dtzone)) {
+    return(t('!who: unknown or bad source timezone.'));
   }
 
   try {
     $dst_dtzone = new DateTimeZone($dst_zone);
-  }
-  catch(Exception $e) {
-    return(t('!nick: unknown or bad destination timezone.'));
+  } catch(Exception $e) { } // soOOO lOoneneLlly.
+  if (!isset($dst_dtzone)) {
+    return(t('!who: unknown or bad destination timezone.'));
   }
 
   $src_dttime->setTimezone($dst_dtzone); // convert src to dst and return.
