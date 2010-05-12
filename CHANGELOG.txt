@@ -2,6 +2,7 @@
 
 Bot 6.x-1.x, xxxx-xx-xx
 -----------------------
+  * #477596: Fixed regexp error in bot_seen.module (thanks Gurpartap).
   * bot_tell.module can now remind you of things: "BOTNAME: help Reminders?"
   * bot_potpourri.module added (thanks, ae1): "BOTNAME: help Timezones?"
   * bot_aggregator.module added (thanks cwgordon7/snufkin). Additions:
