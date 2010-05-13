@@ -167,7 +167,7 @@ function bot_tell_save($author, $recipient, $message, $futurestamp = 0, $future_
   $tell->future_to    = $future_to;
   drupal_write_record('bot_tell_queue', $tell);
 
-  if ($futurestamp != 0) { // only cache immediates.
+  if (!$futurestamp) { // only cache immediates.
     bot_tell_pending_cache($recipient, 'insert');
   }
 }
