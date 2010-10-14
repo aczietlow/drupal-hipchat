@@ -166,7 +166,7 @@ function bot_irc_msg_error($data) {
 
   if (strpos($data->message, 'flood') !== FALSE) { // ah crap, this isn't good.
     global $irc; // if an error comes through that contains "flood", try and slow ourselves.
-    $irc->setSenddelay($irc->_senddelay + 250); // increase it by a quarter second each time.
+    $irc->setSenddelay($irc->_senddelay + 500); // increase it by a half second each time.
     watchdog('bot', 'Flood detected: increasing send delay to @time.', array('@time' => $irc->_senddelay));
   }
 }
@@ -179,7 +179,7 @@ function bot_irc_msg_unknown($data) {
   if ($data->rawmessageex[1] == SMARTIRC_ERR_BANNEDFROMCHAN) {
     $channels = preg_split('/\s*,\s*/', variable_get('bot_channels', '#test'));
     foreach ($channels as $index => $channel) {
-      if (strpos($channel, $data->rawmessageex[3]) !== FALSE) {
+      if ($channel == $data->rawmessageex[3]) {
         unset($channels[$index]); // there's not a whole lot we can do at this point, so wave goodbye to the banners.
         watchdog('bot', '@channel has banned the bot. Removing from joins.', array('@channel' => $data->rawmessageex[3]));
       }
