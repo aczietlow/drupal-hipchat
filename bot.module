@@ -159,22 +159,30 @@ function bot_irc_msg_nickchange($data) {
 }
 
 /**
+ * Implementation of hook_irc_msg_quit() {
+ */
+function bot_irc_msg_quit($data) {
+  if (preg_match("/.*?${addressed}.*?flood.*?/i", $data->rawmessage)) {
+    watchdog('bot', '@error', array('@error' => $data->rawmessage)); // just in case.
+    global $irc; // if an error comes through that contains "flood", try and slow ourselves.
+    $irc->setSenddelay($irc->_senddelay + 250); // increase it by a quarter second each time.
+    watchdog('bot', 'Flood detected: increasing send delay to @time.', array('@time' => $irc->_senddelay));
+  }
+}
+
+/**
  * Implementation of hook_irc_msg_error() {
  */
 function bot_irc_msg_error($data) {
   watchdog('bot', '@error', array('@error' => $data->rawmessage), WATCHDOG_ERROR);
-
-  if (strpos($data->message, 'flood') !== FALSE) { // ah crap, this isn't good.
-    global $irc; // if an error comes through that contains "flood", try and slow ourselves.
-    $irc->setSenddelay($irc->_senddelay + 500); // increase it by a half second each time.
-    watchdog('bot', 'Flood detected: increasing send delay to @time.', array('@time' => $irc->_senddelay));
-  }
 }
 
 /**
  * Implementation of hook_irc_msg_unknown() {
  */
 function bot_irc_msg_unknown($data) {
+  watchdog('bot', '@unknown', array('@unknown' => $data->rawmessage));
+
   // if we're banned from a channel, remove it from joins.
   if ($data->rawmessageex[1] == SMARTIRC_ERR_BANNEDFROMCHAN) {
     $channels = preg_split('/\s*,\s*/', variable_get('bot_channels', '#test'));
