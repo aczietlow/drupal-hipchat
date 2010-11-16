@@ -162,6 +162,8 @@ function bot_irc_msg_nickchange($data) {
  * Implementation of hook_irc_msg_quit() {
  */
 function bot_irc_msg_quit($data) {
+  $addressed = bot_name_regexp();
+
   if (preg_match("/.*?${addressed}.*?flood.*?/i", $data->rawmessage)) {
     watchdog('bot', '@error', array('@error' => $data->rawmessage)); // just in case.
     global $irc; // if an error comes through that contains "flood", try and slow ourselves.
