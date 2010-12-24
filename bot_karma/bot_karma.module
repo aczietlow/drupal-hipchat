@@ -7,7 +7,7 @@
  */
 
 /**
- * Implementation of hook_help().
+ * Implements hook_help().
  */
 function bot_karma_help($section) {
   switch ($section) {
@@ -23,7 +23,7 @@ function bot_karma_help($section) {
 }
 
 /**
- * Implementation of hook_menu().
+ * Implements hook_menu().
  */
 function bot_karma_menu() {
   $items['bot/karma'] = array(
@@ -32,7 +32,7 @@ function bot_karma_menu() {
     'page callback'     => 'bot_karma_overview',
     'title'             => 'Karma',
   );
-  $items['admin/settings/bot/karma'] = array(
+  $items['admin/config/bot/karma'] = array(
     'access arguments'  => array('administer bot'),
     'description'       => 'Configure karma responses with these settings.',
     'page callback'     => 'drupal_get_form',
@@ -44,10 +44,40 @@ function bot_karma_menu() {
 }
 
 /**
- * Implementation of hook_perm().
+ * Implements hook_permission().
  */
-function bot_karma_perm() {
-  return array('access bot karma scores');
+function bot_karma_permission() {
+  return array(
+    'access bot karma scores' => array(
+      'title' => t('Access bot karma scores'),
+    ),
+  );
+}
+
+/**
+ * Display top ten lists of the highest and lowest karma scores.
+ */
+function bot_karma_overview() {
+  $headers = array(t('Term'), t('Karma'));
+
+  foreach (array('highest' => 'DESC', 'lowest' => 'ASC') as $type => $order) {
+    $results = db_query_range('SELECT term, karma FROM {bot_karma} ORDER BY karma ' . $order, 0, 10);
+    $rows = array(); // filled with chocolately goodness.
+    foreach ($results as $result) { // and a nougat center?
+      $rows[] = array(check_plain($result->term), check_plain($result->karma));
+    } // ok, no nougat center, but lots of whip cream. MmMmM, Cool Whip. Delish.
+
+    $build["bot_karma_$type"] = array(
+      '#theme'      => 'table',
+      '#header'     => $headers,
+      '#rows'       => $rows,
+      '#attributes' => array('id' => "bot_karma_$type"),
+      '#empty'      => t('No karma entries are available.'),
+      '#prefix'     => '<h2>' . t('!type karma', array('!type' => drupal_ucfirst($type))) . '</h2>',
+    );
+  }
+
+  return $build;
 }
 
 /**
@@ -64,8 +94,8 @@ function bot_karma_irc_msg_channel($data, $from_query = FALSE) {
 
   // addressing is required. "bot_module: karma foo?".
   if (preg_match("/^${addressed}karma\s+(.*?)[!\?\.]*\s*$/i", $data->message, $matches)) {
-    $result = db_fetch_object(db_query("SELECT term, karma FROM {bot_karma} WHERE term = '%s'", trim(drupal_strtolower($matches[2]))));
-    $karma = $result->term ? $result->karma : 0; // instead of saying "no results", everything has a karma of 0. it's true! life sucks.
+    $result = db_query("SELECT term, karma FROM {bot_karma} WHERE term = :term", array(':term' => trim(drupal_strtolower($matches[2]))))->fetchObject();
+    $karma = $result->term ? $result->karma : 0; // instead of saying "no results", everything has a karma of 0. it's true! life sucks and then you cry.
     bot_message($to, t('!term has karma of !karma.', array('!term' => trim($matches[2]), '!karma' => $karma))); // maintain user case!
   }
 
@@ -82,7 +112,7 @@ function bot_karma_irc_msg_channel($data, $from_query = FALSE) {
     }
 
     // load in the karma item, if it exists, then increment or decrement its value. bOOOroiIIng.
-    $result = db_fetch_object(db_query("SELECT term, karma FROM {bot_karma} WHERE term = '%s'", $term));
+    $result = db_query("SELECT term, karma FROM {bot_karma} WHERE term = :term", array(':term' => $term))->fetchObject();
     $result->karma = ($matches[4] == '++') ? $result->karma + 1 : $result->karma - 1;
 
     if (!$result->term) {
@@ -100,25 +130,6 @@ function bot_karma_irc_msg_channel($data, $from_query = FALSE) {
  */
 function bot_karma_irc_msg_query($data) {
   bot_karma_irc_msg_channel($data, TRUE);
-}
-
-/**
- * Display top ten lists of the highest and lowest karma scores.
- */
-function bot_karma_overview() {
-  $output = NULL; $headers = array(t('Term'), t('Karma'));
-
-  foreach (array('highest' => 'DESC', 'lowest' => 'ASC') as $type => $order) {
-    $output .= '<h2>' . t('!type karma', array('!type' => drupal_ucfirst($type))) . '</h2>';
-    $results = db_query_range('SELECT term, karma FROM {bot_karma} ORDER BY karma ' . $order, 0, 10);
-    $rows = array(); // filled with chocolately goodness.
-    while ($result = db_fetch_object($results)) { // and a nougat center?
-      $rows[] = array(check_plain($result->term), check_plain($result->karma));
-    } // ok, no nougat center, but lots of whip cream. MmMmM, Cool Whip. Delish.
-    $output .= theme('table', $headers, $rows, array('id' => 'karma-' . $type));
-  }
-
-  return $output;
 }
 
 /**

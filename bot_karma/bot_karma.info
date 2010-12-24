@@ -1,6 +1,7 @@
 ; $Id$
 name = Bot Karma
 package = Bot
-description = "Enables positive and negative tracking of words and phrases."
 dependencies[] = bot
-core = 6.x
+description = "Enables positive and negative tracking of words and phrases."
+configure = admin/config/bot/karma
+core = 7.x
