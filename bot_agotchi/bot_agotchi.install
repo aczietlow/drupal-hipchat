@@ -2,7 +2,12 @@
 // $Id$
 
 /**
- * Implementation of hook_uninstall().
+ * @file
+ * Install, update, and uninstall functions for the Botagotchi module.
+ */
+
+/**
+ * Implements hook_uninstall().
  */
 function bot_agotchi_uninstall() {
   variable_del('bot_agotchi_feeding_responses');

@@ -11,7 +11,7 @@
  */
 
 /**
- * Implementation of hook_help().
+ * Implements hook_help().
  */
 function bot_agotchi_help($path, $arg) {
   switch ($path) {
@@ -25,10 +25,10 @@ function bot_agotchi_help($path, $arg) {
 }
 
 /**
- * Implementation of hook_menu().
+ * Implements hook_menu().
  */
 function bot_agotchi_menu() {
-  $items['admin/settings/bot/agotchi'] = array(
+  $items['admin/config/bot/agotchi'] = array(
     'access arguments'  => array('administer bot'),
     'description'       => 'Configure your botagotchi with these settings.',
     'page callback'     => 'drupal_get_form',
