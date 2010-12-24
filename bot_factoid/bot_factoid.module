@@ -7,7 +7,7 @@
  */
 
 /**
- * Implementation of hook_help().
+ * Implements hook_help().
  */
 function bot_factoid_help($path, $arg) {
   switch ($path) {
@@ -23,7 +23,7 @@ function bot_factoid_help($path, $arg) {
 }
 
 /**
- * Implementation of hook_menu().
+ * Implements hook_menu().
  */
 function bot_factoid_menu() {
   $items['bot/factoid'] = array(
@@ -32,7 +32,7 @@ function bot_factoid_menu() {
     'page callback'     => 'bot_factoid_overview',
     'title'             => 'Factoids',
   );
-  $items['admin/settings/bot/factoid'] = array(
+  $items['admin/config/bot/factoid'] = array(
     'access arguments'  => array('administer bot'),
     'description'       => 'Configure factoid learning with these settings.',
     'page callback'     => 'drupal_get_form',
@@ -44,32 +44,42 @@ function bot_factoid_menu() {
 }
 
 /**
- * Implementation of hook_perm().
+ * Implements hook_permission().
  */
-function bot_factoid_perm() {
-  return array('access bot factoids');
+function bot_factoid_permission() {
+  return array(
+    'access bot factoids' => array(
+      'title' => t('Access bot factoids'),
+    ),
+  );
 }
 
 /**
  * Browse all the factoids the bot knows about.
  */
 function bot_factoid_overview() {
-  $output = NULL; // NULL, NULL, the musical toot...
-  $headers = array(t('Subject'), t('Is/Are'), t('Statement'));
+  $rows = array(); // storage of awesomeness.
+  $query = db_select('bot_factoid', 'bf')->extend('PagerDefault');
+  $results = $query->fields('bf', array('subject', 'is_are', 'statement'))->orderBy('subject')->limit(25)->execute();
 
-  $rows = array(); // storage of gimme-gimme awesomeness. wheedoggy!
-  $results = pager_query('SELECT subject, is_are, statement FROM {bot_factoid} ORDER BY subject', 25);
-  while ($result = db_fetch_object($results)) {
+  foreach ($results as $result) {
     $rows[] = array(
       array('data' => check_plain($result->subject), 'class' => 'subject'),
       array('data' => check_plain($result->is_are), 'class' => 'is_are'),
       array('data' => check_plain($result->statement), 'class' => 'statement')
     );
   }
-  $output .= theme('table', $headers, $rows, array('id' => 'factoids'));
-  $output .= theme('pager', NULL, 25, 0);
 
-  return $output;
+  $build['bot_factoid_table'] = array(
+    '#theme'      => 'table',
+    '#header'     => array(t('Subject'), t('Is/Are'), t('Statement')),
+    '#rows'       => $rows,
+    '#attributes' => array('id' => 'factoids'),
+    '#empty'      => t('No factoids are available.'),
+  );
+  $build['bot_factoid_pager'] = array('#theme' => 'pager');
+
+  return $build;
 }
 
 /**
@@ -99,7 +109,7 @@ function bot_factoid_irc_msg_channel($data, $from_query = FALSE) {
   }
 
   // a known factoid was requested...
-  if ($factoid) { // so spit it to $to. puh-wease.
+  if (isset($factoid)) { // so spit it to $to. pwease.
     if (preg_match("/^\/me /", $factoid['result'])) {
       bot_action($to, str_replace('/me ', '', $factoid['result']));
     }
@@ -139,8 +149,8 @@ function bot_factoid_irc_msg_query($data) {
  *   The subject you'd like to delete.
  */
 function bot_factoid_delete($subject) {
-  if (!$subject) { return 0; } // why do you not send me a subject? I like to reap, reap, reap.
-  db_query("DELETE FROM {bot_factoid} WHERE LOWER(subject) = '%s'", drupal_strtolower($subject));
+  if (!$subject) { return 0; } // why do you not send me a subject? Reap, reap, reap!
+  db_delete('bot_factoid')->condition('subject', db_like($subject) . '%', 'LIKE')->execute();
 }
 
 /**
@@ -163,13 +173,13 @@ function bot_factoid_delete($subject) {
  *   ready for sending.
  */
 function bot_factoid_load($subject, $data = NULL) {
-  $factoid = array(); // holds everything about the fact.
-  $is_are_counts = array(); // number of "is" "are" usage.
+  $factoid = array(); // holds data about the fact.
+  $is_are_counts = array('is' => 0, 'are' => 0);
 
-  $results = db_query("SELECT is_are, statement FROM {bot_factoid} WHERE LOWER(subject) = '%s'", drupal_strtolower($subject));
-  while ($result = db_fetch_object($results)) { // Morbus flings his own poo. Not at people. But at glassware. GLASSSWARE!
-    if (strpos($result->statement, '<reply>') !== FALSE)  { $factoid['has_reply']++; }
-    if (strpos($result->statement, '<action>') !== FALSE) { $factoid['has_action']++; }
+  $results = db_query("SELECT is_are, statement FROM {bot_factoid} WHERE subject LIKE :subject", array(':subject' => db_like($subject) . '%'));
+  foreach ($results as $result) { // Morbus flings his own poo. Not at people. But at glassware. GLASSSWARE! (And occasionally recyclable plastics.)
+    if (strpos($result->statement, '<reply>') !== FALSE)  { $factoid['has_reply'] = 1; }
+    if (strpos($result->statement, '<action>') !== FALSE) { $factoid['has_action'] = 1; }
 
     if ($data) { // if the irc object is here, try for some substitutions.
       $substitutions = array('!who' => $data->nick, '!channel' => $data->channel);
@@ -194,14 +204,14 @@ function bot_factoid_load($subject, $data = NULL) {
     // ready printing, but the ability to have multiple statements per subject,
     // and multiple TYPES of statements (<action> and <reply>), causes complexities.
     // we'll do what we can with the result, and munge it for any other case.
-    if (!$factoid['has_reply'] && !$factoid['has_action'] || (count($factoid['statements']) > 1 && ($factoid['has_reply'] || $factoid['has_action']))) {
-      // if we've got no actions and no replies, or we have actions and replies but more than one easy-to-logic statements, we'll just spit 'em verbatim.
+    if (!isset($factoid['has_reply']) && !isset($factoid['has_action']) || (count($factoid['statements']) > 1 && (isset($factoid['has_reply']) || isset($factoid['has_action'])))) {
+      // if we've got no actions and no replies, or we have actions and replies but more than one easy-to-logic statements, we'll just spit 'em verbatim. too confusing otherwise.
       $factoid['result'] = "$factoid[subject] $factoid[is_are] ". implode(" and $factoid[is_are] also ", $factoid['statements']);
     }
-    elseif ($factoid['has_reply'] && count($factoid['statements']) == 1) {
+    elseif (isset($factoid['has_reply']) && count($factoid['statements']) == 1) {
       $factoid['result'] = str_replace('<reply>', '', array_shift($factoid['statements']));
     }
-    elseif ($factoid['has_action'] && count($factoid['statements']) == 1) {
+    elseif (isset($factoid['has_action']) && count($factoid['statements']) == 1) {
       $factoid['result'] = str_replace('<action>', '/me ', array_shift($factoid['statements']));
     }
 
@@ -274,6 +284,7 @@ function bot_factoid_settings() {
   $form['bot_factoid_stopwords'] = array(
     '#default_value' => variable_get('bot_factoid_stopwords', _bot_factoid_stopwords()),
     '#description'   => t('List the words that cannot be the subject of a factoid.'),
+    '#rows'          => 15,
     '#title'         => t('Stopwords'),
     '#type'          => 'textarea',
   );

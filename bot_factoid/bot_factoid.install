@@ -2,29 +2,33 @@
 // $Id$
 
 /**
- * Implementation of hook_schema().
+ * @file
+ * Install, update, and uninstall functions for the Bot Factoid module.
+ */
+
+/**
+ * Implements hook_schema().
  */
 function bot_factoid_schema() {
   $schema['bot_factoid'] = array(
-    'description' => t('The single table necessary for factoid storage.'),
+    'description' => 'The single table necessary for factoid storage.',
     'fields' => array(
       'subject' => array(
         'default'     => '',
-        'description' => t('The word or phrase this factoid is about.'),
+        'description' => 'The word or phrase this factoid is about.',
         'length'      => 255,
         'not null'    => TRUE,
         'type'        => 'varchar',
       ),
       'is_are' => array(
         'default'     => '',
-        'description' => t('The determinant of whether this factoid is singular or plural.'),
+        'description' => 'The determinant of whether this factoid is singular or plural.',
         'length'      => 3,
         'not null'    => TRUE,
         'type'        => 'varchar',
       ),
       'statement' => array(
-        'default'     => '',
-        'description' => t('The factoid defined for this subject.'),
+        'description' => 'The factoid defined for this subject.',
         'not null'    => TRUE,
         'type'        => 'text',
       ),
@@ -33,19 +37,4 @@ function bot_factoid_schema() {
   );
 
   return $schema;
-}
-
-/**
- * Implementation of hook_install().
- */
-function bot_factoid_install() {
-  drupal_install_schema('bot_factoid');
-}
-
-/**
- * Implementation of hook_uninstall().
- */
-function bot_factoid_uninstall() {
-  drupal_uninstall_schema('bot_factoid');
-  variable_del('bot_factoid_stopwords');
 }
