@@ -70,11 +70,11 @@ function bot_factoid_overview() {
     );
   }
 
-  $build['bot_factoid_table'] = array(
+  $build['bot_factoid_list'] = array(
     '#theme'      => 'table',
     '#header'     => array(t('Subject'), t('Is/Are'), t('Statement')),
     '#rows'       => $rows,
-    '#attributes' => array('id' => 'factoids'),
+    '#attributes' => array('id' => 'bot_factoid_list'),
     '#empty'      => t('No factoids are available.'),
   );
   $build['bot_factoid_pager'] = array('#theme' => 'pager');
@@ -173,7 +173,7 @@ function bot_factoid_delete($subject) {
  *   ready for sending.
  */
 function bot_factoid_load($subject, $data = NULL) {
-  $factoid = array(); // holds data about the fact.
+  $factoid = array('statements' => array());
   $is_are_counts = array('is' => 0, 'are' => 0);
 
   $results = db_query("SELECT is_are, statement FROM {bot_factoid} WHERE subject LIKE :subject", array(':subject' => db_like($subject) . '%'));
@@ -218,7 +218,7 @@ function bot_factoid_load($subject, $data = NULL) {
     return $factoid;
   }
 
-  return 0;
+  return NULL;
 }
 
 /**
