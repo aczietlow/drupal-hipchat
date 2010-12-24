@@ -70,7 +70,7 @@ function bot_overview() {
 
   $irc_features = array_filter(module_invoke_all('help', 'irc:features', NULL));
   asort($irc_features); // alphabetical listing of features. the machete is family.
-  foreach ($irc_features as $irc_feature) {
+  foreach ($irc_features as $irc_feature) { // unless you're thinking chainsaws. them too.
     $feature_help = array_filter(module_invoke_all('help', 'irc:features#' . preg_replace('/[^\w\d]/', '_', drupal_strtolower(trim($irc_feature))), NULL));
     $build['bot_overview']['#markup'] .= '<li><strong>' . check_plain($irc_feature) . ':</strong> ' . check_plain(array_shift($feature_help)) . '</li>';
   }
@@ -85,7 +85,7 @@ function bot_overview() {
 function bot_irc_bot_cron() {
   // recreates the variable cache.
   variable_set('bot_cache_cleared', time());
-  $GLOBALS['conf'] = variable_init();
+  $GLOBALS['conf'] = variable_initialize();
 
   // attempt to always be the nick configured...
   bot_name_check(); // ...in our settings.
