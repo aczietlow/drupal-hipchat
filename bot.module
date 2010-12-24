@@ -52,7 +52,8 @@ function bot_menu() {
     'description'       => 'Configure your bot framework with these settings.',
     'page callback'     => 'drupal_get_form',
     'page arguments'    => array('bot_settings'),
-    'title'             => 'Bot core',
+    'title'             => 'Bot',
+    'weight'            => -10,
   );
 
   return $items;
