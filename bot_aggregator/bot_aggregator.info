@@ -4,4 +4,5 @@ package = Bot
 dependencies[] = bot
 dependencies[] = aggregator
 description = Enables the reporting of aggregated feed items to configured channels.
-core = 6.x
+configure = admin/config/bot/aggregator
+core = 7.x
