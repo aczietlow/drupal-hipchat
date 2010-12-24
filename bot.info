@@ -2,4 +2,5 @@
 name = Bot
 package = Bot
 description = "Enables a network and plugin framework for IRC bots."
-core = 6.x
+configure = admin/config/bot
+core = 7.x

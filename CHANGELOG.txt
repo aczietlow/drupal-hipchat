@@ -1,11 +1,15 @@
 // $Id$
 
-Bot 6.x-1.x, xxxx-xx-xx
+Bot 7.x-1.2, 2010-XX-XX
+-----------------------
+  * First release for Drupal 7.x; equivalent to 6.x-1.2.
+
+Bot 6.x-1.2, 2010-12-24
 -----------------------
   * #937836 and #937820: PostgreSQL and E_STRICT fixes (thanks Shiny).
   * #477596: Fixed regexp error in bot_seen.module (thanks Gurpartap).
   * bot_tell.module can now remind you of things: "BOTNAME: help Reminders?"
-  * bot_potpourri.module added (thanks, ae1): "BOTNAME: help Timezones?"
+  * bot_potpourri.module added (thanks ae1): "BOTNAME: help Timezones?"
   * bot_aggregator.module added (thanks cwgordon7/snufkin). Additions:
     - Configuration has been moved to the feed config form, not our own.
     - Different feeds can now be sent to different channels, based on config.

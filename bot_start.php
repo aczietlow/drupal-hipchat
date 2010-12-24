@@ -20,6 +20,7 @@ while ($param = array_shift($_SERVER['argv'])) {
     case '--root':
       $drupal_root = array_shift($_SERVER['argv']);
       is_dir($drupal_root) ? chdir($drupal_root) : exit("ERROR: $drupal_root not found.\n");
+      define('DRUPAL_ROOT', dirname('.')); // we're now where we need to be, so hellOooO!
       break;
 
     case '--url':
@@ -41,7 +42,7 @@ drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
 require_once('Net/SmartIRC.php');
 
 // prevent MySQL timeouts on slow channels.
-db_query('SET SESSION wait_timeout = %d', 24*60*60);
+db_query('SET SESSION wait_timeout = 86400');
 
 // initialize the bot with some sane defaults.
 global $irc; // allow it to be slurped by Drupal modules if need be.
@@ -77,7 +78,7 @@ $irc->registerTimehandler(15000, $bot,  'invoke_irc_bot_cron_fastest');   // 15 
 
 // connect and begin listening.
 $irc->connect(variable_get('bot_server', 'irc.freenode.net'), variable_get('bot_server_port', 6667));
-$irc->login(variable_get('bot_nickname', 'bot_module'), variable_get('bot_nickname', 'bot_module') . ' :http://drupal.org/project/bot', 8, variable_get('bot_nickname', 'bot_module'), (variable_get('bot_password', '') != '') ? variable_get('bot_password', '') : NULL);
+$irc->login(variable_get('bot_nickname', 'bot_module'), variable_get('bot_nickname', 'bot_module') . ' :http://drupal.org/project/bot', 8, variable_get('bot_nickname', 'bot_module'), variable_get('bot_password'));
 
 // channel joining has moved to bot_irc_bot_cron_fastest().
 // read that function for the rationale, and what we gain from it.
