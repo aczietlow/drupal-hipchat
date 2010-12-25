@@ -1,22 +1,22 @@
 
-#bot-log-day tr.even,
-#bot-log-day tr.odd {
+#bot-log-date tr.even,
+#bot-log-date tr.odd {
   background-color: transparent;
 }
 
-#bot-log-day tr.bot-log-none {
+#bot-log-date tr.bot-log-none {
   background-color: #edf5fa;
 }
 
-#bot-log-day tr.bot-log-nick-odd {
+#bot-log-date tr.bot-log-nick-odd {
   background-color: #edf5fa;
 }
 
-#bot-log-day .bot-log-action {
+#bot-log-date .bot-log-action {
   color: green;
 }
 
-#bot-log-day .bot-log-status {
+#bot-log-date .bot-log-status {
   color: red;
 }
 

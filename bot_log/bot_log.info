@@ -3,4 +3,5 @@ name = Bot Log
 package = Bot
 dependencies[] = bot
 description = "Enables the logging of IRC channels."
-core = 6.x
+configure = admin/config/bot/log
+core = 7.x

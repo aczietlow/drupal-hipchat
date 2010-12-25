@@ -2,14 +2,14 @@
 // $Id$
 
 /**
- * Implementation of hook_schema().
+ * Implements hook_schema().
  */
 function bot_log_schema() {
   $schema['bot_log'] = array(
-    'description' => t('The single table necessary for IRC channel logging.'),
+    'description' => 'The single table necessary for IRC channel logging.',
     'fields' => array(
       'id' => array(
-        'description' => t('A unique ID for this log message, across all channels.'),
+        'description' => 'A unique ID for this log message, across all channels.',
         'not null'    => TRUE,
         'size'        => 'big',
         'type'        => 'serial',
@@ -17,34 +17,33 @@ function bot_log_schema() {
       ),
       'type' => array(
         'default'     => 0,
-        'description' => t('The message ID value, as provided by Net_SmartIRC.'),
+        'description' => 'The message ID value, as provided by Net_SmartIRC.',
         'not null'    => TRUE,
         'type'        => 'int',
       ),
       'timestamp' => array(
         'default'     => 0,
-        'description' => t('The Unix timestamp when this log message occurred.'),
+        'description' => 'The Unix timestamp when this log message occurred.',
         'not null'    => TRUE,
         'type'        => 'int',
         'unsigned'    => TRUE,
       ),
       'channel' => array(
         'default'     => '',
-        'description' => t('The IRC channel or channels where this log message occurred.'),
+        'description' => 'The IRC channel or channels where this log message occurred.',
         'length'      => 255,
         'not null'    => TRUE,
         'type'        => 'varchar',
       ),
       'nick' => array(
         'default'     => '',
-        'description' => t('The IRC user that caused this log message to occur.'),
+        'description' => 'The IRC user that caused this log message to occur.',
         'length'      => 60,
         'not null'    => TRUE,
         'type'        => 'varchar',
       ),
       'message' => array(
-        'default'     => '',
-        'description' => t('The log message itself.'),
+        'description' => 'The log message itself.',
         'not null'    => TRUE,
         'type'        => 'text',
       ),
@@ -56,21 +55,18 @@ function bot_log_schema() {
 }
 
 /**
- * Implementation of hook_install().
+ * Implements hook_install().
  */
 function bot_log_install() {
-  drupal_install_schema('bot_log');
-
   // if we don't set the logging module first, then we'll get into situations
   // where a bot factoid response will log BEFORE the actual factoid trigger.
   db_query("UPDATE {system} SET weight = -10 WHERE name = 'bot_log'");
 }
 
 /**
- * Implementation of hook_uninstall().
+ * Implements hook_uninstall().
  */
 function bot_log_uninstall() {
-  drupal_uninstall_schema('bot_log');
   variable_del('bot_log_channels');
   variable_del('bot_log_dont_change_the_content');
 }
@@ -79,7 +75,5 @@ function bot_log_uninstall() {
  * Add index to 'timestamp'.
  */
 function bot_log_update_6100() {
-  $ret = array(); // mah server was getting creamed with logs.
-  db_add_index($ret, 'bot_log', 'timestamp', array('timestamp'));
-  return $ret;
+  db_add_index('bot_log', 'timestamp', array('timestamp'));
 }
