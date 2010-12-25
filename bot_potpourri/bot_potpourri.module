@@ -7,7 +7,7 @@
  */
 
 /**
- * Implementation of hook_help().
+ * Implements hook_help().
  */
 function bot_potpourri_help($path, $arg) {
   switch ($path) {
