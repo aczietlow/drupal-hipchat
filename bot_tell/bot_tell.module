@@ -7,7 +7,7 @@
  */
 
 /**
- * Implementation of hook_help().
+ * Implements hook_help().
  */
 function bot_tell_help($path, $arg) {
   switch ($path) {
@@ -21,12 +21,12 @@ function bot_tell_help($path, $arg) {
 }
 
 /**
- * Implementation of hook_irc_bot_cron().
+ * Implements hook_irc_bot_cron().
  */
 function bot_tell_irc_bot_cron_fastest() {
   // look for futurestamped messages that need to be delivered.
-  $results = db_query_range("SELECT * FROM {bot_tell_queue} WHERE futurestamp != 0 AND futurestamp <= %d ORDER BY timestamp ASC", time(), 0, 3);
-  while ($result = db_fetch_object($results)) { // deliver up to three at at a time to prevent flooding.
+  $results = db_query_range("SELECT * FROM {bot_tell_queue} WHERE futurestamp != 0 AND futurestamp <= :time ORDER BY timestamp ASC", 0, 3, array(':time' => time()));
+  foreach ($results as $result) { // deliver up to three at at a time to prevent flooding.
     $message = t('!recipient: !author asked me to remind you !message', array(
       '!recipient'  => $result->recipient, // sending to yourself? you're a You, punk.
       '!author'     => ($result->recipient == $result->author) ? 'You' : $result->author,
@@ -34,7 +34,7 @@ function bot_tell_irc_bot_cron_fastest() {
     ));
 
     bot_message($result->future_to, $message); // PING! PIIiIiiINnNGGG!
-    db_query('DELETE FROM {bot_tell_queue} WHERE mid = %d', $result->mid);
+    db_delete('bot_tell_queue')->condition('mid', $result->mid)->execute();
   }
 }
 
@@ -116,8 +116,8 @@ function bot_tell_irc_msg_query($data) {
  *   The recipient whose messages are being deleted.
  */
 function bot_tell_delete($recipient) {
-  db_query("DELETE FROM {bot_tell_queue} WHERE LOWER(recipient) = '%s'", drupal_strtolower($recipient));
-  bot_tell_pending_cache($recipient, 'delete'); // maintain the static cache.
+  db_delete('bot_tell_queue')->condition('recipient', db_like($recipient), 'LIKE')->execute();
+  bot_tell_pending_cache($recipient, 'delete'); // maintain static cache to reduce db queries.
 }
 
 /**
@@ -133,9 +133,9 @@ function bot_tell_load($recipient) {
 
   if (bot_tell_pending_cache($recipient)) {
     // we only get messages that have no futurestamp (i.e., "deliver immediately"). futurestamps are checked in cron only.
-    $results = db_query("SELECT * FROM {bot_tell_queue} WHERE LOWER(recipient) = '%s' AND futurestamp = 0 ORDER BY timestamp ASC", drupal_strtolower($recipient));
+    $results = db_query("SELECT * FROM {bot_tell_queue} WHERE recipient LIKE :recipient AND futurestamp = 0 ORDER BY timestamp ASC", array(':recipient' => $recipient));
 
-    while ($result = db_fetch_object($results)) {
+    foreach ($results as $result) {
       $messages[] = $result;
     }
   }
@@ -189,7 +189,7 @@ function bot_tell_pending_cache($recipient, $op = NULL) {
 
   if (!is_array($pending)) {
     $results = db_query('SELECT DISTINCT(recipient) FROM {bot_tell_queue}');
-    while ($result = db_fetch_object($results)) {
+    foreach ($results as $result) { // do you feel smaller, nick? DO YOU!?!
       $pending[drupal_strtolower($result->recipient)] = 1;
     }
   }
