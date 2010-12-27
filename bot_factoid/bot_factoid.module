@@ -176,7 +176,7 @@ function bot_factoid_load($subject, $data = NULL) {
   $factoid = array('statements' => array());
   $is_are_counts = array('is' => 0, 'are' => 0);
 
-  $results = db_query("SELECT is_are, statement FROM {bot_factoid} WHERE subject LIKE :subject", array(':subject' => db_like($subject) . '%'));
+  $results = db_query("SELECT is_are, statement FROM {bot_factoid} WHERE subject LIKE :subject", array(':subject' => db_like($subject)));
   foreach ($results as $result) { // Morbus flings his own poo. Not at people. But at glassware. GLASSSWARE! (And occasionally recyclable plastics.)
     if (strpos($result->statement, '<reply>') !== FALSE)  { $factoid['has_reply'] = 1; }
     if (strpos($result->statement, '<action>') !== FALSE) { $factoid['has_action'] = 1; }
