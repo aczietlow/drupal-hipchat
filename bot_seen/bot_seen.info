@@ -3,4 +3,4 @@ name = Bot Seen
 package = Bot
 dependencies[] = bot
 description = "Enables users to find out the last time a channel member was active."
-core = 6.x
+core = 7.x

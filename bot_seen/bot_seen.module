@@ -7,7 +7,7 @@
  */
 
 /**
- * Implementation of hook_help().
+ * Implements hook_help().
  */
 function bot_seen_help($path, $arg) {
   switch ($path) {
@@ -33,7 +33,7 @@ function bot_seen_irc_msg_channel($data, $from_query = FALSE) {
 
   // log the message, whatever it is. no UPDATEs; just start anew, eh?
   if (!$from_query) { // we only want to record public activity, not private messages.
-    db_query("DELETE FROM {bot_seen} WHERE LOWER(nick) = '%s'", drupal_strtolower($data->nick));
+    db_delete('bot_seen')->condition('nick', db_like($data->nick), 'LIKE')->execute();
     $seen = new stdClass(); // we don't UPDATE cos it's "cheaper" to just trash the old one.
     $seen->nick       = $data->nick;
     $seen->channel    = $data->channel;
@@ -67,9 +67,9 @@ function bot_seen_irc_msg_channel($data, $from_query = FALSE) {
   $messages = array();
   foreach (array_unique($nicks) as $nick) {
     // allow % SQL matching, but only if the nick is three non-* characters or longer.
-    if (strlen(str_replace('*', '', $nick)) >= 3) { $nick = str_replace('*', '%', $nick); }
-    $results = db_query("SELECT nick, channel, message, timestamp FROM {bot_seen} WHERE LOWER(nick) LIKE '%s' ORDER BY timestamp DESC", drupal_strtolower($nick));
-    while ($result = db_fetch_object($results)) { // throw 'em on the bar-b... we'll shrink the result set later. to keep it relevant, we order by timestamp.
+    if (strlen(str_replace('*', '', $nick)) >= 3) { $nick = str_replace('*', '%', $nick); } // no db_like() here cos $nick might contain % that we want.
+    $results = db_query("SELECT nick, channel, message, timestamp FROM {bot_seen} WHERE nick LIKE :nick ORDER BY timestamp DESC", array(':nick' => $nick));
+    foreach ($results as $result) { // throw 'em on the bar-b... we'll shrink the result set a bit later. and to keep it remotely relevant, we order 'em by timestamp.
       $message = preg_replace($all_nicks, '\1_\2', $result->message); // prevent seen-pings by obfuscating the nick and hope they're not pattern matching on anything but exact.
       $messages[] = t("!nick was last seen in !channel !this_long ago saying '!message'.", array('!nick' => $result->nick, '!this_long' => format_interval(time() - $result->timestamp), '!channel' => $result->channel, '!message' => $message, ));
     } if (count($messages) == 0) { $messages[] = t("Sorry, I haven't seen !match.", array('!match' => str_replace('%', '*', $nick), )); }
@@ -94,7 +94,7 @@ function bot_seen_irc_msg_query($data) {
  */
 function bot_seen_irc_msg_action($data) {
   if (strpos($data->channel, '#') === FALSE) { return; } // ignore actions PM'd to the bot.
-  db_query("DELETE FROM {bot_seen} WHERE LOWER(nick) = '%s'", drupal_strtolower($data->nick));
+  db_delete('bot_seen')->condition('nick', db_like($data->nick), 'LIKE')->execute();
   $seen = new stdClass(); // we don't UPDATE cos it's "cheaper" to just trash the old one.
   $seen->nick       = $data->nick;
   $seen->channel    = $data->channel; // there's lots of garbagey odd bits for actions.
