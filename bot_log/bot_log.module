@@ -272,12 +272,10 @@ function bot_log_date($channel = NULL, $date = NULL) {
 /**
  * Themes the logs for a date.
  *
- * @param $channel
- *   The name of the channel this log represents (without #).
  * @param $variables
  *   - date: the date (as YYYY-MM-DD) in the $channel this log represents.
- *   - logs: an array of log entries keyed to id, type, timestamp, channel, nick, message.
- *   - format: the format you want to returned (currently only supports html).
+ *   - logs: an array of log objects with id, type, timestamp, channel, nick, message.
+ *   - format: the format you want returned (currently only supports html).
  */
 function theme_bot_log_date($variables) {
   $output = NULL; $rows = array(); // filled with delicious candy.

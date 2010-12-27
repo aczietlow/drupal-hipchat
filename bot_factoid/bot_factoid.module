@@ -74,7 +74,7 @@ function bot_factoid_overview() {
     '#theme'      => 'table',
     '#header'     => array(t('Subject'), t('Is/Are'), t('Statement')),
     '#rows'       => $rows,
-    '#attributes' => array('id' => 'bot_factoid_list'),
+    '#attributes' => array('id' => 'bot-factoid-list'),
     '#empty'      => t('No factoids are available.'),
   );
   $build['bot_factoid_pager'] = array('#theme' => 'pager');

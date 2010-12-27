@@ -71,7 +71,7 @@ function bot_karma_overview() {
       '#theme'      => 'table',
       '#header'     => $headers,
       '#rows'       => $rows,
-      '#attributes' => array('id' => "bot_karma_$type"),
+      '#attributes' => array('id' => "bot-karma-$type"),
       '#empty'      => t('No karma entries are available.'),
       '#prefix'     => '<h2>' . t('!type karma', array('!type' => drupal_ucfirst($type))) . '</h2>',
     );

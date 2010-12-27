@@ -2,7 +2,7 @@
 
 Bot 7.x-1.2, 2010-XX-XX
 -----------------------
-  * First release for Drupal 7.x; equivalent to 6.x-1.2.
+  * First release for Drupal 7.x; roughly equivalent to 6.x-1.2.
 
 Bot 6.x-1.2, 2010-12-24
 -----------------------
