@@ -1,8 +1,9 @@
 // $Id$
 
-Bot 7.x-1.2, 2010-XX-XX
+Bot 7.x-1.3, 2011-xx-xx
 -----------------------
-  * First release for Drupal 7.x; roughly equivalent to 6.x-1.2.
+  * All forgotten substr()s have been changed to drupal_substr().
+  * First release for Drupal 7.x; based on 6.x-1.2 release.
 
 Bot 6.x-1.2, 2010-12-24
 -----------------------

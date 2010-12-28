@@ -72,8 +72,8 @@ function bot_tell_irc_msg_channel($data, $from_query = FALSE) {
     // if bot_factoid.module is enabled, we'll check to see if this could be about a factoid.
     // if it is, we'll let bot_factoid handle it and skip over this message's processing here.
     // @todo ideally, this would be smoother with http://drupal.org/node/218595.
-    if (module_exists('bot_factoid') && substr($matches[4], 0, 5) == 'about' && $factoid = bot_factoid_load(substr($matches[4], 6))) {
-      return; // we're just not gonna do anything with this, cos bot_factoid will gladly take over.
+    if (module_exists('bot_factoid') && drupal_substr($matches[4], 0, 5) == 'about' && $factoid = bot_factoid_load(drupal_substr($matches[4], 6))) {
+      return; // we're just not gonna do anything with this particular message cos bot_factoid will gladly take over the response.
     }
 
     // queued message accepted, keptin.

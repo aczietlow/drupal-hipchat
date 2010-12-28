@@ -155,7 +155,7 @@ function bot_log_irc_msg_topicchange($data) {
  * Log bot replies (as normal channel messages).
  */
 function bot_log_irc_bot_reply_message($to, $message) {
-  if (substr($to, 0, 1) == '#') { // but, naturally, only for channel messages.
+  if (drupal_substr($to, 0, 1) == '#') { // but, naturally, only for channel messages.
     include_once("Net/SmartIRC/defines.php"); // load the whole thingy in for one constant. bah!
     bot_log_insert(SMARTIRC_TYPE_CHANNEL, $to, variable_get('bot_nickname', 'bot_module'), $message);
   }
@@ -165,7 +165,7 @@ function bot_log_irc_bot_reply_message($to, $message) {
  * Log bot actions (as normal channel messages).
  */
 function bot_log_irc_bot_reply_action($to, $message) {
-  if (substr($to, 0, 1) == '#') { // but, naturally, only for channel messages.
+  if (drupal_substr($to, 0, 1) == '#') { // but, naturally, only for channel messages.
     include_once("Net/SmartIRC/defines.php"); // load the whole thingy in for one constant. bah!
     bot_log_insert(SMARTIRC_TYPE_ACTION, $to, variable_get('bot_nickname', 'bot_module'), $message);
   }
@@ -233,7 +233,7 @@ function bot_log_date($channel = NULL, $date = NULL) {
   if (!isset($channel)) { // no channel? show a list of all we're logging.
     foreach (variable_get('bot_log_channels', array()) as $available_channel) { // RUN AWAY!
       if (user_access("view bot logs: $available_channel")) { // unleashed spirits of the war dead.
-        $logged_channels[] = '<li>' . l($available_channel, 'bot/log/' . substr($available_channel, 1)) . '</li>';
+        $logged_channels[] = '<li>' . l($available_channel, 'bot/log/' . drupal_substr($available_channel, 1)) . '</li>';
       } // you'll be popular, but just not quite as popular asSSs MmE.eEEe.
     }
 
