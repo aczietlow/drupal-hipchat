@@ -34,6 +34,7 @@ function bot_seen_irc_msg_channel($data, $from_query = FALSE) {
   // log the message, whatever it is. no UPDATEs; just start anew, eh?
   if (!$from_query) { // we only want to record public activity, not private messages.
     db_delete('bot_seen')->condition('nick', db_like($data->nick), 'LIKE')->execute();
+
     $seen = new stdClass(); // we don't UPDATE cos it's "cheaper" to just trash the old one.
     $seen->nick       = $data->nick;
     $seen->channel    = $data->channel;
@@ -67,7 +68,7 @@ function bot_seen_irc_msg_channel($data, $from_query = FALSE) {
   $messages = array();
   foreach (array_unique($nicks) as $nick) {
     // allow % SQL matching, but only if the nick is three non-* characters or longer.
-    if (strlen(str_replace('*', '', $nick)) >= 3) { $nick = str_replace('*', '%', $nick); } // no db_like() here cos $nick might contain % that we want.
+    if (drupal_strlen(str_replace('*', '', $nick)) >= 3) { $nick = str_replace('*', '%', $nick); } // no db_like() here cos $nick might contain valid %'s.
     $results = db_query("SELECT nick, channel, message, timestamp FROM {bot_seen} WHERE nick LIKE :nick ORDER BY timestamp DESC", array(':nick' => $nick));
     foreach ($results as $result) { // throw 'em on the bar-b... we'll shrink the result set a bit later. and to keep it remotely relevant, we order 'em by timestamp.
       $message = preg_replace($all_nicks, '\1_\2', $result->message); // prevent seen-pings by obfuscating the nick and hope they're not pattern matching on anything but exact.

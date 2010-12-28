@@ -102,7 +102,7 @@ function bot_karma_irc_msg_channel($data, $from_query = FALSE) {
   // someone has affected the cosmos! modify the karma!
   elseif (preg_match("/^($addressed)?(.*?)(\+\+|--)$/", $data->message, $matches)) {
     $term = trim(drupal_strtolower($matches[3])); // always store it lowercase.
-    if (strlen($term) < 3 || strlen($term) > 15) { return; } // skip odd sizes.
+    if (drupal_strlen($term) < 3 || drupal_strlen($term) > 15) { return; }
 
     // a user has tried to karma themselves.
     if (drupal_strtolower($data->nick) == $term) {
