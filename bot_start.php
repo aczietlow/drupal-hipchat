@@ -36,17 +36,17 @@ while ($param = array_shift($_SERVER['argv'])) {
   }
 }
 
-// load in our required libraries.
-require_once './includes/bootstrap.inc';
-drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
-require_once('Net/SmartIRC.php');
+// load in required libraries.
+require_once 'Net/SmartIRC.php';
+require_once DRUPAL_ROOT . '/includes/bootstrap.inc';
+drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL); // gotta bootstrap everything in before d_g_p.
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'bot') . '/bot.smartirc.inc';
 
 // prevent MySQL timeouts on slow channels.
 db_query('SET SESSION wait_timeout = 86400');
 
 // initialize the bot with some sane defaults.
 global $irc; // allow it to be slurped by Drupal modules if need be.
-$bot = new drupal_wrapper(); // wrapper that integrates with Drupal hooks.
 $irc = new Net_SmartIRC(); // MmmmmmM. The IRC object itself. Magick happens here.
 $irc->setDebug( variable_get('bot_debugging', 0) ? SMARTIRC_DEBUG_ALL : SMARTIRC_DEBUG_NONE );
 // the (boolean) here is required, as Net_SmartIRC doesn't respect a FAPI checkbox value of 1, only TRUE.
@@ -67,14 +67,15 @@ $irc_message_types = array(
 );
 
 foreach ($irc_message_types as $irc_message_type) {
-  $irc->registerActionhandler(constant('SMARTIRC_TYPE_' . $irc_message_type), '.*', $bot, 'invoke_irc_msg_' . strtolower($irc_message_type));
+  $class = 'bot_irc_msg_' . drupal_strtolower($irc_message_type);
+  $irc->registerActionhandler(constant('SMARTIRC_TYPE_' . $irc_message_type), '.*', new $class(), 'invoke');
 }
 
 // set up a timers similar to Drupal's hook_cron(), multiple types. I would have
 // liked to just pass a parameter to a single function, but SmartIRC can't do that.
-$irc->registerTimehandler(300000, $bot, 'invoke_irc_bot_cron');           // 5 minutes.
-$irc->registerTimehandler(60000, $bot,  'invoke_irc_bot_cron_faster');    // 1 minute.
-$irc->registerTimehandler(15000, $bot,  'invoke_irc_bot_cron_fastest');   // 15 seconds.
+$irc->registerTimehandler(300000, new bot_irc_bot_cron(),         'invoke'); // 5 minutes.
+$irc->registerTimehandler(60000,  new bot_irc_bot_cron_faster(),  'invoke'); // 1 minute.
+$irc->registerTimehandler(15000,  new bot_irc_bot_cron_fastest(), 'invoke'); // 15 seconds.
 
 // connect and begin listening.
 $irc->connect(variable_get('bot_server', 'irc.freenode.net'), variable_get('bot_server_port', 6667));
@@ -85,41 +86,3 @@ $irc->login(variable_get('bot_nickname', 'bot_module'), variable_get('bot_nickna
 
 $irc->listen(); // go into the forever loop - no code after this is run.
 $irc->disconnect(); // if we stop listening, disconnect properly.
-
-// pass off IRC messages to our modules via Drupal's hook system.
-class drupal_wrapper {
-  function invoke_irc_bot_cron(&$irc)                 { module_invoke_all('irc_bot_cron'); }
-  function invoke_irc_bot_cron_faster(&$irc)          { module_invoke_all('irc_bot_cron_faster'); }
-  function invoke_irc_bot_cron_fastest(&$irc)         { module_invoke_all('irc_bot_cron_fastest'); }
-  function invoke_irc_msg_unknown(&$irc, &$data)      { module_invoke_all('irc_msg_unknown', $data); }
-  function invoke_irc_msg_channel(&$irc, &$data)      { module_invoke_all('irc_msg_channel', $data); }
-  function invoke_irc_msg_query(&$irc, &$data)        { module_invoke_all('irc_msg_query', $data); }
-  function invoke_irc_msg_ctcp(&$irc, &$data)         { module_invoke_all('irc_msg_ctcp', $data); }
-  function invoke_irc_msg_notice(&$irc, &$data)       { module_invoke_all('irc_msg_notice', $data); }
-  function invoke_irc_msg_who(&$irc, &$data)          { module_invoke_all('irc_msg_who', $data); }
-  function invoke_irc_msg_join(&$irc, &$data)         { module_invoke_all('irc_msg_join', $data); }
-  function invoke_irc_msg_invite(&$irc, &$data)       { module_invoke_all('irc_msg_invite', $data); }
-  function invoke_irc_msg_action(&$irc, &$data)       { module_invoke_all('irc_msg_action', $data); }
-  function invoke_irc_msg_topicchange(&$irc, &$data)  { module_invoke_all('irc_msg_topicchange', $data); }
-  function invoke_irc_msg_nickchange(&$irc, &$data)   { module_invoke_all('irc_msg_nickchange', $data); }
-  function invoke_irc_msg_kick(&$irc, &$data)         { module_invoke_all('irc_msg_kick', $data); }
-  function invoke_irc_msg_quit(&$irc, &$data)         { module_invoke_all('irc_msg_quit', $data); }
-  function invoke_irc_msg_login(&$irc, &$data)        { module_invoke_all('irc_msg_login', $data); }
-  function invoke_irc_msg_info(&$irc, &$data)         { module_invoke_all('irc_msg_info', $data); }
-  function invoke_irc_msg_list(&$irc, &$data)         { module_invoke_all('irc_msg_list', $data); }
-  function invoke_irc_msg_name(&$irc, &$data)         { module_invoke_all('irc_msg_name', $data); }
-  function invoke_irc_msg_motd(&$irc, &$data)         { module_invoke_all('irc_msg_motd', $data); }
-  function invoke_irc_msg_modechange(&$irc, &$data)   { module_invoke_all('irc_msg_modechange', $data); }
-  function invoke_irc_msg_part(&$irc, &$data)         { module_invoke_all('irc_msg_part', $data); }
-  function invoke_irc_msg_error(&$irc, &$data)        { module_invoke_all('irc_msg_error', $data); }
-  function invoke_irc_msg_banlist(&$irc, &$data)      { module_invoke_all('irc_msg_banlist', $data); }
-  function invoke_irc_msg_topic(&$irc, &$data)        { module_invoke_all('irc_msg_topic', $data); }
-  function invoke_irc_msg_nonrelevant(&$irc, &$data)  { module_invoke_all('irc_msg_nonrelevant', $data); }
-  function invoke_irc_msg_whois(&$irc, &$data)        { module_invoke_all('irc_msg_whois', $data); }
-  function invoke_irc_msg_whowas(&$irc, &$data)       { module_invoke_all('irc_msg_whowas', $data); }
-  function invoke_irc_msg_usermode(&$irc, &$data)     { module_invoke_all('irc_msg_usermode', $data); }
-  function invoke_irc_msg_channelmode(&$irc, &$data)  { module_invoke_all('irc_msg_channelmode', $data); }
-  function invoke_irc_msg_ctcp_request(&$irc, &$data) { module_invoke_all('irc_msg_ctcp_request', $data); }
-  function invoke_irc_msg_ctcp_reply(&$irc, &$data)   { module_invoke_all('irc_msg_ctcp_reply', $data); }
-}
-
