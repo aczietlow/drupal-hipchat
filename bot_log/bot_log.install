@@ -29,11 +29,9 @@ function bot_log_schema() {
         'unsigned'    => TRUE,
       ),
       'channel' => array(
-        'default'     => '',
         'description' => 'The IRC channel or channels where this log message occurred.',
-        'length'      => 255,
         'not null'    => TRUE,
-        'type'        => 'varchar',
+        'type'        => 'text',
       ),
       'nick' => array(
         'default'     => '',
@@ -76,4 +74,23 @@ function bot_log_uninstall() {
  */
 function bot_log_update_6100() {
   db_add_index('bot_log', 'timestamp', array('timestamp'));
+}
+
+/**
+ * Increase the size of the bot_log.channel column.
+ *
+ * If a user who is in dozens of channels QUITs or NICKCHANGEs, the
+ * channel string would be longer than a varchar's 255 characters (since
+ * a QUIT or NICKCHANGE effects each of those dozens of channels). Prior
+ * to Drupal 6, this extra data would be silently ignored. In Drupal 7+,
+ * a PDOException is flagged, killing the bot.
+ */
+function bot_log_update_7100() {
+  db_change_field('bot_log', 'channel', 'channel',
+    array(
+      'description' => 'The IRC channel or channels where this log message occurred.',
+      'not null'    => TRUE,
+      'type'        => 'text',
+    )
+  );
 }
