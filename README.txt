@@ -51,6 +51,10 @@ entails running the bot through a shell, NOT through web browser access.
    to trick Drupal into thinking that it is being run as through a web
    browser. It sets HTTP_HOST and PHP_SELF, as required by Drupal.
 
+  If you want to run the bot as a background process, use:
+
+    nohup php bot_start.php ... &
+
 5. Your bot is now started and is trying to connect.
 
 6. Once your bot is connected, you can query it for more information:
