@@ -156,6 +156,7 @@ function bot_log_irc_msg_topicchange($data) {
  */
 function bot_log_irc_bot_reply_message($to, $message) {
   if (drupal_substr($to, 0, 1) == '#') { // but, naturally, only for channel messages.
+    require_once 'Net/SmartIRC/defines.php'; // load the whole thingy in for one constant. bah!
     bot_log_insert(SMARTIRC_TYPE_CHANNEL, $to, variable_get('bot_nickname', 'bot_module'), $message);
   }
 }
@@ -165,6 +166,7 @@ function bot_log_irc_bot_reply_message($to, $message) {
  */
 function bot_log_irc_bot_reply_action($to, $message) {
   if (drupal_substr($to, 0, 1) == '#') { // but, naturally, only for channel messages.
+    require_once 'Net/SmartIRC/defines.php'; // load the whole thingy in for one constant. bah!
     bot_log_insert(SMARTIRC_TYPE_ACTION, $to, variable_get('bot_nickname', 'bot_module'), $message);
   }
 }
@@ -228,6 +230,8 @@ function bot_log_insert($type, $channel, $nick, $message) {
  *   A themed log for display.
  */
 function bot_log_date($channel = NULL, $date = NULL) {
+  require_once 'Net/SmartIRC/defines.php'; // type constants.
+
   if (!isset($channel)) { // no channel? show a list of all we're logging.
     foreach (variable_get('bot_log_channels', array()) as $available_channel) { // RUN AWAY!
       if (user_access("view bot logs: $available_channel")) { // unleashed spirits of the war dead.
