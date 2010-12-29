@@ -3,8 +3,8 @@
 Bot 7.x-1.3, 2011-xx-xx
 -----------------------
   * bot_log.channel is now a text column (required for large installations).
-  * All incoming messages are forced to UTF-8 (thanks bellHead, nick_vh!).
-  * #918966: Rewrote/moved Net_SmartIRC wrapper; hook_irc_access added.
+  * All incoming messages are forced to UTF-8 (thanks bellHead, nick_vh).
+  * #918966: New Net_SmartIRC wrapper; hook_irc_access added (thanks Bevan).
   * All forgotten strlens()s have been changed to drupal_strlen().
   * All forgotten substr()s have been changed to drupal_substr().
   * First release for Drupal 7.x; based on 6.x-1.2 release.
