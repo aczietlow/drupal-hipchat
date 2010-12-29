@@ -48,11 +48,11 @@ entails running the bot through a shell, NOT through web browser access.
 STARTING THE BOT
 ----------------
 
-Inside the bot/ directory is a bot_start.php script which is a wrapper
-around Drupal and the IRC network libraries. To run this script, you'll
-need to open up a shell to that directory and use the following command:
+Inside bot/scripts is a bot_start.php script which is a wrapper around Drupal
+and the IRC network libraries. To run this script, you'll need to open up a
+shell to that directory and use the following command:
 
-  php bot_start.php --root /path/to/drupal/root --url http://www.example.com
+  php bot_start.php --root /path/to/drupal --url http://www.example.com
 
 --root refers to the full path to your Drupal installation directory and
 allows you to execute bot_start.php without moving it to the root directory.
@@ -60,9 +60,9 @@ allows you to execute bot_start.php without moving it to the root directory.
 into thinking that it is being run as through a web browser. It sets
 HTTP_HOST and PHP_SELF, as required by Drupal.
 
-If you want to run the bot as a background process, use:
+If you want to run the bot as a background process, try:
 
-  nohup php bot_start.php ... &
+  nohup php bot_start.php --root /path/to/drupal --url http://www.example.com &
 
 
 USING THE BOT
