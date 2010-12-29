@@ -48,17 +48,37 @@ entails running the bot through a shell, NOT through web browser access.
 STARTING THE BOT
 ----------------
 
-Inside bot/scripts is a bot_start.php script which is a wrapper around Drupal
-and the IRC network libraries. To run this script, you'll need to open up a
-shell to that directory and use the following command:
+If you have Drush installed, the following commands are available:
+
+  drush bot-start
+  drush bot-status
+  drush bot-status-reset
+  drush bot-stop
+
+To start the bot as a background process, use:
+
+  nohup drush bot-start &
+
+Stopping the bot is accomplished with:
+
+  drush bot-stop
+
+If the bot crashes, is killed, Ctrl-C'd, or otherwise improperly interrupted,
+the internal connection status will be stuck in a "connected" state, and
+Drush will refuse to "bot-start". You can force a status reset with "drush
+bot-status-reset".
+
+IF YOU DO NOT HAVE DRUSH INSTALLED, scripts/bot_start.php is a simple wrapper
+around Drupal and the IRC network libraries. To run the bot, move to the
+scripts directory and issue the following command:
 
   php bot_start.php --root /path/to/drupal --url http://www.example.com
 
 --root refers to the full path to your Drupal installation directory and
 allows you to execute bot_start.php without moving it to the root directory.
 --url is required (and is equivalent to Drupal's base URL) to trick Drupal
-into thinking that it is being run as through a web browser. It sets
-HTTP_HOST and PHP_SELF, as required by Drupal.
+into thinking that it is being run as through a web browser. It sets all
+the required Drupal environment variables.
 
 If you want to run the bot as a background process, try:
 

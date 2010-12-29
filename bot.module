@@ -6,6 +6,10 @@
  * Enables a network and plugin framework for IRC bots.
  */
 
+define('BOT_STATUS_DISCONNECTED',  0);
+define('BOT_STATUS_CONNECTING',    1);
+define('BOT_STATUS_CONNECTED',     2);
+
 /**
  * Implements hook_help().
  */
@@ -66,8 +70,8 @@ function bot_menu() {
  * verbatim (meaning URLs won't be linked, etc.). @todo Someday, urlfilter.
  */
 function bot_overview() {
-  $build['bot_overview']['#markup']  = '<p>' . t('The bot connects to server %server as nick %name.', array('%server' => variable_get('bot_server', 'irc.freenode.net'), '%name' => variable_get('bot_nickname', 'bot_module'))) . '</p>';
-  $build['bot_overview']['#markup'] .= '<ul id="bot_features">'; // witness this incredibly long line above this equally long, but mirthfully useless, comment! ha ha!
+  $build['bot_overview']['#markup']  = '<p>' . t('The bot connects to %server as %name.', array('%server' => variable_get('bot_server', 'irc.freenode.net'), '%name' => variable_get('bot_nickname', 'bot_module'))) . '</p>';
+  $build['bot_overview']['#markup'] .= '<ul id="bot-features">'; // witness this incredibly long line above this equally long, but mirthfully useless, comment! ha ha!
 
   $irc_features = array_filter(module_invoke_all('help', 'irc:features', NULL));
   asort($irc_features); // alphabetical listing of features. the machete is family.
@@ -114,6 +118,13 @@ function bot_irc_bot_cron_fastest() {
       $irc->join($channel_parts[0], isset($channel_parts[1]) ? $channel_parts[1] : NULL);
       break; // we only join one channel per 15 seconds, to prevent overloading.
     }
+  }
+
+  // if a disconnect lock is NOT available, than that means we've been told
+  // to disconnect from someone or something (likely Drush). respect 'em.
+  if (!lock_may_be_available('bot_disconnect')) {
+    $irc->disconnect(); // let everyone know we're done.
+    variable_set('bot_status', BOT_STATUS_DISCONNECTED);
   }
 }
 
@@ -327,6 +338,16 @@ function bot_randomized_choice($substitutions, $possibilities) {
 
   $chosen = array_rand($possibilities);
   return strtr(trim($possibilities[$chosen]), $substitutions);
+}
+
+/**
+ * Retrieve the current bot status.
+ */
+function bot_status_get() {
+  // recreates the variable cache.
+  variable_set('bot_cache_cleared', time());
+  $GLOBALS['conf'] = variable_initialize();
+  return variable_get('bot_status');
 }
 
 /**

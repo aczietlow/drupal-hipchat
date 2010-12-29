@@ -12,6 +12,7 @@
 function bot_smartirc_start() {
   require_once 'Net/SmartIRC.php';
   require_once 'Net/SmartIRC/defines.php';
+  variable_set('bot_status', BOT_STATUS_CONNECTING);
 
   // prevent MySQL timeouts on slow channels.
   db_query('SET SESSION wait_timeout = 86400');
@@ -52,12 +53,15 @@ function bot_smartirc_start() {
   // connect and begin listening.
   $irc->connect(variable_get('bot_server', 'irc.freenode.net'), variable_get('bot_server_port', 6667));
   $irc->login(variable_get('bot_nickname', 'bot_module'), variable_get('bot_nickname', 'bot_module') . ' :http://drupal.org/project/bot', 8, variable_get('bot_nickname', 'bot_module'), variable_get('bot_password'));
+  variable_set('bot_status', BOT_STATUS_CONNECTED);
 
   // channel joining has moved to bot_irc_bot_cron_fastest().
   // read that function for the rationale, and what we gain from it.
 
   $irc->listen(); // go into the forever loop - no code after this is run.
   $irc->disconnect(); // if we stop listening, disconnect properly.
+  // see bot_irc_bot_cron_fastest() for another disconnect() call.
+  variable_set('bot_status', BOT_STATUS_DISCONNECTED);
 }
 
 /**
