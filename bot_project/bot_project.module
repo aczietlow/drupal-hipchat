@@ -18,7 +18,7 @@ function bot_project_help($path, $arg) {
       }
       return $features;
     case 'irc:features#project_urls':
-      return t('Displays the title of project URLs; multiple URLs in a single message are acceptable. Also supports numerical IDs such as "#12345" or "4321", but only if that is the entirety of the message and the number is within a configured range. Popular and recent URLs are tracked at <!url>.', array('!url' => url('bot/project_urls', array('absolute' => TRUE))));
+      return t('Displays the title of project URLs; multiple URLs in a single message are acceptable. Also supports numerical IDs such as "#12345" or "4321", but only if that is the entirety of the message and the number is within a configured range. Popular and recent URLs in the past two weeks are tracked at <!url>.', array('!url' => url('bot/project_urls', array('absolute' => TRUE))));
     case 'irc:features#function_lookups':
       return t('The bot provides function lookups, triggered by "<function>?", based on the host\'s installed branches. Branches besides the default, if any, can be specified with "<function>:<branch>?".');
     case 'bot/project_urls':

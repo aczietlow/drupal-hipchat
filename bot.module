@@ -196,7 +196,7 @@ function bot_irc_msg_error($data) {
  * Implements hook_irc_msg_unknown() {
  */
 function bot_irc_msg_unknown($data) {
-  watchdog('bot', '@unknown', array('@unknown' => $data->rawmessage));
+  watchdog('bot', '@unknown', array('@unknown' => $data->rawmessage), WATCHDOG_INFO);
 
   // if we're banned from a channel, remove it from joins.
   if ($data->rawmessageex[1] == SMARTIRC_ERR_BANNEDFROMCHAN) {

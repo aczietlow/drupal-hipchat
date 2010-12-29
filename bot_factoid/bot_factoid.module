@@ -14,7 +14,7 @@ function bot_factoid_help($path, $arg) {
     case 'irc:features':
       return array(t('Factoids'));
     case 'irc:features#factoids':
-      return t('Set factoids with "BOTNAME: Drupal is great.", "No, BOTNAME, cats are furry.", "BOTNAME: Drupal is also powerful.", "BOTNAME: cheer is <action>cheers for !who in !channel!", or "BOTNAME: ping is <reply>WHAT?!". Retrieve with "Drupal?" or "BOTNAME: cheer!" Forget with "BOTNAME: forget ping". Private message with "BOTNAME: tell newb about support". Browsable at <!url>.', array('!url' => url('bot/factoid', array('absolute' => TRUE))));
+      return t('Set factoids with "BOTNAME: Drupal is great.", "No, BOTNAME, cats are furry.", "BOTNAME: Drupal is also powerful.", "BOTNAME: cheer is <action>cheers for !who in !channel!", or "BOTNAME: ping is <reply>WHAT?!". Retrieve with "Drupal?" or "BOTNAME: cheer!" Forget with "BOTNAME: forget ping". PM with "BOTNAME: tell newb about support". Browsable at <!url>.', array('!url' => url('bot/factoid', array('absolute' => TRUE))));
     case 'bot/factoid':
       return '<p>' . t('Browse all the factoids the bot knows about.') . '</p>';
     case 'admin/settings/bot/factoid':
