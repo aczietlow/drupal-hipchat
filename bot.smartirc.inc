@@ -19,6 +19,7 @@ function bot_smartirc_start() {
   // initialize the bot with some sane defaults.
   global $irc; // allow it to be slurped by Drupal modules if need be.
   $irc = new Net_SmartIRC(); // MmmmmmM. The IRC object itself. Magick happens here.
+  $irc->nreplycodes = $SMARTIRC_nreplycodes; // unreliably set from $_GLOBALS, so force it here.
   $irc->setDebug( variable_get('bot_debugging', 0) ? SMARTIRC_DEBUG_ALL : SMARTIRC_DEBUG_NONE );
   // the (boolean) here is required, as Net_SmartIRC doesn't respect a FAPI checkbox value of 1, only TRUE.
   $irc->setAutoReconnect((boolean) variable_get('bot_auto_reconnect', 1)); // reconnect to the server if disconnected.
