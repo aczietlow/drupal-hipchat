@@ -156,7 +156,6 @@ function bot_log_irc_msg_topicchange($data) {
  */
 function bot_log_irc_bot_reply_message($to, $message) {
   if (drupal_substr($to, 0, 1) == '#') { // but, naturally, only for channel messages.
-    include_once("Net/SmartIRC/defines.php"); // load the whole thingy in for one constant. bah!
     bot_log_insert(SMARTIRC_TYPE_CHANNEL, $to, variable_get('bot_nickname', 'bot_module'), $message);
   }
 }
@@ -166,7 +165,6 @@ function bot_log_irc_bot_reply_message($to, $message) {
  */
 function bot_log_irc_bot_reply_action($to, $message) {
   if (drupal_substr($to, 0, 1) == '#') { // but, naturally, only for channel messages.
-    include_once("Net/SmartIRC/defines.php"); // load the whole thingy in for one constant. bah!
     bot_log_insert(SMARTIRC_TYPE_ACTION, $to, variable_get('bot_nickname', 'bot_module'), $message);
   }
 }
@@ -279,7 +277,6 @@ function bot_log_date($channel = NULL, $date = NULL) {
  */
 function theme_bot_log_date($variables) {
   $output = NULL; $rows = array(); // filled with delicious candy.
-  include_once("Net/SmartIRC/defines.php"); // type constants.
 
   if ($variables['format'] == 'html') {
     foreach ($variables['logs'] as $log) {
