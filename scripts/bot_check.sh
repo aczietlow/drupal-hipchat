@@ -7,7 +7,7 @@
 # the bot has crashed, we force a status reset to first clear the internal
 # "connected" state. A script like this could be run through cron with:
 #
-#   * * * * * cd /path/to/bot/scripts && sh bot_check.sh &> /dev/null
+#   * * * * * cd /path/to/bot/scripts && sh bot_check.sh >> /dev/null 2>&1
 
 if ! ps ax | grep -v grep | grep bot-start
 then
