@@ -80,7 +80,7 @@ function drush_bot_status() {
  */
 function drush_bot_status_reset() {
   if (lock_may_be_available('bot_disconnect')) {
-    if ($force || drush_confirm(dt("Are you sure you want to reset the IRC bot's connect status?"))) {
+    if (drush_confirm(dt("Are you sure you want to reset the IRC bot's connect status?"))) {
       variable_set('bot_status', BOT_STATUS_DISCONNECTED); // NO LIKELY YOU GO 'WAY NOW KTHX.
       drush_log(dt("The IRC bot's connection status has been reset."), 'ok');
     }
