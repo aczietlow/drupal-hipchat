@@ -2,9 +2,10 @@
 
 Bot 7.x-1.3, 2011-xx-xx
 -----------------------
+  * #273116: bot_auth.module added (thanks snufkin, RobLoach).
   * scripts/bot_start.php: the new location of bot_start.php.
   * scripts/bot_check.sh added: restarts the bot if it's not running.
-  * Drush integration added (thanks jonhattan, q0rban, sirkitree).
+  * #524218: Drush integration added (thanks jonhattan, q0rban, sirkitree).
   * bot_log.channel is now a text column (required for large installations).
   * All incoming messages are forced to UTF-8 (thanks bellHead, nick_vh).
   * #918966: New Net_SmartIRC wrapper; hook_irc_access added (thanks Bevan).

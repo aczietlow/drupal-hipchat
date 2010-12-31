@@ -1,0 +1,6 @@
+; $Id$
+name = Bot Auth
+package = Bot
+dependencies[] = bot
+description = "Authenticate to the bot with your Drupal user account."
+core = 7.x
