@@ -55,6 +55,12 @@ If you have Drush installed, the following commands are available:
   drush bot-status-reset
   drush bot-stop
 
+Note, however, that bot.module does use your site's URL in some commands, but
+Drush doesn't ever know your URL by default. To ensure proper reporting by the
+bot, you'll need to either set your $base_url in settings.php, or tell Drush
+your URL with "--uri=http://example.com/". If you don't, the bot will report
+all URLs as "http://default/". I prefer setting the URL in settings.php.
+
 To start the bot as a background process, use:
 
   nohup drush bot-start &
