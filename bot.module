@@ -17,7 +17,7 @@ function bot_help($path, $arg) {
   switch ($path) {
     case 'bot':
       return '<p>' . t('Listed here are the bot\'s enabled features and settings. Information about the bot\'s features is also available by asking it directly for "help", and then for more detail with "help &lt;feature&gt;" (such as "help Factoids"). This would best be done in a private message so as not to disrupt regular channel activity.') . '</p>';
-    case 'admin/settings/bot':
+    case 'admin/config/bot/core':
       return '<p>' . t('Configure your bot framework with these settings.') . '</p>';
   }
 }

@@ -15,7 +15,7 @@ function bot_log_help($path, $arg) {
       return array(t('Logging'));
     case 'irc:features#logging':
       return t('Logging is enabled for some or all channels at <!url>. A URL to the current log and timestamp is retrievable with "BOTNAME: log pointer?" or "BOTNAME: log bookmark?"', array('!url' => url('bot/log', array('absolute' => TRUE))));
-    case 'admin/settings/bot/log':
+    case 'admin/config/bot/log':
       return '<p>' . t('Configure bot logging with these settings.') . '</p>';
   }
 }

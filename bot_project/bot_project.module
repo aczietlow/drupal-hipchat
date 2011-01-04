@@ -23,7 +23,7 @@ function bot_project_help($path, $arg) {
       return t('The bot provides function lookups, triggered by "<function>?", based on the host\'s installed branches. Branches besides the default, if any, can be specified with "<function>:<branch>?".');
     case 'bot/project_urls':
       return '<p>' . t('View the most recent and popular project URLs mentioned in the IRC channels.') . '</p>';
-    case 'admin/settings/bot/project':
+    case 'admin/config/bot/project':
       return '<p>' . t('Configure the project toolkit features with these settings.') . '</p>';
   }
 }

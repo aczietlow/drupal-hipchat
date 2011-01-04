@@ -42,7 +42,7 @@ entails running the bot through a shell, NOT through web browser access.
 
 2. Copy this bot/ directory to your sites/SITENAME/modules directory.
 
-3. Enable the module(s) and then configure them at admin/settings/bot.
+3. Enable the module(s) and then configure them at admin/config/bot.
 
 
 STARTING THE BOT

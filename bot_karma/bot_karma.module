@@ -17,7 +17,7 @@ function bot_karma_help($section) {
       return t('Keeps track of "karma" altered by "foo++" or "bar--". Terms must be 3 to 15 characters in length. "BOTNAME: karma foo?" gives the current karma score. Highest and lowest karma scores can be seen at <!url>.', array('!url' => url('bot/karma', array('absolute' => TRUE))));
     case 'bot/karma':
       return '<p>' . t('View the highest and lowest karma scores earned from IRC.') . '</p>';
-    case 'admin/settings/bot/karma':
+    case 'admin/config/bot/karma':
       return '<p>' . t('Configure karma responses with these settings.') . '</p>';
   }
 }
