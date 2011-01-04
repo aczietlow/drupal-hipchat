@@ -14,7 +14,7 @@ function bot_auth_help($path, $arg) {
     case 'irc:features':
       return array(t('Auth'));
     case 'irc:features#auth':
-      return t('If you have a Drupal user account with the bot\'s host, you can "/msg BOTNAME login [username]/[password]" to authenticate your IRC session and gain additional privileges.');
+      return t('If you have a Drupal user account with the bot\'s host, you can "/msg BOTNAME login USERNAME/PASSWORD" to authenticate your IRC session and gain additional privileges.');
   }
 }
 
