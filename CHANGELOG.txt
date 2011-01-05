@@ -1,6 +1,6 @@
 // $Id$
 
-Bot 7.x-1.3, 2011-xx-xx
+Bot 7.x-1.3, 2011-01-05
 -----------------------
   * #273116: bot_auth.module added (thanks snufkin, RobLoach).
   * scripts/bot_start.php: the new location of bot_start.php.
