@@ -81,14 +81,14 @@ function bot_potpourri_timezone($string) {
     $src_dtzone = new DateTimeZone($src_zone);
     $src_dttime = new DateTime($src_time, $src_dtzone);
   } catch(Exception $e) { } // sadness for the emptiness.
-  if (!isset($src_dtzone)) {
+  if (!isset($src_dtzone) || !isset($src_dttime)) {
     return(t('!who: unknown or bad source timezone.'));
   }
 
   try {
     $dst_dtzone = new DateTimeZone($dst_zone);
   } catch(Exception $e) { } // soOOO lOoneneLlly.
-  if (!isset($dst_dtzone)) {
+  if (!isset($dst_dtzone)) { // g'night sweetheart. sniff.
     return(t('!who: unknown or bad destination timezone.'));
   }
 
