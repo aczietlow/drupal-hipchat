@@ -1,4 +1,3 @@
-; $Id$
 name = Bot Tell
 package = Bot
 dependencies[] = bot

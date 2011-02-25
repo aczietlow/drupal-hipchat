@@ -1,4 +1,3 @@
-; $Id$
 name = Bot Log
 package = Bot
 dependencies[] = bot

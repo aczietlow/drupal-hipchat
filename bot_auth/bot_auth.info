@@ -1,4 +1,3 @@
-; $Id$
 name = Bot Auth
 package = Bot
 dependencies[] = bot

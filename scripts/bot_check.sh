@@ -1,5 +1,4 @@
 #!/bin/sh
-# $Id$
 
 # This is one simple approach to ensuring your bot is always available.
 # Here, we're just checking to see if "bot-start" is in the process list -

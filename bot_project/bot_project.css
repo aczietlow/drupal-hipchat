@@ -1,4 +1,3 @@
-/* $Id$ */
 
 /*  long titles can cause Last Seen to wrap - force a width for 'em.  */
 #bot-project-urls-popular .last_seen, #bot-project-urls-recent .last_seen {
