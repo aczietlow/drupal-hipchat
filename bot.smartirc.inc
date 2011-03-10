@@ -13,8 +13,10 @@ function bot_smartirc_start() {
   require_once 'Net/SmartIRC/defines.php';
   variable_set('bot_status', BOT_STATUS_CONNECTING);
 
-  // prevent MySQL timeouts on slow channels.
-  db_query('SET SESSION wait_timeout = 86400');
+  if (db_driver() === 'mysql') {
+    // prevent timeouts on slow channels.
+    db_query('SET SESSION wait_timeout = 86400');
+  }
 
   // initialize the bot with some sane defaults.
   global $irc; // allow it to be slurped by Drupal modules if need be.

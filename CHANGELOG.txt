@@ -1,6 +1,7 @@
 
 Bot 7.x-1.4, 2011-XX-XX
 -----------------------
+  * Issue #1067748: Only MySQL under MySQL (thanks Garrett Albright).
   * Fixed crash on bad time format in bot_potpourri (thanks ilo).
 
 Bot 7.x-1.3, 2011-01-05
