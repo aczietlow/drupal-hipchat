@@ -384,7 +384,7 @@ function bot_settings() {
     '#type'           => 'textfield',
   );
   $form['bot_connection']['bot_channels'] = array(
-    '#default_value'  => variable_get('bot_channels', '#test'),
+    '#default_value'  => variable_get('bot_channels', '#botwar'),
     '#description'    => t('Enter a comma-separated list of channels the bot will join. For channels with a key, use "&lt;#channel> &lt;key>".'),
     '#rows'           => 3,
     '#title'          => t('Bot channels'),

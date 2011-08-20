@@ -148,8 +148,8 @@ function bot_factoid_irc_msg_query($data) {
  *   The subject you'd like to delete.
  */
 function bot_factoid_delete($subject) {
-  if (!$subject) { return 0; } // why do you not send me a subject? Reap, reap, reap!
-  db_delete('bot_factoid')->condition('subject', db_like($subject) . '%', 'LIKE')->execute();
+  if (!$subject) { return 0; } // why you not send me a subject? Weep.
+  db_delete('bot_factoid')->condition('subject', $subject)->execute();
 }
 
 /**
