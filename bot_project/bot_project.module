@@ -128,7 +128,7 @@ function bot_project_irc_msg_channel($data, $from_query = FALSE) {
       if ($result->branch_name == $branch) { $function_result = $result; }
     } // no matching branch? we'll just use whatever is first in the list of all matches.
     $function_result = $function_result ? $function_result : array_shift($db_functions);
-    if (!$function_result->branch_name) { return; } // no branch name == no results.
+    if (!isset($function_result->branch_name)) { return; } // no branch name == no results.
 
     // build up the actual message for spitting.
     if (!$function_result->summary && $function_result->branch_name != 'php') { $function_result->summary = '[There is no documentation! This is a bug. File a patch!]'; }

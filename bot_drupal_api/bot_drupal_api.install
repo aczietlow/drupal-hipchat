@@ -1,0 +1,63 @@
+<?php
+
+/**
+ * @file
+ * Install, update, and uninstall functions for the Bot Drupal API module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function bot_drupal_api_schema() {
+  $schema['bot_drupal_api'] = array(
+    'description' => 'Stores function data retrieved from Drupal api.module exports.',
+    'fields' => array(
+      'name' => array(
+        'default'     => '',
+        'description' => 'The function name.',
+        'length'      => 255,
+        'not null'    => TRUE,
+        'type'        => 'varchar',
+      ),
+      'signature' => array(
+        'default'     => '',
+        'description' => 'The function signature.',
+        'length'      => 600,
+        'not null'    => FALSE,
+        'type'        => 'varchar',
+      ),
+      'summary' => array(
+        'description' => 'The function summary.',
+        'type'        => 'text',
+        'not null'    => FALSE,
+      ),
+      'label' => array(
+        'description' => 'A label that identifies which dump this function is from.',
+        'length'      => 255,
+        'not null'    => TRUE,
+        'type'        => 'varchar',
+      ),
+      'url' => array(
+        'default'     => '',
+        'description' => 'The URL where more information about the function can be found.',
+        'length'      => 255,
+        'not null'    => TRUE,
+        'type'        => 'varchar',
+      ),
+    ),
+    'indexes' => array(
+      'bot_drupal_api_label_name' => array('label', 'name'),
+    ),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function bot_drupal_api_uninstall() {
+  variable_del('bot_drupal_api_function_dumps');
+  variable_del('bot_drupal_api_function_dump_dates');
+  variable_del('bot_drupal_api_function_dump_update_frequency');
+}
