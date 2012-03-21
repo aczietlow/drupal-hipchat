@@ -47,7 +47,7 @@ function bot_drupal_api_irc_msg_channel($data, $from_query = FALSE) {
         foreach (array_values(bot_drupal_api_function_dumps_array()) as $label) {
           if (isset($functions_returned[$label])) {
             $found_function = $functions_returned[$label];
-            continue; // First found, first served, bub.
+            break; // First found, first served, bub.
           }
         }
       }

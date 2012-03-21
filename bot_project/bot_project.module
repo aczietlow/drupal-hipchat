@@ -12,14 +12,9 @@ function bot_project_help($path, $arg) {
   switch ($path) {
     case 'irc:features':
       $features = array(t('Project URLs'));
-      if (module_exists('api')) {
-        $features[] = t('Function Lookups');
-      }
       return $features;
     case 'irc:features#project_urls':
       return t('Displays the title of project URLs; multiple URLs in a single message are acceptable. Also supports numerical IDs such as "#12345" or "4321", but only if that is the entirety of the message and the number is within a configured range. Popular and recent URLs in the past two weeks are tracked at <!url>.', array('!url' => url('bot/project_urls', array('absolute' => TRUE))));
-    case 'irc:features#function_lookups':
-      return t('The bot provides function lookups, triggered by "<function>?", based on the host\'s installed branches. Branches besides the default, if any, can be specified with "<function>:<branch>?".');
     case 'bot/project_urls':
       return '<p>' . t('View the most recent and popular project URLs mentioned in the IRC channels.') . '</p>';
     case 'admin/config/bot/project':
@@ -109,35 +104,6 @@ function bot_project_urls_overview() {
  */
 function bot_project_irc_msg_channel($data, $from_query = FALSE) {
   $to = $from_query ? $data->nick : $data->channel;
-
-  // ======================================================================== */
-  // if api.module issue lookups are enabled...                               */
-  // ======================================================================== */
-  if (module_exists('api') && preg_match('/^(\w*):?([\w\-]*)\?$/', $data->messageex[0], $matches)) {
-    $function_name = $matches[1]; $branch = $matches[2] ? $matches[2] : variable_get('bot_project_api_default_branch', NULL);
-    if (!$function_name) { return; } // some modules have bad docs that allow "?" to match incorrectly.
-
-    // there could be more than one result for a function lookup, so we'll load
-    // them all and return only the right branch (if that's a determining factor).
-    // we can't just force the branch into the SQL; too restrictive on 3+ branches.
-    $results = db_query("SELECT ad.branch_name, ad.summary, af.signature FROM {api_function} af INNER JOIN {api_documentation} ad ON
-      af.did = ad.did WHERE ad.object_type = 'function' AND ad.object_name = :function_name", array(':function_name' => $function_name));
-    $db_functions = array(); // a master list of all the matched functions.
-    foreach ($results as $result) { // look for the desired branch and...
-      $db_functions[] = $result; // store the results for use as a last resort.
-      if ($result->branch_name == $branch) { $function_result = $result; }
-    } // no matching branch? we'll just use whatever is first in the list of all matches.
-    $function_result = $function_result ? $function_result : array_shift($db_functions);
-    if (!isset($function_result->branch_name)) { return; } // no branch name == no results.
-
-    // build up the actual message for spitting.
-    if (!$function_result->summary && $function_result->branch_name != 'php') { $function_result->summary = '[There is no documentation! This is a bug. File a patch!]'; }
-    if (preg_match("/\n/", $function_result->summary) && $function_result->branch_name != 'php') { $function_result->summary = '[Documented summary is not one line. This is a bug. File a patch!]'; }
-    $message = $function_result->branch_name != 'php' // if we've indexed the php functions, they're in branch 'php', so we'll spit out a slightly different format.
-      ? t('!function: !summary => !signature => !url', array('!function' => $function_name, '!signature' => $function_result->signature, '!summary' => $function_result->summary, '!url' => strtr(bot_project_branch_url($function_result->branch_name), array('!function' => $function_name))))
-      : t('!function: !url', array('!function' => $function_name, '!url' => 'http://php.net/' . $function_name));
-    bot_message($to, $message);
-  }
 
   // ======================================================================== */
   // if project.module issue lookups are enabled...                           */
@@ -269,19 +235,6 @@ function bot_project_irc_msg_query($data) {
 }
 
 /**
- * Quickie branch URL generation, without url().
- *
- * @param $branch
- *   The name of the branch to create a URL to.
- * @return $url
- *   A FQDN with %function ready to be replaced.
- */
-function bot_project_branch_url($branch) {
-  global $base_url; // we don't use url() so that it doesn't URL-encode the !function interpolated.
-  return variable_get('bot_project_api_branch_' . $branch . '_url', $base_url . base_path() . 'api/function/!function/' . $branch);
-}
-
-/**
  * Log a URL into the database and return its seen count.
  *
  * @param $url
@@ -309,32 +262,6 @@ function bot_project_url_save($url, $title) {
  * Configures the project toolkit features.
  */
 function bot_project_settings() {
-  if (module_exists('api')) {
-    $results = db_query('SELECT branch_name, title FROM {api_branch} ORDER BY title');
-    $branches = array(); while ($result = db_fetch_object($results)) { $branches[$result->branch_name] = $result->title; }
-
-    $form['bot_project_api'] = array(
-      '#collapsible'   => TRUE,
-      '#title'         => t('api.module integration'),
-      '#type'          => 'fieldset',
-    );
-    $form['bot_project_api']['bot_project_api_default_branch'] = array(
-      '#default_value' => variable_get('bot_project_api_default_branch', NULL),
-      '#description'   => t('Choose the default branch that will be used for non-specific function lookups.'),
-      '#options'       => $branches,
-      '#title'         => t('Default API Branch'),
-      '#type'          => 'select',
-    );
-    foreach ($branches as $branch => $title) {
-      $form['bot_project_api']['bot_project_api_branch_' . $branch . '_url'] = array(
-        '#default_value' => bot_project_branch_url($branch),
-        '#description'   => t('Define the URL displayed in responses to this branch\'s function lookups.'),
-        '#title'         => t('Function URLs for branch %name', array('%name' => $branch)),
-        '#type'          => 'textfield',
-      );
-    }
-  }
-
   $form['bot_project_project'] = array(
     '#collapsible'   => TRUE,
     '#title'         => t('project.module integration'),

@@ -11,6 +11,8 @@ Bot 7.x-1.4, 2012-XX-XX
 * variable_del or convert the old config from project?
 * check the indexes to make sure they're being used
 * Help lookup for api module
+    case 'irc:features#function_lookups':
+      return t('The bot provides function lookups, triggered by "<function>?", based on the host\'s installed branches. Branches besides the default, if any, can be specified with "<function>:<branch>?".');
 * @todo add the placeholder "file a patch!" docs in again
 
 

@@ -44,7 +44,6 @@ function bot_project_schema() {
  * Implements hook_uninstall().
  */
 function bot_project_uninstall() {
-  variable_del('bot_project_api_default_branch');
   variable_del('bot_project_project_enable');
   variable_del('bot_project_project_nid_min');
   variable_del('bot_project_project_nid_max');
@@ -56,7 +55,12 @@ function bot_project_uninstall() {
   variable_del('bot_project_trac_num_max');
   variable_del('bot_project_trac_url');
   variable_del('bot_project_trac_url_regexp');
+}
 
-  // branch names create dynamic variables. get 'em all here.
+/**
+ * Remove api.module bot variables. See bot_api.module instead.
+ */
+function bot_project_update_7100() {
+  variable_del('bot_project_api_default_branch');
   db_query("DELETE FROM {variable} WHERE name LIKE 'bot_project_api_branch_%'");
 }
