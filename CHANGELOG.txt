@@ -11,6 +11,7 @@ Bot 7.x-1.4, 2013-XX-XX
 * add the placeholder "file a patch!" docs in again
 * rename bot_potpourri to bot_timezones
 
+  * Issue #1883616: Long issue titles cause Druplicon to disconnect.
   * Issue #1061292: Moved api.module integration to its own module.
    - We are now no longer dependent on api.module being installed.
    - We instead use the function dump URLs provided by api.module...

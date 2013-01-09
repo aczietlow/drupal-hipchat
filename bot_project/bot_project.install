@@ -17,7 +17,7 @@ function bot_project_schema() {
       'title' => array(
         'default'     => '',
         'description' => 'The title of the URL, cached for quicker lookups.',
-        'length'      => 128,
+        'length'      => 255,
         'not null'    => TRUE,
         'type'        => 'varchar',
       ),
@@ -63,4 +63,19 @@ function bot_project_uninstall() {
 function bot_project_update_7100() {
   variable_del('bot_project_api_default_branch'); // we call this a fell swoop.
   db_query("DELETE FROM {variable} WHERE name LIKE 'bot_project_api_branch_%'");
+}
+
+/**
+ * Increase the size of titles to 255 characters.
+ */
+function bot_project_update_7101() {
+  db_change_field('bot_urls', 'title', 'title',
+    array(
+      'default'     => '',
+      'description' => 'The title of the URL, cached for quicker lookups.',
+      'length'      => 255,
+      'not null'    => TRUE,
+      'type'        => 'varchar',
+    )
+  );
 }
