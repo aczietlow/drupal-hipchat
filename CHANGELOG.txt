@@ -11,16 +11,17 @@ Bot 7.x-1.4, 2013-XX-XX
 * add the placeholder "file a patch!" docs in again
 * rename bot_potpourri to bot_timezones
 
-  * Issue #1883616: Long URL titles caused disconnect (thanks xjm, etc.)
-  * Issue #1061292: Moved api.module integration to its own module.
+  * #1883616: Long URL titles caused disconnect (thanks xjm, timplunkett).
+  * #1837044: bot_log display fails on Postgres (thanks Gisle, steinmb).
+  * #1254268: Removed LIKE on factoid deletion (thanks greg.harvey).
+  * #1067748: Only MySQL under MySQL (thanks Garrett Albright).
+  * #1061292: Moved api.module integration to its own module.
    - We are now no longer dependent on api.module being installed.
    - We instead use the function dump URLs provided by api.module...
    - ... which means API installations can be remote from the bot install.
    - The default configuration supports D6 and D7 core *and* contrib.
    - Thanks to snufkin for the groundwork, psynaptic for drupalcontrib.org.
    - YOU'LL NEED TO CONFIGURE bot_api. THERE IS NO MIGRATION FROM BOT PROJECT.
-  * Issue #1254268: Removed LIKE on factoid deletion (thanks greg.harvey).
-  * Issue #1067748: Only MySQL under MySQL (thanks Garrett Albright).
   * Fixed crash on bad time format in bot_potpourri (thanks ilo).
   * Changed default #test channel to #botwar per Freenode's docs.
 

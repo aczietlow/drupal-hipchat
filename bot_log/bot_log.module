@@ -256,10 +256,8 @@ function bot_log_date($channel = NULL, $date = NULL) {
     drupal_add_css(drupal_get_path('module', 'bot_log') .'/bot_log.css');
     drupal_set_title(t('IRC logs for @channel, @date (GMT)', array('@channel' => "#$channel", '@date' => $date)), PASS_THROUGH);
 
-    // see bot_log_irc_msg_quit() for why we use a regexp on channels for lookups.
-    // this likely fails for a number of non-MySQL databases; LIKE wasn't happy for me...
-    $results = db_query("SELECT * FROM {bot_log} WHERE channel REGEXP '#$channel( |$)' AND (timestamp >=
-      :date_start AND timestamp <= :date_end) ORDER BY id", array(':date_start' => $date_start, ':date_end' => $date_end));
+    $results = db_query("SELECT * FROM {bot_log} WHERE (channel LIKE '%#channel %' OR channel LIKE '%#$channel') AND (timestamp
+      >= :date_start AND timestamp <= :date_end) ORDER BY id", array(':date_start' => $date_start, ':date_end' => $date_end));
     $build['bot_log_filter_form'] = drupal_get_form('bot_log_filter_form', $channel, $date); // thwip! thwip! back! forth!
     $build['bot_log_date'] = array('#theme' => 'bot_log_date', '#channel' => $channel, '#date' => $date, '#logs' => $results);
   }
@@ -330,7 +328,7 @@ function theme_bot_log_date($variables) {
       }
 
       // our type determines number of columns.
-      if ($log->type == SMARTIRC_TYPE_CHANNEL) { 
+      if ($log->type == SMARTIRC_TYPE_CHANNEL) {
         $rows[] = array('class' => array($nick_class), 'data' => array(
           array('class' => array('bot-log-time'), 'data' => $permalink),
           array('class' => array('bot-log-nick'), 'data' => '&lt;' . check_plain($log->nick) . '>'),
