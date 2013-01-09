@@ -13,6 +13,7 @@ Bot 7.x-1.4, 2013-XX-XX
 
   * #1883616: Long URL titles caused disconnect (thanks xjm, timplunkett).
   * #1837044: bot_log display fails on Postgres (thanks Gisle, steinmb).
+  * #1539194: Trim further whitespace from channel list (thanks jhr).
   * #1254268: Removed LIKE on factoid deletion (thanks greg.harvey).
   * #1067748: Only MySQL under MySQL (thanks Garrett Albright).
   * #1061292: Moved api.module integration to its own module.

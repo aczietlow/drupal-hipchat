@@ -109,7 +109,7 @@ function bot_irc_bot_cron_fastest() {
   global $irc;
 
   // to support passwords, we have to make a single join per channel.
-  $channels = preg_split('/\s*,\s*/', variable_get('bot_channels', '#botwar'));
+  $channels = preg_split('/\s*,\s*/', trim(variable_get('bot_channels', '#botwar')));
 
   foreach ($channels as $channel) { // for every one we're configured to join...
     $channel_parts = explode(' ', $channel); // passwords are space-separated on list.
