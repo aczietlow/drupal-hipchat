@@ -61,6 +61,6 @@ function bot_project_uninstall() {
  * Remove api.module bot variables. See bot_api.module instead.
  */
 function bot_project_update_7100() {
-  variable_del('bot_project_api_default_branch');
+  variable_del('bot_project_api_default_branch'); // we call this a fell swoop.
   db_query("DELETE FROM {variable} WHERE name LIKE 'bot_project_api_branch_%'");
 }
