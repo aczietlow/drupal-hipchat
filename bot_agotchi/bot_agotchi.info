@@ -1,0 +1,6 @@
+name = Botagotchi
+package = Bot
+dependencies[] = bot
+description = "Proper care and feeding lets your botagotchi grow and be happy!"
+configure = admin/config/bot/agotchi
+core = 7.x

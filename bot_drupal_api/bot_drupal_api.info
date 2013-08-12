@@ -1,0 +1,6 @@
+name = Bot Drupal API
+package = Bot
+dependencies[] = bot
+description = "Enables function name lookups from a Drupal api.module export."
+configure = admin/config/bot/drupal_api
+core = 7.x

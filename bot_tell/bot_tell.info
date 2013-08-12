@@ -1,0 +1,5 @@
+name = Bot Tell
+package = Bot
+dependencies[] = bot
+description = "Enables queued messages for unavailable users."
+core = 7.x

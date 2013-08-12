@@ -1,0 +1,183 @@
+<?php
+
+/**
+ * @file
+ * Enables function name lookups from a Drupal api.module export.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function bot_drupal_api_menu() {
+  $items['admin/config/bot/drupal_api'] = array(
+    'access arguments'  => array('administer bot'),
+    'description'       => 'Configure the function name lookups with these settings.',
+    'page callback'     => 'drupal_get_form',
+    'page arguments'    => array('bot_drupal_api_settings'),
+    'title'             => 'Bot Drupal API',
+    'file'              => 'bot_drupal_api.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Listen for conversation directed at, or around, the bot.
+ *
+ * @param $data
+ *   The regular $data object prepared by the IRC library.
+ * @param $from_query
+ *   Boolean; whether this was a queried request.
+ */
+function bot_drupal_api_irc_msg_channel($data, $from_query = FALSE) {
+  $to = $from_query ? $data->nick : $data->channel;
+
+  if (preg_match('/^(\w*):?([\w\-]*)\?$/', $data->messageex[0], $matches)) {
+    $functions_returned = db_select('bot_drupal_api', 'bda')
+      ->fields('bda', array('name', 'signature', 'summary', 'label', 'url'))
+      ->condition('name', $matches[1])->execute()->fetchAllAssoc('label');
+
+    if (count($functions_returned)) {
+      // If we've had a label specified, and it exists, use it. Otherwise,
+      // we'll default to the priority order from the adminterface.
+      if (isset($matches[2]) && isset($functions_returned[$matches[2]])) {
+        $found_function = $functions_returned[$matches[2]];
+      }
+      else {
+        foreach (array_values(bot_drupal_api_function_dumps_array()) as $label) {
+          if (isset($functions_returned[$label])) {
+            $found_function = $functions_returned[$label];
+            break; // First found, first served, bub.
+          }
+        }
+      }
+
+      if (isset($found_function)) {
+        bot_message($to, t('!function: !summary => !function(!signature) => !url', array(
+          '!function'   => $found_function->name,
+          '!signature'  => $found_function->signature,
+          '!summary'    => $found_function->summary,
+          '!url'        => $found_function->url,
+        )));
+      }
+    }
+  }
+}
+
+/**
+ * All responses are available via a query.
+ */
+function bot_drupal_api_irc_msg_query($data) {
+  bot_drupal_api_irc_msg_channel($data, TRUE);
+}
+
+/**
+ * Implements hook_cron().
+ */
+function bot_drupal_api_cron() {
+  $urls_and_labels = bot_drupal_api_function_dumps_array();
+  $url_dates = variable_get('bot_drupal_api_function_dump_dates', array());
+  $frequency = variable_get('bot_drupal_api_function_dump_update_frequency', 604800);
+  $queue = DrupalQueue::get('bot_drupal_api_function_dump_update');
+
+  foreach (array_keys($urls_and_labels) as $url) {
+    if (!isset($url_dates[$url]) || $url_dates[$url] + $frequency <= REQUEST_TIME) {
+      $queue->createItem($url);
+    }
+  }
+}
+
+/**
+ * Implements hook_cron_queue_info().
+ */
+function bot_drupal_api_cron_queue_info() {
+  $queues['bot_drupal_api_function_dump_update'] = array(
+    'worker callback' => 'bot_drupal_api_function_dump_update',
+    'time'            => 120,
+  );
+
+  return $queues;
+}
+
+/**
+ * DrupalQueue worker callback: process an outdated function dump URL.
+ */
+function bot_drupal_api_function_dump_update($url) {
+  $urls_and_labels = bot_drupal_api_function_dumps_array();
+  watchdog('bot_drupal_api', 'Updating %url.', array('%url' => $url));
+  $result = drupal_http_request($url);
+
+  if ($result->code != 200) {
+    watchdog('bot_drupal_api', 'Update failed for %url with error: %error.',
+      array('%url' => $url, '%error' => $result->code), WATCHDOG_ERROR);
+    return;
+  }
+
+  // Parse the downloaded data.
+  $found_functions = array();
+  $lines = explode("\n", $result->data);
+  foreach ($lines as $line) {
+    $split_line = explode(" ### ", $line);
+    if (count($split_line) != 2) { continue; }
+
+    // $split_line[0] is function and its argument. Parse them out into separate happies.
+    $matched = preg_match('!^([a-zA-Z0-9_]+)\((.*)\)!m', trim($split_line[0]), $matches);
+    if ($matched) {
+      $found_functions[] = array(
+        'name'      => $matches[1],
+        'signature' => $matches[2],
+        'summary'   => trim($split_line[1]),
+        'label'     => $urls_and_labels[$url],
+        'url'       => str_replace('_dump', '/' . $matches[1], $url),
+        // turn function_dump/BRANCH into function/FUNCTION/BRANCH. magick!
+      );
+    }
+  }
+
+  // Record our found functions in multi-insert batches. We can't do multi-
+  // merges unfortunately, so we run a full delete for this label before hand.
+  $batch_size = 500; // Probably worth being configurable one day. Newb patch!
+  db_delete('bot_drupal_api')->condition('label', $urls_and_labels[$url])->execute();
+  $loops = (count($found_functions) > $batch_size) ? ceil(count($found_functions)/$batch_size) : 1;
+  watchdog('bot_drupal_api', '@count functions found in %url; processing in @number insertion loops.',
+    array('@count' => count($found_functions), '%url' => $url, '@number' => $loops), WATCHDOG_NOTICE);
+
+  for ($i = 0; $i < $loops; $i++) {
+    $insert = db_insert('bot_drupal_api')->fields(array('name', 'signature', 'summary', 'label', 'url'));
+    foreach (array_splice($found_functions, 0, $batch_size) as $found_function) {
+      $insert->values($found_function); // Splicing shrinks our master list.
+    } // NP: 'Any Given Sunday' from Jamie Foxx's album 'Any Given Sunday'.
+    $insert->execute();
+  }
+
+  // Update our timestamps so we're not redownloading every cron run.
+  $url_dates = variable_get('bot_drupal_api_function_dump_dates', array());
+  $url_dates[$url] = REQUEST_TIME; // we're done bub, so wait for the next time.
+  variable_set('bot_drupal_api_function_dump_dates', $url_dates);
+}
+
+/**
+ * Returns a parsed list of api.module function dump URLs and labels.
+ */
+function bot_drupal_api_function_dumps_array() {
+  $urls_and_labels = array();
+  $lines = explode("\n", variable_get('bot_drupal_api_function_dumps', _bot_drupal_api_function_dumps_string()));
+  foreach ($lines as $line) { // pain for the developer, but not for the adminterface.
+    list($url, $label) = preg_split('/:(?!\/)/', $line);
+    $urls_and_labels[$url] = trim($label);
+  }
+  return $urls_and_labels;
+}
+
+/**
+ * Returns an unparsed default list of api.module function dump URLs and labels.
+ */
+function _bot_drupal_api_function_dumps_string() {
+  return implode("\n", array(
+    'http://api.drupal.org/api/function_dump/7:7',
+    'http://api.drupal.org/api/function_dump/6:6',
+    'http://drupalcontrib.org/api/function_dump/7:contrib-7',
+    'http://drupalcontrib.org/api/function_dump/6:contrib-6',
+  ));
+}
+

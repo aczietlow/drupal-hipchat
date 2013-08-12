@@ -1,0 +1,7 @@
+name = Bot Aggregator
+package = Bot
+dependencies[] = bot
+dependencies[] = aggregator
+description = Enables the reporting of aggregated feed items to configured channels.
+configure = admin/config/bot/aggregator
+core = 7.x

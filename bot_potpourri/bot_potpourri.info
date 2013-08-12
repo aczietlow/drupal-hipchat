@@ -1,0 +1,5 @@
+name = Bot Potpourri
+package = Bot
+dependencies[] = bot
+description = Enables a collection of gentle and pleasant smelling utilities.
+core = 7.x

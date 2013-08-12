@@ -1,0 +1,6 @@
+name = Bot Project
+package = Bot
+dependencies[] = bot
+description = "Enables various project toolkit compatible actions."
+configure = admin/config/bot/project
+core = 7.x

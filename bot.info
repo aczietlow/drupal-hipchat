@@ -1,0 +1,5 @@
+name = Bot
+package = Bot
+description = "Enables a network and plugin framework for IRC bots."
+configure = admin/config/bot
+core = 7.x

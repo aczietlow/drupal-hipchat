@@ -1,0 +1,6 @@
+name = Bot Karma
+package = Bot
+dependencies[] = bot
+description = "Enables positive and negative tracking of words and phrases."
+configure = admin/config/bot/karma
+core = 7.x
